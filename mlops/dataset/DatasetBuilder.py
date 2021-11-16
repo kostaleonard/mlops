@@ -1,13 +1,13 @@
 """Contains the DatasetBuilder class."""
 
+from mlops.dataset import ENDPOINT_LOCAL, ENDPOINT_S3
 from mlops.dataset.DataProcessor import DataProcessor
 
-ENDPOINT_LOCAL = 'local'
-ENDPOINT_S3 = 's3'
 
-
+# TODO this object should allow dataset_path to also point to an S3 bucket.
 class DatasetBuilder:
-    """Builds the dataset from a file or directory and publishes it to S3."""
+    """Builds the dataset from a file or directory and publishes it locally or
+    on a cloud platform such as S3."""
 
     def __init__(self,
                  dataset_path: str,

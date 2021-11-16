@@ -1,11 +1,10 @@
 """Contains the DataProcessor class."""
 
-import numpy as np
-
-FeaturesAndPossibleLabels = (np.ndarray, np.ndarray | None)
+from mlops.dataset import FeaturesAndOptionalLabels
 
 
-# TODO abstract
+# TODO abstract class
+# TODO this object should allow dataset_path to also point to an S3 bucket.
 class DataProcessor:
     """Transforms raw data from a file or directory into features for downstream
     model training, prediction, etc."""
@@ -43,5 +42,15 @@ class DataProcessor:
             'Subclasses must override this function if calibration is '
             'required.')
 
-    def path_to_dataset(self, dataset_path: str) -> dict[str, FeaturesAndPossibleLabels]:
-        """Transforms the raw data at the given file or directory into """
+    # TODO abstract
+    def path_to_features_and_labels(self,
+                                    dataset_path: str,
+                                    endpoint: str = ENDPOINT_LOCAL) -> \
+            dict[str, FeaturesAndOptionalLabels]:
+        """Transforms the raw data at the given file or directory into features
+        and labels that can be used by downstream models.
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :return: A dictionary whose keys
+        """
