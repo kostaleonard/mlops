@@ -63,9 +63,35 @@ class DataProcessor:
         """
 
     # TODO abstract method
-    def get_features_and_labels_from_path(self,
-                                          dataset_path: str,
-                                          endpoint: str = ENDPOINT_LOCAL) -> \
+    def get_raw_feature_tensors(self, raw_dataset: Any) -> \
+            dict[str, np.ndarray]:
+        """TODO"""
+
+    # TODO abstract method
+    def get_raw_label_tensors(self, raw_dataset: Any) -> dict[str, np.ndarray]:
+        """TODO"""
+
+    # TODO abstract method
+    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+        # TODO
+        pass
+
+    # TODO abstract method
+    def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
+        # TODO
+        pass
+
+    # TODO abstract method
+    def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
+        # TODO
+        pass
+
+    # TODO abstract method
+    def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
+        # TODO
+        pass
+
+    def get_preprocessed_features(self, raw_dataset: Any) -> \
             dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
         and labels that can be used by downstream models. The data in the
@@ -74,8 +100,6 @@ class DataProcessor:
         format. Downstream models can expect the features and labels of this
         function to be preprocessed in any way required for model consumption.
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
         TODO param
         :return: A dictionary whose values are feature and label tensors and
             whose corresponding keys are the names by which those tensors should
@@ -83,25 +107,14 @@ class DataProcessor:
             called "X_train" (key), and the training labels (value) may be
             called "y_train" (value).
         """
+        # TODO update docstring
+        raw_feature_tensors = self.get_raw_feature_tensors(raw_dataset)
+        return {name: self.preprocess_features(raw_feature_tensor)
+                for name, raw_feature_tensor in raw_feature_tensors.items()}
 
-    def get_raw_feature_tensor(self, raw_dataset: Any) -> np.ndarray:
+    def get_preprocessed_labels(self, raw_dataset: Any) -> \
+            dict[str, np.ndarray]:
         """TODO"""
-
-    def get_raw_label_tensor(self, raw_dataset: Any) -> np.ndarray:
-        """TODO"""
-
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
-
-    def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
-
-    def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
-
-    def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
+        raw_label_tensors = self.get_raw_label_tensors(raw_dataset)
+        return {name: self.preprocess_labels(raw_label_tensor)
+                for name, raw_label_tensor in raw_label_tensors.items()}

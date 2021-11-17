@@ -16,10 +16,12 @@ class VersionedDatasetPackage:
                  version: str,
                  data_processor: DataProcessor,
                  raw_dataset: Any,
-                 features_and_labels: dict[str, np.ndarray]) -> None:
+                 features: dict[str, np.ndarray],
+                 labels: dict[str, np.ndarray]) -> None:
         """TODO"""
         # TODO
 
+    # TODO raw_dataset should be something that can be serialized.
     @staticmethod
     def from_path(version: str,
                   dataset_path: str,
@@ -27,6 +29,16 @@ class VersionedDatasetPackage:
                   endpoint: str = ENDPOINT_LOCAL) -> 'VersionedDatasetPackage':
         """TODO"""
         # TODO
+        raw_dataset = data_processor.get_raw_dataset(dataset_path,
+                                                     endpoint=endpoint)
+        features = data_processor.get_preprocessed_features(raw_dataset)
+        labels = data_processor.get_preprocessed_labels(raw_dataset)
+        return VersionedDatasetPackage(
+            version,
+            data_processor,
+            raw_dataset,
+            features,
+            labels)
 
     def publish(self,
                 path: str,
