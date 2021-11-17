@@ -2,6 +2,7 @@
 
 from typing import Any
 import numpy as np
+from mlops.dataset.RawDataset import RawDataset
 
 
 # TODO abstract class
@@ -53,7 +54,7 @@ class DataProcessor:
     # TODO abstract method
     def get_raw_dataset(self,
                         dataset_path: str,
-                        endpoint: str = ENDPOINT_LOCAL) -> Any:
+                        endpoint: str = ENDPOINT_LOCAL) -> RawDataset:
         """Returns a representation of the raw dataset stored at the given file
         or directory. The representation could be the dataset itself, or a link
         to the dataset if the raw data is stored in its own versioned
@@ -63,12 +64,13 @@ class DataProcessor:
         """
 
     # TODO abstract method
-    def get_raw_feature_tensors(self, raw_dataset: Any) -> \
+    def get_raw_feature_tensors(self, raw_dataset: RawDataset) -> \
             dict[str, np.ndarray]:
         """TODO"""
 
     # TODO abstract method
-    def get_raw_label_tensors(self, raw_dataset: Any) -> dict[str, np.ndarray]:
+    def get_raw_label_tensors(self, raw_dataset: RawDataset) -> \
+            dict[str, np.ndarray]:
         """TODO"""
 
     # TODO abstract method
@@ -91,7 +93,7 @@ class DataProcessor:
         # TODO
         pass
 
-    def get_preprocessed_features(self, raw_dataset: Any) -> \
+    def get_preprocessed_features(self, raw_dataset: RawDataset) -> \
             dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
         and labels that can be used by downstream models. The data in the
@@ -112,7 +114,7 @@ class DataProcessor:
         return {name: self.preprocess_features(raw_feature_tensor)
                 for name, raw_feature_tensor in raw_feature_tensors.items()}
 
-    def get_preprocessed_labels(self, raw_dataset: Any) -> \
+    def get_preprocessed_labels(self, raw_dataset: RawDataset) -> \
             dict[str, np.ndarray]:
         """TODO"""
         raw_label_tensors = self.get_raw_label_tensors(raw_dataset)

@@ -1,12 +1,13 @@
-"""Contains the VersionedDatasetPackage class."""
+"""Contains the VersionedDatasetBuilder class."""
 
 from typing import Any
 import numpy as np
 from mlops.dataset import ENDPOINT_LOCAL, ENDPOINT_S3
+from mlops.dataset.RawDataset import RawDataset
 from mlops.dataset.DataProcessor import DataProcessor
 
 
-class VersionedDatasetPackage:
+class VersionedDatasetBuilder:
     """An object containing all of the components that form a versioned dataset.
     This object is only used to ensure a standard format for datasets stored in
     a dataset archive (such as the local filesystem or S3), and is not meant for
@@ -15,25 +16,24 @@ class VersionedDatasetPackage:
     def __init__(self,
                  version: str,
                  data_processor: DataProcessor,
-                 raw_dataset: Any,
+                 raw_dataset: RawDataset,
                  features: dict[str, np.ndarray],
                  labels: dict[str, np.ndarray]) -> None:
         """TODO"""
         # TODO
 
-    # TODO raw_dataset should be something that can be serialized.
     @staticmethod
     def from_path(version: str,
                   dataset_path: str,
                   data_processor: DataProcessor,
-                  endpoint: str = ENDPOINT_LOCAL) -> 'VersionedDatasetPackage':
+                  endpoint: str = ENDPOINT_LOCAL) -> 'VersionedDatasetBuilder':
         """TODO"""
         # TODO
         raw_dataset = data_processor.get_raw_dataset(dataset_path,
                                                      endpoint=endpoint)
         features = data_processor.get_preprocessed_features(raw_dataset)
         labels = data_processor.get_preprocessed_labels(raw_dataset)
-        return VersionedDatasetPackage(
+        return VersionedDatasetBuilder(
             version,
             data_processor,
             raw_dataset,

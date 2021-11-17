@@ -1,9 +1,9 @@
-"""Contains the Dataset class."""
+"""Contains the VersionedDataset class."""
 
 from mlops.dataset import FeaturesAndOptionalLabels, ENDPOINT_LOCAL, ENDPOINT_S3
 
 
-class Dataset:
+class VersionedDataset:
     """TODO"""
 
     def __init__(self,
