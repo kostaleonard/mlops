@@ -1,6 +1,6 @@
 """Contains the DataProcessor class."""
 
-from mlops.dataset import FeaturesAndOptionalLabels
+import numpy as np
 
 
 # TODO abstract class
@@ -42,15 +42,21 @@ class DataProcessor:
             'Subclasses must override this function if calibration is '
             'required.')
 
-    # TODO abstract
-    def path_to_features_and_labels(self,
-                                    dataset_path: str,
-                                    endpoint: str = ENDPOINT_LOCAL) -> \
-            dict[str, FeaturesAndOptionalLabels]:
+    # TODO abstract method
+    def features_and_labels_from_path(self,
+                                      dataset_path: str,
+                                      endpoint: str = ENDPOINT_LOCAL) -> \
+            dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
-        and labels that can be used by downstream models.
+        and labels that can be used by downstream models. The data in the
+        directory may be the training/validation/test data, or it may be a batch
+        of user data that is intended for prediction, or some other form of
+        data.
 
         :param dataset_path: The path to the file or directory on the local
             filesystem containing the dataset.
-        :return: A dictionary whose keys
+        :return: A dictionary whose values are feature and label tensors and
+            whose corresponding keys are the names by which those tensors should
+            be referenced. For example, if a tensor (value) is called "X_train"
+            (key), then it will be
         """
