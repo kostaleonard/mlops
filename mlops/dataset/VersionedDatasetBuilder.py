@@ -15,28 +15,25 @@ class VersionedDatasetBuilder:
 
     def __init__(self,
                  version: str,
-                 data_processor: DataProcessor,
                  raw_dataset: RawDataset,
+                 data_processor: DataProcessor,
                  features: dict[str, np.ndarray],
                  labels: dict[str, np.ndarray]) -> None:
         """TODO"""
         # TODO
 
     @staticmethod
-    def from_path(version: str,
-                  dataset_path: str,
-                  data_processor: DataProcessor,
-                  endpoint: str = ENDPOINT_LOCAL) -> 'VersionedDatasetBuilder':
+    def from_raw_dataset(version: str,
+                         raw_dataset: RawDataset,
+                         data_processor: DataProcessor) -> \
+            'VersionedDatasetBuilder':
         """TODO"""
-        # TODO
-        raw_dataset = data_processor.get_raw_dataset(dataset_path,
-                                                     endpoint=endpoint)
         features = data_processor.get_preprocessed_features(raw_dataset)
         labels = data_processor.get_preprocessed_labels(raw_dataset)
         return VersionedDatasetBuilder(
             version,
-            data_processor,
             raw_dataset,
+            data_processor,
             features,
             labels)
 

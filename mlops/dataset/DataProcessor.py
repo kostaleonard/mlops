@@ -8,14 +8,13 @@ from mlops.dataset.RawDataset import RawDataset
 # TODO abstract class
 # TODO this object should allow dataset_path to also point to an S3 bucket.
 class DataProcessor:
-    """Transforms raw data from a file or directory into features for downstream
+    """Transforms a RawDataset into features for downstream
     model training, prediction, etc. Also inverts any preprocessing to transform
     preprocessed data back into raw, real-world values for analysis and
     interpretability."""
 
     def __init__(self,
-                 dataset_path: str | None,
-                 endpoint: str = ENDPOINT_LOCAL) -> None:
+                 raw_dataset: RawDataset | None) -> None:
         """Instantiates the object.
 
         :param dataset_path: The path to the file or directory on the local
@@ -29,14 +28,13 @@ class DataProcessor:
             training data beforehand, e.g., image data simply needs to be
             divided by 255 to ensure that pixel values fall in the interval
             [0, 1].
-        TODO param
+        TODO update
         """
-        if dataset_path:
-            self._calibrate(dataset_path)
+        if raw_dataset:
+            self._calibrate(raw_dataset)
 
     def _calibrate(self,
-                   dataset_path: str,
-                   endpoint: str = ENDPOINT_LOCAL) -> None:
+                   raw_dataset: RawDataset) -> None:
         """Sets any necessary local variables with which data should be
         normalized or otherwise transformed. For example, the mean and standard
         deviation of certain features can be extracted from the training data so
@@ -45,23 +43,39 @@ class DataProcessor:
 
         :param dataset_path: The path to the file or directory on the local
             filesystem containing the dataset.
-        TODO param
+        TODO update
         """
         raise NotImplementedError(
             'Subclasses must override this function if calibration is '
             'required.')
 
-    # TODO abstract method
-    def get_raw_dataset(self,
-                        dataset_path: str,
-                        endpoint: str = ENDPOINT_LOCAL) -> RawDataset:
-        """Returns a representation of the raw dataset stored at the given file
-        or directory. The representation could be the dataset itself, or a link
-        to the dataset if the raw data is stored in its own versioned
-        repository.
+    def get_preprocessed_features(self, raw_dataset: RawDataset) -> \
+            dict[str, np.ndarray]:
+        """Transforms the raw data at the given file or directory into features
+        and labels that can be used by downstream models. The data in the
+        directory may be the training/validation/test data, or it may be a batch
+        of user data that is intended for prediction, or data in some other
+        format. Downstream models can expect the features and labels of this
+        function to be preprocessed in any way required for model consumption.
 
-        TODO params and return
+        TODO param
+        :return: A dictionary whose values are feature and label tensors and
+            whose corresponding keys are the names by which those tensors should
+            be referenced. For example, the training features (value) may be
+            called "X_train" (key), and the training labels (value) may be
+            called "y_train" (value).
         """
+        # TODO update docstring
+        raw_feature_tensors = self.get_raw_feature_tensors(raw_dataset)
+        return {name: self.preprocess_features(raw_feature_tensor)
+                for name, raw_feature_tensor in raw_feature_tensors.items()}
+
+    def get_preprocessed_labels(self, raw_dataset: RawDataset) -> \
+            dict[str, np.ndarray]:
+        """TODO"""
+        raw_label_tensors = self.get_raw_label_tensors(raw_dataset)
+        return {name: self.preprocess_labels(raw_label_tensor)
+                for name, raw_label_tensor in raw_label_tensors.items()}
 
     # TODO abstract method
     def get_raw_feature_tensors(self, raw_dataset: RawDataset) -> \
@@ -92,31 +106,3 @@ class DataProcessor:
     def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
         # TODO
         pass
-
-    def get_preprocessed_features(self, raw_dataset: RawDataset) -> \
-            dict[str, np.ndarray]:
-        """Transforms the raw data at the given file or directory into features
-        and labels that can be used by downstream models. The data in the
-        directory may be the training/validation/test data, or it may be a batch
-        of user data that is intended for prediction, or data in some other
-        format. Downstream models can expect the features and labels of this
-        function to be preprocessed in any way required for model consumption.
-
-        TODO param
-        :return: A dictionary whose values are feature and label tensors and
-            whose corresponding keys are the names by which those tensors should
-            be referenced. For example, the training features (value) may be
-            called "X_train" (key), and the training labels (value) may be
-            called "y_train" (value).
-        """
-        # TODO update docstring
-        raw_feature_tensors = self.get_raw_feature_tensors(raw_dataset)
-        return {name: self.preprocess_features(raw_feature_tensor)
-                for name, raw_feature_tensor in raw_feature_tensors.items()}
-
-    def get_preprocessed_labels(self, raw_dataset: RawDataset) -> \
-            dict[str, np.ndarray]:
-        """TODO"""
-        raw_label_tensors = self.get_raw_label_tensors(raw_dataset)
-        return {name: self.preprocess_labels(raw_label_tensor)
-                for name, raw_label_tensor in raw_label_tensors.items()}
