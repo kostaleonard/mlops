@@ -1,7 +1,7 @@
 """Contains the VersionedDatasetBuilder class."""
 
 import numpy as np
-from mlops.dataset import ENDPOINT_LOCAL, ENDPOINT_S3
+from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
 from mlops.dataset.DataProcessor import DataProcessor
 
 STRATEGY_COPY = 'copy'

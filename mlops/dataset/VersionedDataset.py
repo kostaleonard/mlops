@@ -1,10 +1,12 @@
 """Contains the VersionedDataset class."""
 
-from mlops.dataset import ENDPOINT_LOCAL, ENDPOINT_S3
+from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
+from mlops.dataset.DataProcessor import DataProcessor
 
 
 class VersionedDataset:
     """TODO"""
+    data_processor: DataProcessor
 
     def __init__(self,
                  path: str,
@@ -17,3 +19,6 @@ class VersionedDataset:
             loaded. 'local' loads the files from the local filesystem; 's3'
             loads the files from S3, in which case path should be an S3 URL.
         """
+        # TODO
+
+    # TODO probably want to add methods to preprocess/unpreprocess data, which would call data_processor's methods
