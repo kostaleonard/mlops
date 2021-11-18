@@ -19,7 +19,23 @@ class VersionedDatasetBuilder:
                  data_processor: DataProcessor,
                  features: dict[str, np.ndarray],
                  labels: dict[str, np.ndarray]) -> None:
-        """TODO"""
+        """Instantiates the object.
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :param data_processor: The DataProcessor object with which the features
+            and labels were generated. This object is saved so that properly
+            formatted features can be generated at prediction time, and so that
+            features and labels can be "unpreprocessed" to match their original
+            representations.
+        :param features: A dictionary containing the preprocessed features with
+            which the model will be trained, validated, tested, etc. The keys of
+            this dictionary are the tensor names, and the values are the tensors
+            themselves. When this object is published, these tensors will be
+            saved with '.h5' as the suffix. For example, if a tensor is named
+            'X_train', it will be saved as 'X_train.h5'.
+        TODO
+        """
         # TODO
 
     @staticmethod
