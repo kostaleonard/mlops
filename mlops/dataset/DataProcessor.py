@@ -1,11 +1,10 @@
 """Contains the DataProcessor class."""
 
+from abc import ABC, abstractmethod
 import numpy as np
 
 
-# TODO abstract class
-# TODO this object should allow dataset_path to also point to an S3 bucket.
-class DataProcessor:
+class DataProcessor(ABC):
     """Transforms a RawDataset into features for downstream
     model training, prediction, etc. Also inverts any preprocessing to transform
     preprocessed data back into raw, real-world values for analysis and
@@ -73,32 +72,27 @@ class DataProcessor:
         return {name: self.preprocess_labels(raw_label_tensor)
                 for name, raw_label_tensor in raw_label_tensors.items()}
 
-    # TODO abstract method
-    def get_raw_feature_tensors(self, dataset_path: str) -> \
-            dict[str, np.ndarray]:
+    @abstractmethod
+    def get_raw_feature_tensors(self,
+                                dataset_path: str) -> dict[str, np.ndarray]:
         """TODO"""
 
-    # TODO abstract method
-    def get_raw_label_tensors(self, dataset_path: str) -> \
-            dict[str, np.ndarray]:
+    @abstractmethod
+    def get_raw_label_tensors(self, dataset_path: str) -> dict[str, np.ndarray]:
         """TODO"""
 
-    # TODO abstract method
+    @abstractmethod
     def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
+        """TODO"""
 
-    # TODO abstract method
+    @abstractmethod
     def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
+        """TODO"""
 
-    # TODO abstract method
+    @abstractmethod
     def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
+        """TODO"""
 
-    # TODO abstract method
+    @abstractmethod
     def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
-        # TODO
-        pass
+        """TODO"""

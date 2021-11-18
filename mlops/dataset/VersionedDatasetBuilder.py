@@ -24,8 +24,7 @@ class VersionedDatasetBuilder:
 
     @staticmethod
     def from_path(dataset_path: str,
-                  data_processor: DataProcessor) -> \
-            'VersionedDatasetBuilder':
+                  data_processor: DataProcessor) -> 'VersionedDatasetBuilder':
         """TODO"""
         features = data_processor.get_preprocessed_features(dataset_path)
         labels = data_processor.get_preprocessed_labels(dataset_path)

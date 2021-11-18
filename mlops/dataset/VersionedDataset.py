@@ -1,6 +1,6 @@
 """Contains the VersionedDataset class."""
 
-from mlops.dataset import FeaturesAndOptionalLabels, ENDPOINT_LOCAL, ENDPOINT_S3
+from mlops.dataset import ENDPOINT_LOCAL, ENDPOINT_S3
 
 
 class VersionedDataset:
@@ -17,7 +17,3 @@ class VersionedDataset:
             loaded. 'local' loads the files from the local filesystem; 's3'
             loads the files from S3, in which case path should be an S3 URL.
         """
-
-    def _get_features_and_labels(self) -> set[FeaturesAndOptionalLabels]:
-        """TODO"""
-        # TODO
