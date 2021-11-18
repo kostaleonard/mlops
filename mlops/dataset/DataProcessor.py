@@ -1,8 +1,6 @@
 """Contains the DataProcessor class."""
 
-from typing import Any
 import numpy as np
-from mlops.dataset.RawDataset import RawDataset
 
 
 # TODO abstract class
@@ -14,7 +12,7 @@ class DataProcessor:
     interpretability."""
 
     def __init__(self,
-                 raw_dataset: RawDataset | None) -> None:
+                 dataset_path: str | None) -> None:
         """Instantiates the object.
 
         :param dataset_path: The path to the file or directory on the local
@@ -28,13 +26,12 @@ class DataProcessor:
             training data beforehand, e.g., image data simply needs to be
             divided by 255 to ensure that pixel values fall in the interval
             [0, 1].
-        TODO update
         """
-        if raw_dataset:
-            self._calibrate(raw_dataset)
+        if dataset_path:
+            self._calibrate(dataset_path)
 
     def _calibrate(self,
-                   raw_dataset: RawDataset) -> None:
+                   dataset_path: str) -> None:
         """Sets any necessary local variables with which data should be
         normalized or otherwise transformed. For example, the mean and standard
         deviation of certain features can be extracted from the training data so
@@ -43,13 +40,12 @@ class DataProcessor:
 
         :param dataset_path: The path to the file or directory on the local
             filesystem containing the dataset.
-        TODO update
         """
         raise NotImplementedError(
             'Subclasses must override this function if calibration is '
             'required.')
 
-    def get_preprocessed_features(self, raw_dataset: RawDataset) -> \
+    def get_preprocessed_features(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
         and labels that can be used by downstream models. The data in the
@@ -62,28 +58,28 @@ class DataProcessor:
         :return: A dictionary whose values are feature and label tensors and
             whose corresponding keys are the names by which those tensors should
             be referenced. For example, the training features (value) may be
-            called "X_train" (key), and the training labels (value) may be
-            called "y_train" (value).
+            called 'X_train' (key), and the training labels (value) may be
+            called 'y_train' (value).
         """
         # TODO update docstring
-        raw_feature_tensors = self.get_raw_feature_tensors(raw_dataset)
+        raw_feature_tensors = self.get_raw_feature_tensors(dataset_path)
         return {name: self.preprocess_features(raw_feature_tensor)
                 for name, raw_feature_tensor in raw_feature_tensors.items()}
 
-    def get_preprocessed_labels(self, raw_dataset: RawDataset) -> \
+    def get_preprocessed_labels(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """TODO"""
-        raw_label_tensors = self.get_raw_label_tensors(raw_dataset)
+        raw_label_tensors = self.get_raw_label_tensors(dataset_path)
         return {name: self.preprocess_labels(raw_label_tensor)
                 for name, raw_label_tensor in raw_label_tensors.items()}
 
     # TODO abstract method
-    def get_raw_feature_tensors(self, raw_dataset: RawDataset) -> \
+    def get_raw_feature_tensors(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """TODO"""
 
     # TODO abstract method
-    def get_raw_label_tensors(self, raw_dataset: RawDataset) -> \
+    def get_raw_label_tensors(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """TODO"""
 
