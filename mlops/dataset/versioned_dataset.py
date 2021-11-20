@@ -5,7 +5,7 @@ from mlops.dataset.data_processor import DataProcessor
 
 
 class VersionedDataset:
-    """TODO"""
+    """Represents a versioned dataset."""
     data_processor: DataProcessor
 
     def __init__(self,
@@ -20,5 +20,3 @@ class VersionedDataset:
             loads the files from S3, in which case path should be an S3 URL.
         """
         # TODO
-
-    # TODO probably want to add methods to preprocess/unpreprocess data, which would call data_processor's methods

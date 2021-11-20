@@ -17,7 +17,11 @@ class VersionedModelBuilder:
                  history: History) -> None:
         """Instantiates the object.
 
-        TODO
+        :param versioned_dataset: The versioned dataset object with which the
+            model was trained/validated/tested. Used to preprocess new data at
+            prediction time.
+        :param model: The trained Keras model.
+        :param history: The model's training history.
         """
 
     def publish(self,
