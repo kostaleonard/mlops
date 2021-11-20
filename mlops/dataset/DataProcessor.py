@@ -1,49 +1,12 @@
 """Contains the DataProcessor class."""
 
-from typing import Optional
 from abc import ABC, abstractmethod
 import numpy as np
 
 
 class DataProcessor(ABC):
-    """Transforms a RawDataset into features for downstream
-    model training, prediction, etc. Also inverts any preprocessing to transform
-    preprocessed data back into raw, real-world values for analysis and
-    interpretability."""
-
-    def __init__(self,
-                 dataset_path: Optional[str]) -> None:
-        """Instantiates the object.
-
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset. If provided, sets any necessary
-            local variables with which data should be normalized or otherwise
-            transformed. For example, this value can be provided to extract the
-            mean and standard deviation from a column of feature data in the
-            training dataset so that, at prediction time, new data can be
-            normalized according to the training values. This value may not be
-            necessary if normalization can be accomplished without knowledge of
-            training data beforehand, e.g., image data simply needs to be
-            divided by 255 to ensure that pixel values fall in the interval
-            [0, 1].
-        """
-        if dataset_path:
-            self._calibrate(dataset_path)
-
-    def _calibrate(self,
-                   dataset_path: str) -> None:
-        """Sets any necessary local variables with which data should be
-        normalized or otherwise transformed. For example, the mean and standard
-        deviation of certain features can be extracted from the training data so
-        that, at prediction time, new data can be normalized according to the
-        training values.
-
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
-        """
-        raise NotImplementedError(
-            'Subclasses must override this function if calibration is '
-            'required.')
+    """Transforms a raw dataset into features for downstream model training,
+    prediction, etc."""
 
     def get_preprocessed_features(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
@@ -88,24 +51,63 @@ class DataProcessor(ABC):
     @abstractmethod
     def get_raw_feature_tensors(self,
                                 dataset_path: str) -> dict[str, np.ndarray]:
-        """TODO"""
+        """Returns the raw feature tensors from the dataset path. The raw
+        features are how training/validation/test as well as prediction data
+        enter the data pipeline. For example, when handling image data, the raw
+        features would likely be tensors of shape m x h x w x c, where m is the
+        number of images, h is the image height, w is the image width, and c is
+        the number of channels (3 for RGB), with all values in the interval
+        [0, 255].
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :return: A dictionary whose values are feature tensors and whose
+            corresponding keys are the names by which those tensors should be
+            referenced. For example, the training features (value) may be called
+            'X_train' (key).
+        """
 
     @abstractmethod
     def get_raw_label_tensors(self, dataset_path: str) -> dict[str, np.ndarray]:
-        """TODO"""
+        """Returns the raw label tensors from the dataset path. The raw labels
+        are how training/validation/test as well as prediction data enter the
+        data pipeline. For example, in a classification task, the raw labels may
+        be tensors of shape m, where m is the number of examples, with all
+        values in the set {0, ..., k - 1} indicating the class.
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :return: A dictionary whose values are label tensors and whose
+            corresponding keys are the names by which those tensors should be
+            referenced. For example, the training labels (value) may be called
+            'y_train' (key).
+        """
 
     @abstractmethod
     def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
-        """TODO"""
+        """Returns the preprocessed feature tensor from the raw tensor. The
+        preprocessed features are how training/validation/test as well as
+        prediction data are fed into downstream models. For example, when
+        handling image data, the preprocessed features would likely be tensors
+        of shape m x h x w x c, where m is the number of images, h is the image
+        height, w is the image width, and c is the number of channels (3 for
+        RGB), with all values in the interval [0, 1].
+
+        :param raw_feature_tensor: The raw features to be preprocessed.
+        :return: The preprocessed feature tensor. This tensor is ready for
+            downstream model consumption.
+        """
 
     @abstractmethod
     def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
-        """TODO"""
+        """Returns the preprocessed label tensor from the raw tensor. The
+        preprocessed labels are how training/validation/test as well as
+        prediction data are fed into downstream models. For example, in a
+        classification task, the raw labels may be tensors of shape m x k, where
+        m is the number of examples, and k is the number of classes, where each
+        of the k-length vectors are one-hot encoded.
 
-    @abstractmethod
-    def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
-        """TODO"""
-
-    @abstractmethod
-    def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
-        """TODO"""
+        :param raw_label_tensor: The raw labels to be preprocessed.
+        :return: The preprocessed label tensor. This tensor is ready for
+            downstream model consumption.
+        """
