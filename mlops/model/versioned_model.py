@@ -1,9 +1,10 @@
 """Contains the VersionedModel class."""
+# pylint: disable=no-name-in-module
 
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import History
 from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
-from mlops.dataset.VersionedDataset import VersionedDataset
+from mlops.dataset.versioned_dataset import VersionedDataset
 
 
 class VersionedModel:

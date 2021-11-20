@@ -2,7 +2,7 @@
 
 import numpy as np
 from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
-from mlops.dataset.DataProcessor import DataProcessor
+from mlops.dataset.data_processor import DataProcessor
 
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'

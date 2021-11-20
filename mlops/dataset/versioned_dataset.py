@@ -1,7 +1,7 @@
 """Contains the VersionedDataset class."""
 
 from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
-from mlops.dataset.DataProcessor import DataProcessor
+from mlops.dataset.data_processor import DataProcessor
 
 
 class VersionedDataset:

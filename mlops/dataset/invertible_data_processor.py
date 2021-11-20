@@ -2,10 +2,10 @@
 
 from abc import ABC, abstractmethod
 import numpy as np
-from mlops.dataset.DataProcessor import DataProcessor
+from mlops.dataset.data_processor import DataProcessor
 
 
-class InvertibleDataProcessor(ABC, DataProcessor):
+class InvertibleDataProcessor(DataProcessor, ABC):
     """A DataProcessor that can invert any preprocessing to transform
     preprocessed data back into raw, real-world values for analysis and
     interpretability."""
