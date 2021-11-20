@@ -34,14 +34,32 @@ class VersionedDatasetBuilder:
             themselves. When this object is published, these tensors will be
             saved with '.h5' as the suffix. For example, if a tensor is named
             'X_train', it will be saved as 'X_train.h5'.
-        TODO
+        :param labels: A dictionary containing the preprocessed labels with
+            which the model will be trained, validated, tested, etc. The keys of
+            this dictionary are the tensor names, and the values are the tensors
+            themselves. When this object is published, these tensors will be
+            saved with '.h5' as the suffix. For example, if a tensor is named
+            'y_train', it will be saved as 'y_train.h5'.
         """
         # TODO
 
     @staticmethod
     def from_path(dataset_path: str,
                   data_processor: DataProcessor) -> 'VersionedDatasetBuilder':
-        """TODO"""
+        """Returns a new instantiation of this class using the given path and
+        DataProcessor object. Features and labels will be extracted from the
+        dataset path using the DataProcessor object.
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :param data_processor: The DataProcessor object with which the features
+            and labels were generated. This object is saved so that properly
+            formatted features can be generated at prediction time, and so that
+            features and labels can be "unpreprocessed" to match their original
+            representations.
+        :return: A new instantiation of this class using the given path and
+            DataProcessor object.
+        """
         features = data_processor.get_preprocessed_features(dataset_path)
         labels = data_processor.get_preprocessed_labels(dataset_path)
         return VersionedDatasetBuilder(
