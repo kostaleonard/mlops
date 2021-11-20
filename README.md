@@ -1,6 +1,7 @@
 # MLOps
 
-A framework for conducting MLOps.
+mlops is a package for conducting MLOps, including versioning of datasets and
+models
 
 ## Installation
 

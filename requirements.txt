@@ -1,3 +1,5 @@
 pylint
+pytest
+pytest-cov
 numpy
 tensorflow
