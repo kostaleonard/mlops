@@ -1,5 +1,6 @@
 """Contains the DataProcessor class."""
 
+from typing import Optional
 from abc import ABC, abstractmethod
 import numpy as np
 
@@ -11,7 +12,7 @@ class DataProcessor(ABC):
     interpretability."""
 
     def __init__(self,
-                 dataset_path: str | None) -> None:
+                 dataset_path: Optional[str]) -> None:
         """Instantiates the object.
 
         :param dataset_path: The path to the file or directory on the local
@@ -47,27 +48,39 @@ class DataProcessor(ABC):
     def get_preprocessed_features(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
-        and labels that can be used by downstream models. The data in the
-        directory may be the training/validation/test data, or it may be a batch
-        of user data that is intended for prediction, or data in some other
-        format. Downstream models can expect the features and labels of this
-        function to be preprocessed in any way required for model consumption.
+        that can be used by downstream models. The data in the directory may be
+        the training/validation/test data, or it may be a batch of user data
+        that is intended for prediction, or data in some other format.
+        Downstream models can expect the features returned by this function to
+        be preprocessed in any way required for model consumption.
 
-        TODO param
-        :return: A dictionary whose values are feature and label tensors and
-            whose corresponding keys are the names by which those tensors should
-            be referenced. For example, the training features (value) may be
-            called 'X_train' (key), and the training labels (value) may be
-            called 'y_train' (value).
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :return: A dictionary whose values are feature tensors and whose
+            corresponding keys are the names by which those tensors should be
+            referenced. For example, the training features (value) may be called
+            'X_train' (key).
         """
-        # TODO update docstring
         raw_feature_tensors = self.get_raw_feature_tensors(dataset_path)
         return {name: self.preprocess_features(raw_feature_tensor)
                 for name, raw_feature_tensor in raw_feature_tensors.items()}
 
     def get_preprocessed_labels(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
-        """TODO"""
+        """Transforms the raw data at the given file or directory into labels
+        that can be used by downstream models. The data in the directory may be
+        the training/validation/test data, or it may be a batch of user data
+        that is intended for prediction, or data in some other format.
+        Downstream models can expect the labels returned by this function to
+        be preprocessed in any way required for model consumption.
+
+        :param dataset_path: The path to the file or directory on the local
+            filesystem containing the dataset.
+        :return: A dictionary whose values are label tensors and whose
+            corresponding keys are the names by which those tensors should be
+            referenced. For example, the training labels (value) may be called
+            'y_train' (key).
+        """
         raw_label_tensors = self.get_raw_label_tensors(dataset_path)
         return {name: self.preprocess_labels(raw_label_tensor)
                 for name, raw_label_tensor in raw_label_tensors.items()}
