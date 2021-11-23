@@ -5,8 +5,8 @@ import numpy as np
 
 
 class DataProcessor(ABC):
-    """Transforms a raw dataset into features for downstream model training,
-    prediction, etc."""
+    """Transforms a raw dataset into features and labels for downstream model
+    training, prediction, etc."""
 
     def get_preprocessed_features(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
