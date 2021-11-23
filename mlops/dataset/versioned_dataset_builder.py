@@ -21,8 +21,8 @@ class VersionedDatasetBuilder:
                  labels: dict[str, np.ndarray]) -> None:
         """Instantiates the object.
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset.
         :param data_processor: The DataProcessor object with which the features
             and labels were generated. This object is saved so that properly
             formatted features can be generated at prediction time, and so that
@@ -72,7 +72,8 @@ class VersionedDatasetBuilder:
                 path: str,
                 endpoint: str = ENDPOINT_LOCAL,
                 dataset_copy_strategy: str = STRATEGY_COPY) -> None:
-        """Saves the versioned dataset files to the given path.
+        """Saves the versioned dataset files to the given path. If the path
+        already exists, this operation will raise an IOError.
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, to which the dataset should be saved. This path

@@ -3,3 +3,4 @@ pytest
 pytest-cov
 numpy
 tensorflow
+boto3
