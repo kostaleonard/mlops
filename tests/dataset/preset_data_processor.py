@@ -2,7 +2,7 @@
 
 import numpy as np
 from tensorflow.keras.utils import to_categorical
-from mlops.dataset.data_processor import DataProcessor
+from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
 
 PRESET_RAW_FEATURES = np.array([
     [10, 20, 30, 40],
@@ -22,7 +22,7 @@ VAL_EMD = TRAIN_END + int(len(PRESET_RAW_FEATURES) * 0.2)
 SCALING_FACTOR = 10
 
 
-class PresetDataProcessor(DataProcessor):
+class PresetDataProcessor(InvertibleDataProcessor):
     """Processes a preset dataset, with no file I/O."""
 
     def get_raw_features(self,
@@ -70,3 +70,23 @@ class PresetDataProcessor(DataProcessor):
             downstream model consumption.
         """
         return to_categorical(raw_label_tensor)
+
+    def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
+        """Returns the raw feature tensor from the preprocessed tensor; inverts
+        preprocessing. Improves model interpretability by enabling users to
+        transform model inputs into real-world values.
+
+        :param feature_tensor: The preprocessed features to be inverted.
+        :return: The raw feature tensor.
+        """
+        return feature_tensor * SCALING_FACTOR
+
+    def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
+        """Returns the raw label tensor from the preprocessed tensor; inverts
+        preprocessing. Improves model interpretability by enabling users to
+        transform model outputs into real-world values.
+
+        :param label_tensor: The preprocessed labels to be inverted.
+        :return: The raw label tensor.
+        """
+        return np.argmax(label_tensor)
