@@ -24,7 +24,7 @@ class DataProcessor(ABC):
             referenced. For example, the training features (value) may be called
             'X_train' (key).
         """
-        raw_feature_tensors = self.get_raw_feature_tensors(dataset_path)
+        raw_feature_tensors = self.get_raw_features(dataset_path)
         return {name: self.preprocess_features(raw_feature_tensor)
                 for name, raw_feature_tensor in raw_feature_tensors.items()}
 
@@ -44,13 +44,12 @@ class DataProcessor(ABC):
             referenced. For example, the training labels (value) may be called
             'y_train' (key).
         """
-        raw_label_tensors = self.get_raw_label_tensors(dataset_path)
+        raw_label_tensors = self.get_raw_labels(dataset_path)
         return {name: self.preprocess_labels(raw_label_tensor)
                 for name, raw_label_tensor in raw_label_tensors.items()}
 
     @abstractmethod
-    def get_raw_feature_tensors(self,
-                                dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:
         """Returns the raw feature tensors from the dataset path. The raw
         features are how training/validation/test as well as prediction data
         enter the data pipeline. For example, when handling image data, the raw
@@ -68,7 +67,7 @@ class DataProcessor(ABC):
         """
 
     @abstractmethod
-    def get_raw_label_tensors(self, dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_labels(self, dataset_path: str) -> dict[str, np.ndarray]:
         """Returns the raw label tensors from the dataset path. The raw labels
         are how training/validation/test as well as prediction data enter the
         data pipeline. For example, in a classification task, the raw labels may

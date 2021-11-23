@@ -25,8 +25,8 @@ SCALING_FACTOR = 10
 class PresetDataProcessor(DataProcessor):
     """Processes a preset dataset, with no file I/O."""
 
-    def get_raw_feature_tensors(self,
-                                dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_features(self,
+                         dataset_path: str) -> dict[str, np.ndarray]:
         """Returns the preset raw features.
 
         :param dataset_path: Unused.
@@ -39,7 +39,7 @@ class PresetDataProcessor(DataProcessor):
                 'X_val': PRESET_RAW_FEATURES[TRAIN_END:VAL_EMD],
                 'X_test': PRESET_RAW_FEATURES[VAL_EMD:]}
 
-    def get_raw_label_tensors(self, dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_labels(self, dataset_path: str) -> dict[str, np.ndarray]:
         """Returns the preset raw label tensors.
 
         :param dataset_path: Unused.
