@@ -1,1 +1,1 @@
-"""Contains an example on an image processing task."""
+"""Contains examples on image processing tasks."""
