@@ -89,4 +89,4 @@ class PresetDataProcessor(InvertibleDataProcessor):
         :param label_tensor: The preprocessed labels to be inverted.
         :return: The raw label tensor.
         """
-        return np.argmax(label_tensor)
+        return np.argmax(label_tensor, axis=1)
