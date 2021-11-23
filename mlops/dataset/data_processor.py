@@ -17,8 +17,8 @@ class DataProcessor(ABC):
         Downstream models can expect the features returned by this function to
         be preprocessed in any way required for model consumption.
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
             referenced. For example, the training features (value) may be called
@@ -37,8 +37,8 @@ class DataProcessor(ABC):
         Downstream models can expect the labels returned by this function to
         be preprocessed in any way required for model consumption.
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset.
         :return: A dictionary whose values are label tensors and whose
             corresponding keys are the names by which those tensors should be
             referenced. For example, the training labels (value) may be called
@@ -59,8 +59,8 @@ class DataProcessor(ABC):
         the number of channels (3 for RGB), with all values in the interval
         [0, 255].
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
             referenced. For example, the training features (value) may be called
@@ -75,8 +75,8 @@ class DataProcessor(ABC):
         be tensors of shape m, where m is the number of examples, with all
         values in the set {0, ..., k - 1} indicating the class.
 
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset.
         :return: A dictionary whose values are label tensors and whose
             corresponding keys are the names by which those tensors should be
             referenced. For example, the training labels (value) may be called

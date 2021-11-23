@@ -59,7 +59,7 @@ class PresetDataProcessor(DataProcessor):
         :return: The preprocessed feature tensor. This tensor is ready for
             downstream model consumption.
         """
-        return raw_feature_tensor / SCALING_FACTOR
+        return raw_feature_tensor // SCALING_FACTOR
 
     def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
         """Returns the preprocessed label tensor from the raw tensor. Returns
