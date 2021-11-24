@@ -13,13 +13,19 @@ class VersionedDatasetBuilder:
     This object is only used to ensure a standard format for datasets stored in
     a dataset archive (such as the local filesystem or S3), and is not meant for
     consumption by downstream models."""
+    dataset_path: str
+    data_processor: DataProcessor
+    features: dict[str, np.ndarray]
+    labels: dict[str, np.ndarray]
 
     def __init__(self,
                  dataset_path: str,
-                 data_processor: DataProcessor,
-                 features: dict[str, np.ndarray],
-                 labels: dict[str, np.ndarray]) -> None:
-        """Instantiates the object.
+                 data_processor: DataProcessor) -> None:
+        """Instantiates the object. Features and labels will be extracted from
+        the dataset path using the DataProcessor object. When this object is
+        published, the feature and label tensors will be saved with '.h5' as the
+        suffix. For example, if a tensor is named 'X_train', it will be saved as
+        'X_train.h5'.
 
         :param dataset_path: The path to the file or directory on the local or
             remote filesystem containing the dataset.
@@ -28,45 +34,11 @@ class VersionedDatasetBuilder:
             formatted features can be generated at prediction time, and so that
             features and labels can be "unpreprocessed" to match their original
             representations.
-        :param features: A dictionary containing the preprocessed features with
-            which the model will be trained, validated, tested, etc. The keys of
-            this dictionary are the tensor names, and the values are the tensors
-            themselves. When this object is published, these tensors will be
-            saved with '.h5' as the suffix. For example, if a tensor is named
-            'X_train', it will be saved as 'X_train.h5'.
-        :param labels: A dictionary containing the preprocessed labels with
-            which the model will be trained, validated, tested, etc. The keys of
-            this dictionary are the tensor names, and the values are the tensors
-            themselves. When this object is published, these tensors will be
-            saved with '.h5' as the suffix. For example, if a tensor is named
-            'y_train', it will be saved as 'y_train.h5'.
         """
-        # TODO
-
-    @staticmethod
-    def from_path(dataset_path: str,
-                  data_processor: DataProcessor) -> 'VersionedDatasetBuilder':
-        """Returns a new instantiation of this class using the given path and
-        DataProcessor object. Features and labels will be extracted from the
-        dataset path using the DataProcessor object.
-
-        :param dataset_path: The path to the file or directory on the local
-            filesystem containing the dataset.
-        :param data_processor: The DataProcessor object with which the features
-            and labels were generated. This object is saved so that properly
-            formatted features can be generated at prediction time, and so that
-            features and labels can be "unpreprocessed" to match their original
-            representations.
-        :return: A new instantiation of this class using the given path and
-            DataProcessor object.
-        """
-        features = data_processor.get_preprocessed_features(dataset_path)
-        labels = data_processor.get_preprocessed_labels(dataset_path)
-        return VersionedDatasetBuilder(
-            dataset_path,
-            data_processor,
-            features,
-            labels)
+        self.dataset_path = dataset_path
+        self.data_processor = data_processor
+        self.features = data_processor.get_preprocessed_features(dataset_path)
+        self.labels = data_processor.get_preprocessed_labels(dataset_path)
 
     def publish(self,
                 path: str,
