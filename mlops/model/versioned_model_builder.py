@@ -28,7 +28,8 @@ class VersionedModelBuilder:
                 path: str,
                 endpoint: str = ENDPOINT_LOCAL) -> None:
         """Saves the versioned model files to the given path. If the path
-        already exists, this operation will raise an IOError.
+        already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, to which the model should be saved. This path

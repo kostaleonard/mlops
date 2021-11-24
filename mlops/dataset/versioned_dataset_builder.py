@@ -1,6 +1,5 @@
 """Contains the VersionedDatasetBuilder class."""
 
-import numpy as np
 from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
 from mlops.dataset.data_processor import DataProcessor
 
@@ -13,10 +12,6 @@ class VersionedDatasetBuilder:
     This object is only used to ensure a standard format for datasets stored in
     a dataset archive (such as the local filesystem or S3), and is not meant for
     consumption by downstream models."""
-    dataset_path: str
-    data_processor: DataProcessor
-    features: dict[str, np.ndarray]
-    labels: dict[str, np.ndarray]
 
     def __init__(self,
                  dataset_path: str,
@@ -45,7 +40,8 @@ class VersionedDatasetBuilder:
                 endpoint: str = ENDPOINT_LOCAL,
                 dataset_copy_strategy: str = STRATEGY_COPY) -> None:
         """Saves the versioned dataset files to the given path. If the path
-        already exists, this operation will raise an IOError.
+        already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, to which the dataset should be saved. This path
