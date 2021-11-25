@@ -1,6 +1,5 @@
 """Contains the VersionedDatasetBuilder class."""
 
-from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
 from mlops.dataset.data_processor import DataProcessor
 
 STRATEGY_COPY = 'copy'
@@ -37,7 +36,6 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
-                endpoint: str = ENDPOINT_LOCAL,
                 dataset_copy_strategy: str = STRATEGY_COPY) -> None:
         """Saves the versioned dataset files to the given path. If the path
         already exists, this operation will raise a
@@ -45,10 +43,8 @@ class VersionedDatasetBuilder:
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, to which the dataset should be saved. This path
-            should indicate the version.
-        :param endpoint: The system to which the dataset files should be saved.
-            'local' saves the files to the local filesystem; 's3' saves the
-            files to S3, in which case path should be an S3 URL.
+            should indicate the version. An S3 path should be a URL of the form
+            "s3://bucket-name/path/to/file.txt".
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. The default is 'copy',
             which copies the entire raw dataset to the published path so that it
