@@ -46,11 +46,13 @@ class VersionedDatasetBuilder:
             should indicate the version. An S3 path should be a URL of the form
             "s3://bucket-name/path/to/file.txt".
         :param dataset_copy_strategy: The strategy by which to copy the
-            original, raw dataset to the published path. The default is 'copy',
-            which copies the entire raw dataset to the published path so that it
-            can be properly versioned. 'link' will instead create a file
-            containing the supplied dataset path; this is desirable if the raw
-            dataset is already stored in a versioned repository, and copying
-            would create an unnecessary duplicate.
+            original, raw dataset to the published path. The default is
+            STRATEGY_COPY, which recursively copies all files and directories
+            from the dataset path supplied at instantiation to the published
+            path so that the dataset can be properly versioned. STRATEGY_LINK
+            will instead create a file containing the supplied dataset path;
+            this is desirable if the raw dataset is already stored in a
+            versioned repository, and copying would create an unnecessary
+            duplicate.
         """
         # TODO
