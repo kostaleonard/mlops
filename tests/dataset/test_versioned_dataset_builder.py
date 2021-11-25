@@ -3,7 +3,8 @@
 
 def test_publish_local_path_creates_expected_files() -> None:
     """Tests that publish on a local path creates the expected
-    files/directories on the local filesystem."""
+    files/directories on the local filesystem.
+    """
     # TODO
     assert False
 
@@ -39,5 +40,12 @@ def test_publish_copies_raw_dataset() -> None:
 def test_publish_includes_raw_dataset_link() -> None:
     """Tests that publish includes a link to the raw dataset when the copy
     strategy is STRATEGY_LINK."""
+    # TODO
+    assert False
+
+
+def test_publish_includes_expected_metadata() -> None:
+    """Tests that publish creates a file meta.json with the expected metadata.
+    """
     # TODO
     assert False

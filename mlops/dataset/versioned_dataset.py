@@ -13,3 +13,5 @@ class VersionedDataset:
             "s3://bucket-name/path/to/file.txt".
         """
         # TODO
+
+    # TODO public accessor methods?

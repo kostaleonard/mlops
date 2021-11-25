@@ -1,5 +1,6 @@
 """Contains the VersionedDatasetBuilder class."""
 
+from typing import Optional
 from mlops.dataset.data_processor import DataProcessor
 
 STRATEGY_COPY = 'copy'
@@ -36,15 +37,35 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
-                dataset_copy_strategy: str = STRATEGY_COPY) -> None:
+                version: str,
+                dataset_copy_strategy: str = STRATEGY_COPY,
+                tags: Optional[list[str]] = None) -> None:
         """Saves the versioned dataset files to the given path. If the path
         already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
+
+        The following files will be created:
+            path/ (the publication path)
+                X_train.h5 (and other feature tensors by their given names)
+                y_train.h5 (and other label tensors by their given names)
+                data_processor.pkl (DataProcessor object)
+                meta.json (metadata)
+                raw/ (non-empty directory with the raw dataset files)
+                    ...
+
+        The contents of meta.json will be:
+            {
+                version: (dataset version)
+                hash: (MD5 hash of all objects apart from meta.json)
+                created_at: (timestamp)
+                tags: (optional list of tags)
+            }
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, to which the dataset should be saved. This path
             should indicate the version. An S3 path should be a URL of the form
             "s3://bucket-name/path/to/file.txt".
+        :param version: TODO
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. The default is
             STRATEGY_COPY, which recursively copies all files and directories
@@ -54,5 +75,7 @@ class VersionedDatasetBuilder:
             this is desirable if the raw dataset is already stored in a
             versioned repository, and copying would create an unnecessary
             duplicate.
+        :param tags: TODO
         """
-        # TODO
+        # TODO update docstring
+        # TODO VersionedModelBuilder should match this interface
