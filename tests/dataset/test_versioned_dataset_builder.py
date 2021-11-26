@@ -4,6 +4,7 @@ import os
 import shutil
 from pathlib import Path
 from datetime import datetime
+import json
 import pytest
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
@@ -43,7 +44,7 @@ def test_publish_appends_explicit_version() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
-    expected_filename = os.path.join(TEST_DATASET_PATH_LOCAL, version)
+    expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
 
@@ -148,23 +149,57 @@ def test_publish_includes_raw_dataset_link() -> None:
 def test_publish_includes_expected_metadata() -> None:
     """Tests that publish creates a file meta.json with the expected
     metadata."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    meta_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    assert set(contents.keys()) == {'version', 'hash', 'created_at', 'tags'}
 
 
 def test_publish_timestamps_match() -> None:
     """Tests that all 3 timestamps match if no version string is supplied:
     metadata.json's version and created_at fields, and the final directory
     of the published path."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL)
+    assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
+    dirname = os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0]
+    dirname_time = datetime.fromisoformat(dirname)
+    meta_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, dirname, 'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    version_time = contents['version']
+    created_at_time = contents['created_at']
+    assert dirname_time == version_time == created_at_time
 
 
 def test_publish_accepts_path_with_trailing_slash() -> None:
     """Tests that publish accepts a path with (potentially many) trailing
     slashes and creates the files as if the trailing slashes were absent."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    # One trailing slash.
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version)
+    expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    # Many trailing slashes.
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '///', version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
 
 
 def test_same_datasets_have_same_hashes() -> None:
