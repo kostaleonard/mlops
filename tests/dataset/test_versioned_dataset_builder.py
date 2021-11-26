@@ -257,13 +257,12 @@ def test_publish_timestamps_match() -> None:
     builder.publish(TEST_PUBLICATION_PATH_LOCAL)
     assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
     dirname = os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0]
-    dirname_time = datetime.fromisoformat(dirname)
     meta_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, dirname, 'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
         contents = json.loads(infile.read())
     version_time = contents['version']
     created_at_time = contents['created_at']
-    assert dirname_time == version_time == created_at_time
+    assert dirname == version_time == created_at_time
 
 
 def test_publish_accepts_path_with_trailing_slash() -> None:

@@ -7,6 +7,8 @@ from typing import Optional, Collection
 import pickle
 import hashlib
 from functools import partial
+from datetime import datetime
+import json
 import numpy as np
 from mlops.dataset.data_processor import DataProcessor
 from mlops.errors import PublicationPathAlreadyExistsError
@@ -94,6 +96,11 @@ class VersionedDatasetBuilder:
             metadata.
         """
         # TODO add S3 logic after local implementation complete
+        timestamp = datetime.now().isoformat()
+        if not version:
+            version = timestamp
+        if not tags:
+            tags = []
         publication_path = os.path.join(path, version)
         path_obj = Path(publication_path)
         try:
@@ -102,7 +109,7 @@ class VersionedDatasetBuilder:
             raise PublicationPathAlreadyExistsError
         files_to_hash = set()
         # Save tensors.
-        for name, tensor in {**self.features, **self.labels}:
+        for name, tensor in {**self.features, **self.labels}.items():
             file_path = os.path.join(publication_path, f'{name}.npy')
             files_to_hash.add(file_path)
             np.save(file_path, tensor)
@@ -113,9 +120,16 @@ class VersionedDatasetBuilder:
         for current_path, _, filenames in os.walk(raw_dataset_path):
             for filename in filenames:
                 files_to_hash.add(os.path.join(current_path, filename))
-        # TODO compute hash--sort the filenames first!
-        hash_result = VersionedDatasetBuilder._get_hash(files_to_hash)
-        # TODO save meta.json
+        hash_digest = VersionedDatasetBuilder._get_hash(files_to_hash)
+        # Save metadata.
+        metadata = {
+            'version': version,
+            'hash': hash_digest,
+            'created_at': timestamp,
+            'tags': tags}
+        metadata_path = os.path.join(publication_path, 'meta.json')
+        with open(metadata_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(metadata))
         # Save data processor object.
         with open(os.path.join(publication_path, 'data_processor.pkl'),
                   'wb') as outfile:
