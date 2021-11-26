@@ -116,8 +116,8 @@ def test_publish_local_path_creates_expected_files() -> None:
     assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
     assert os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0] == version
     publication_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
-    expected_features = {'X_train', 'X_val', 'X_test'}
-    expected_labels = {'y_train', 'y_val', 'y_test'}
+    expected_features = {'X_train.h5', 'X_val.h5', 'X_test.h5'}
+    expected_labels = {'y_train.h5', 'y_val.h5', 'y_test.h5'}
     assert set(os.listdir(publication_dir)) == expected_features.union(
         expected_labels).union(
         {'data_processor.pkl', 'meta.json', 'raw'})
@@ -126,6 +126,38 @@ def test_publish_local_path_creates_expected_files() -> None:
 def test_publish_s3_path_creates_expected_files() -> None:
     """Tests that publish on an S3 path creates the expected files/directories
     on S3."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    _remove_test_directories_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    dirname = os.path.join(TEST_PUBLICATION_PATH_S3, version)
+    parse_result = urlparse(dirname)
+    bucket_name = parse_result.netloc
+    # Remove leading slash
+    prefix = parse_result.path[1:]
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(bucket_name)
+    items = list(bucket.objects.filter(Prefix=prefix))
+    item_keys = set(item.key for item in items)
+    # Check for every key except raw.
+    expected_features = {'X_train.h5', 'X_val.h5', 'X_test.h5'}
+    expected_labels = {'y_train.h5', 'y_val.h5', 'y_test.h5'}
+    expected_keys = expected_features.union(
+        expected_labels).union(
+        {'data_processor.pkl', 'meta.json'})
+    expected_keys = {os.path.join(prefix, key) for key in expected_keys}
+    assert expected_keys.intersection(item_keys) == expected_keys
+    # Check for raw "directory" (flat filesystem).
+    raw_directory_key = os.path.join(prefix, 'raw/')
+    assert any(key.startswith(raw_directory_key) for key in item_keys)
+
+
+def test_publish_from_raw_dataset_in_s3() -> None:
+    """Tests that publish correctly reads the dataset path when the dataset is
+    in S3."""
     _remove_test_directories_s3()
     _create_test_dataset_s3()
     # TODO
@@ -148,8 +180,15 @@ def test_publish_local_path_raises_path_already_exists_error() -> None:
 def test_publish_s3_path_raises_path_already_exists_error() -> None:
     """Tests that publish on an S3 path that already exists raises a
     PublicationPathAlreadyExistsError."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    _remove_test_directories_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    with pytest.raises(PublicationPathAlreadyExistsError):
+        builder.publish(TEST_PUBLICATION_PATH_S3, version)
 
 
 def test_publish_copies_raw_dataset() -> None:
