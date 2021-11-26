@@ -205,12 +205,46 @@ def test_publish_accepts_path_with_trailing_slash() -> None:
 def test_same_datasets_have_same_hashes() -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
 
 
 def test_different_datasets_have_different_hashes() -> None:
     """Tests that the hash values from two datasets that have different files
     are different."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v1')
+    # The second dataset is missing one of the raw dataset files.
+    os.remove(os.path.join(TEST_DATASET_PATH_LOCAL, TEST_DATASET_FILENAMES[0]))
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] != contents2['hash']
