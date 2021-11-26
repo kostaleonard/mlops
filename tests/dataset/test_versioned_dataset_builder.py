@@ -158,10 +158,15 @@ def test_publish_s3_path_creates_expected_files() -> None:
 def test_publish_from_raw_dataset_in_s3() -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3."""
+    _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
-    # TODO
-    assert False
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
+    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES) 
 
 
 def test_publish_local_path_raises_path_already_exists_error() -> None:
