@@ -1,10 +1,19 @@
 """Contains the VersionedDatasetBuilder class."""
 
-from typing import Optional
+import os
+from pathlib import Path
+import shutil
+from typing import Optional, Collection
+import pickle
+import hashlib
+from functools import partial
+import numpy as np
 from mlops.dataset.data_processor import DataProcessor
+from mlops.errors import PublicationPathAlreadyExistsError
 
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
+CHUNK_SIZE = 2 ** 20
 
 
 class VersionedDatasetBuilder:
@@ -18,9 +27,9 @@ class VersionedDatasetBuilder:
                  data_processor: DataProcessor) -> None:
         """Instantiates the object. Features and labels will be extracted from
         the dataset path using the DataProcessor object. When this object is
-        published, the feature and label tensors will be saved with '.h5' as the
-        suffix. For example, if a tensor is named 'X_train', it will be saved as
-        'X_train.h5'.
+        published, the feature and label tensors will be saved with '.npy' as
+        the suffix. For example, if a tensor is named 'X_train', it will be
+        saved as 'X_train.npy'.
 
         :param dataset_path: The path to the file or directory on the local or
             remote filesystem containing the dataset.
@@ -46,8 +55,8 @@ class VersionedDatasetBuilder:
 
         The following files will be created:
             path/version/ (the publication path and version)
-                X_train.h5 (and other feature tensors by their given names)
-                y_train.h5 (and other label tensors by their given names)
+                X_train.npy (and other feature tensors by their given names)
+                y_train.npy (and other label tensors by their given names)
                 data_processor.pkl (DataProcessor object)
                 meta.json (metadata)
                 raw/ (non-empty directory with the raw dataset files)
@@ -84,5 +93,48 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
-        # TODO make sure docstring doesn't get mangled in docs
-        # TODO VersionedModelBuilder should match this interface
+        # TODO add S3 logic after local implementation complete
+        publication_path = os.path.join(path, version)
+        path_obj = Path(publication_path)
+        try:
+            path_obj.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            raise PublicationPathAlreadyExistsError
+        files_to_hash = set()
+        # Save tensors.
+        for name, tensor in {**self.features, **self.labels}:
+            file_path = os.path.join(publication_path, f'{name}.npy')
+            files_to_hash.add(file_path)
+            np.save(file_path, tensor)
+        # Save the raw dataset.
+        # TODO dataset_copy_strategy; this could be a function call.
+        raw_dataset_path = os.path.join(publication_path, 'raw')
+        shutil.copytree(self.dataset_path, raw_dataset_path)
+        for current_path, _, filenames in os.walk(raw_dataset_path):
+            for filename in filenames:
+                files_to_hash.add(os.path.join(current_path, filename))
+        # TODO compute hash--sort the filenames first!
+        hash_result = VersionedDatasetBuilder._get_hash(files_to_hash)
+        # TODO save meta.json
+        # Save data processor object.
+        with open(os.path.join(publication_path, 'data_processor.pkl'),
+                  'wb') as outfile:
+            outfile.write(pickle.dumps(self.data_processor))
+
+    @staticmethod
+    def _get_hash(files_to_hash: Collection[str]) -> str:
+        """Returns the MD5 hex digest string from hashing the content of all the
+        given files. The files are sorted before hashing so that the process is
+        reproducible.
+
+        :param files_to_hash: A collection of paths to files whose contents
+            should be hashed.
+        :return: The MD5 hex digest string from hashing the content of all the
+            given files.
+        """
+        hash_md5 = hashlib.md5()
+        for filename in sorted(files_to_hash):
+            with open(filename, 'rb') as infile:
+                for chunk in iter(partial(infile.read, CHUNK_SIZE), b''):
+                    hash_md5.update(chunk)
+        return hash_md5.hexdigest()

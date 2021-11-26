@@ -3,7 +3,7 @@
 from mlops.errors import PublicationPathAlreadyExistsError
 
 
-def test_publication_path_alread_exists_error_extends_io_error() -> None:
-    """Tests that PublicationPathAlreadyExistsError extends IOError."""
+def test_publication_path_error_extends_file_exists_error() -> None:
+    """Tests that PublicationPathAlreadyExistsError extends FileExistsError."""
     err = PublicationPathAlreadyExistsError()
-    assert isinstance(err, IOError)
+    assert isinstance(err, FileExistsError)

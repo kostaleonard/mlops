@@ -116,8 +116,8 @@ def test_publish_local_path_creates_expected_files() -> None:
     assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
     assert os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0] == version
     publication_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
-    expected_features = {'X_train.h5', 'X_val.h5', 'X_test.h5'}
-    expected_labels = {'y_train.h5', 'y_val.h5', 'y_test.h5'}
+    expected_features = {'X_train.npy', 'X_val.npy', 'X_test.npy'}
+    expected_labels = {'y_train.npy', 'y_val.npy', 'y_test.npy'}
     assert set(os.listdir(publication_dir)) == expected_features.union(
         expected_labels).union(
         {'data_processor.pkl', 'meta.json', 'raw'})
@@ -143,8 +143,8 @@ def test_publish_s3_path_creates_expected_files() -> None:
     items = list(bucket.objects.filter(Prefix=prefix))
     item_keys = set(item.key for item in items)
     # Check for every key except raw.
-    expected_features = {'X_train.h5', 'X_val.h5', 'X_test.h5'}
-    expected_labels = {'y_train.h5', 'y_val.h5', 'y_test.h5'}
+    expected_features = {'X_train.npy', 'X_val.npy', 'X_test.npy'}
+    expected_labels = {'y_train.npy', 'y_val.npy', 'y_test.npy'}
     expected_keys = expected_features.union(
         expected_labels).union(
         {'data_processor.pkl', 'meta.json'})
@@ -361,3 +361,18 @@ def test_publish_local_and_s3_create_same_dataset() -> None:
     contents2 = json.loads(contents2.decode('utf-8'))
     assert contents1['created_at'] != contents2['created_at']
     assert contents1['hash'] == contents2['hash']
+
+
+def test_hash_is_reproducible() -> None:
+    """Tests that hashing of files is reproducible."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    files_to_hash_forward = [os.path.join(TEST_DATASET_PATH_LOCAL, filename)
+                             for filename in TEST_DATASET_FILENAMES]
+    files_to_hash_reverse = [os.path.join(TEST_DATASET_PATH_LOCAL, filename)
+                             for filename in TEST_DATASET_FILENAMES[::-1]]
+    hash_forward = VersionedDatasetBuilder._get_hash(files_to_hash_forward)
+    hash_reverse = VersionedDatasetBuilder._get_hash(files_to_hash_reverse)
+    assert hash_forward
+    assert hash_reverse
+    assert hash_forward == hash_reverse
