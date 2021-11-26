@@ -1,14 +1,15 @@
 """Tests data_processor.py."""
+
 import numpy as np
 import pytest
-from mlops.dataset import data_processor as dp
+from mlops.dataset.data_processor import DataProcessor
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
 
 def test_data_processor_is_abstract() -> None:
     """Tests that the DataProcessor object is abstract."""
     with pytest.raises(TypeError):
-        _ = dp.DataProcessor()
+        _ = DataProcessor()
 
 
 def test_data_processor_accepts_local_path() -> None:
