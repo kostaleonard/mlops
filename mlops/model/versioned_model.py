@@ -15,7 +15,7 @@ class VersionedModel:
 
         :param path: The path, either on the local filesystem or in a cloud
             store such as S3, from which the model should be loaded. An S3 path
-            should be a URL of the form "s3://bucket-name/path/to/file.txt".
+            should be a URL of the form "s3://bucket-name/path/to/dir".
         """
         # TODO Model, History, and VersionedDataset
 
@@ -29,7 +29,7 @@ class VersionedModel:
         :param paths: A list of the VersionedModel paths to check. Each path may
             be on the local filesystem or remote, independent of the other
             paths. An S3 path should be a URL of the form
-            "s3://bucket-name/path/to/file.txt".
+            "s3://bucket-name/path/to/dir".
         :param metric: The name of the metric in the model's training history
             to use as the basis of comparison for determining the best model.
             This metric is often the validation loss.
@@ -39,3 +39,7 @@ class VersionedModel:
             metric value, say, validation loss.
         """
         # TODO
+
+    # TODO search (by version, by tag, by timestamp)
+
+    # TODO mirror VersionedDataset interface
