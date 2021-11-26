@@ -23,6 +23,7 @@ class VersionedModelBuilder:
         :param model: The trained Keras model.
         :param history: The model's training history.
         """
+        # TODO
 
     def publish(self,
                 path: str,

@@ -1,6 +1,19 @@
 """Tests versioned_dataset_builder.py."""
 
 
+def test_publish_appends_explicit_version() -> None:
+    """Tests that publish appends the version string to the path."""
+    # TODO
+    assert False
+
+
+def test_publish_appends_version_timestamp() -> None:
+    """Tests that publish appends the timestamp to the path when no version is
+    given."""
+    # TODO
+    assert False
+
+
 def test_publish_local_path_creates_expected_files() -> None:
     """Tests that publish on a local path creates the expected
     files/directories on the local filesystem."""
@@ -46,5 +59,13 @@ def test_publish_includes_raw_dataset_link() -> None:
 def test_publish_includes_expected_metadata() -> None:
     """Tests that publish creates a file meta.json with the expected
     metadata."""
+    # TODO
+    assert False
+
+
+def test_publish_timestamps_match() -> None:
+    """Tests that all 3 timestamps match if no version string is supplied:
+    metadata.json's version and created_at fields, and the final directory
+    of the published path."""
     # TODO
     assert False
