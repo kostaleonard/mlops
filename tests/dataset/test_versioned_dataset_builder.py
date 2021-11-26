@@ -166,7 +166,7 @@ def test_publish_from_raw_dataset_in_s3() -> None:
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
-    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES) 
+    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES)
 
 
 def test_publish_local_path_raises_path_already_exists_error() -> None:
@@ -333,3 +333,31 @@ def test_different_datasets_have_different_hashes() -> None:
         contents2 = json.loads(infile.read())
     assert contents1['created_at'] != contents2['created_at']
     assert contents1['hash'] != contents2['hash']
+
+
+def test_publish_local_and_s3_create_same_dataset() -> None:
+    """Tests that publishing locally or remotely on S3 produces the same
+    dataset. Verifies identity by comparing dataset hashes."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    _remove_test_directories_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              version,
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    s3 = boto3.client('s3')
+    parse_result = urlparse(TEST_PUBLICATION_PATH_S3)
+    bucket_name = parse_result.netloc
+    # Remove leading slash
+    prefix = parse_result.path[1:]
+    contents2 = s3.get_object(Bucket=bucket_name,
+                              Key=os.path.join(prefix, version, 'meta.json'))
+    contents2 = json.loads(contents2.decode('utf-8'))
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
