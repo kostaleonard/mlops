@@ -5,15 +5,21 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 import json
+from urllib.parse import urlparse
 import pytest
 import boto3
+from botocore.exceptions import ClientError
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
 from mlops.errors import PublicationPathAlreadyExistsError
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
-TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/dataset'
-TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/publish'
+TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/raw_dataset'
+TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/datasets'
+TEST_DATASET_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
+                        'raw_dataset')
+TEST_PUBLICATION_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
+                            'datasets')
 TEST_DATASET_FILENAMES = ['file0.txt', 'file1.txt', 'file2.txt']
 
 
@@ -26,6 +32,18 @@ def _remove_test_directories_local() -> None:
             pass
 
 
+def _remove_test_directories_s3() -> None:
+    """Removes the S3 test directories."""
+    s3 = boto3.resource('s3')
+    for dirname in (TEST_DATASET_PATH_S3, TEST_PUBLICATION_PATH_S3):
+        parse_result = urlparse(dirname)
+        bucket_name = parse_result.netloc
+        # Remove leading slash
+        prefix = parse_result.path[1:]
+        bucket = s3.Bucket(bucket_name)
+        bucket.objects.filter(Prefix=prefix).delete()
+
+
 def _create_test_dataset_local() -> None:
     """Creates a preset raw dataset at the local test dataset path."""
     path = Path(TEST_DATASET_PATH_LOCAL)
@@ -35,6 +53,26 @@ def _create_test_dataset_local() -> None:
                   'w',
                   encoding='utf-8') as outfile:
             outfile.write(filename)
+
+
+def _create_test_dataset_s3() -> None:
+    """Creates a preset raw dataset at the S3 test dataset path."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    s3 = boto3.client('s3')
+    parse_result = urlparse(TEST_DATASET_PATH_S3)
+    bucket_name = parse_result.netloc
+    # Remove leading slash
+    prefix = parse_result.path[1:]
+    for filename in TEST_DATASET_FILENAMES:
+        local_path = os.path.join(TEST_DATASET_PATH_LOCAL, filename)
+        s3_path = os.path.join(prefix, filename)
+        try:
+            _ = s3.upload_file(local_path,
+                               bucket_name,
+                               s3_path)
+        except ClientError as exc:
+            raise exc
 
 
 def test_publish_appends_explicit_version() -> None:
@@ -87,7 +125,9 @@ def test_publish_local_path_creates_expected_files() -> None:
 
 def test_publish_s3_path_creates_expected_files() -> None:
     """Tests that publish on an S3 path creates the expected files/directories
-    on the local filesystem."""
+    on S3."""
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
     # TODO
     assert False
 
