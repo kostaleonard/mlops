@@ -6,6 +6,7 @@ from pathlib import Path
 from datetime import datetime
 import json
 import pytest
+import boto3
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
 from mlops.errors import PublicationPathAlreadyExistsError

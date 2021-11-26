@@ -4,3 +4,4 @@ pytest-cov
 numpy
 tensorflow
 boto3
+botocore
