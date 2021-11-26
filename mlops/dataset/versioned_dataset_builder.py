@@ -1,7 +1,8 @@
 """Contains the VersionedDatasetBuilder class."""
 
-from typing import Optional
+from typing import Optional, Callable
 from mlops.dataset.data_processor import DataProcessor
+from mlops.versioning.path_version_extractor import get_version_from_last_entry
 
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
@@ -40,10 +41,12 @@ class VersionedDatasetBuilder:
                 version: str,
                 dataset_copy_strategy: str = STRATEGY_COPY,
                 tags: Optional[list[str]] = None) -> None:
-        """Saves the versioned dataset files to the given path.
+        """Saves the versioned dataset files to the given path. If the path and
+            appended version already exists, this operation will raise a
+            PublicationPathAlreadyExistsError.
 
         The following files will be created:
-            path/ (the publication path)
+            path/version/ (the publication path and version)
                 X_train.h5 (and other feature tensors by their given names)
                 y_train.h5 (and other label tensors by their given names)
                 data_processor.pkl (DataProcessor object)
@@ -60,14 +63,14 @@ class VersionedDatasetBuilder:
             }
 
         :param path: The path, either on the local filesystem or in a cloud
-            store such as S3, to which the dataset should be saved. This path
-            should indicate the version for easier user reference. An S3 path
-            should be a URL of the form "s3://bucket-name/path/to/dir". If the
-            path already exists, this operation will raise a
-            PublicationPathAlreadyExistsError.
+            store such as S3, to which the dataset should be saved. The version
+            will be appended to this path as a subdirectory. An S3 path
+            should be a URL of the form "s3://bucket-name/path/to/dir". It is
+            recommended to use this same path to publish all datasets, since it
+            will prevent the user from creating two different datasets with the
+            same version.
         :param version: A string indicating the dataset version. The version
-            string can be in any format, but should be unique, descriptive, and
-            consistent with project standards.
+            should be unique to this dataset.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. The default is
             STRATEGY_COPY, which recursively copies all files and directories
