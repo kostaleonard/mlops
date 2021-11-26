@@ -1,8 +1,7 @@
 """Contains the VersionedDatasetBuilder class."""
 
-from typing import Optional, Callable
+from typing import Optional
 from mlops.dataset.data_processor import DataProcessor
-from mlops.versioning.path_version_extractor import get_version_from_last_entry
 
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
@@ -38,12 +37,12 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
-                version: str,
+                version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY,
                 tags: Optional[list[str]] = None) -> None:
         """Saves the versioned dataset files to the given path. If the path and
-            appended version already exists, this operation will raise a
-            PublicationPathAlreadyExistsError.
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
 
         The following files will be created:
             path/version/ (the publication path and version)
@@ -70,7 +69,8 @@ class VersionedDatasetBuilder:
             will prevent the user from creating two different datasets with the
             same version.
         :param version: A string indicating the dataset version. The version
-            should be unique to this dataset.
+            should be unique to this dataset. If None, the publication timestamp
+            will be used as the version.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. The default is
             STRATEGY_COPY, which recursively copies all files and directories

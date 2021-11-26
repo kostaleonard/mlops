@@ -26,19 +26,36 @@ class VersionedModelBuilder:
 
     def publish(self,
                 path: str,
-                version: str,
+                version: Optional[str] = None,
                 tags: Optional[list[str]] = None) -> None:
-        """Saves the versioned model files to the given path.
+        """Saves the versioned model files to the given path. If the path and
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
+
+        The following files will be created:
+            path/version/ (the publication path and version)
+                model.h5 (the saved model)
+                dataset.txt (a file containing a link to the dataset used)
+                meta.json (metadata)
+
+        The contents of meta.json will be:
+            {
+                version: (model version)
+                hash: (MD5 hash of all objects apart from meta.json)
+                created_at: (timestamp)
+                tags: (optional list of tags)
+            }
 
         :param path: The path, either on the local filesystem or in a cloud
-            store such as S3, to which the model should be saved. This path
-            should indicate the version for easier user reference. An S3 path
-            should be a URL of the form "s3://bucket-name/path/to/dir". If the
-            path already exists, this operation will raise a
-            PublicationPathAlreadyExistsError.
+            store such as S3, to which the model should be saved. The version
+            will be appended to this path as a subdirectory. An S3 path
+            should be a URL of the form "s3://bucket-name/path/to/dir". It is
+            recommended to use this same path to publish all models, since it
+            will prevent the user from creating two different models with the
+            same version.
         :param version: A string indicating the model version. The version
-            string can be in any format, but should be unique, descriptive, and
-            consistent with project standards.
+            should be unique to this model. If None, the publication timestamp
+            will be used as the version.
         :param tags: An optional list of string tags to add to the model
             metadata.
         """
