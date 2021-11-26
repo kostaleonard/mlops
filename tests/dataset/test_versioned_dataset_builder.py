@@ -3,6 +3,7 @@
 import os
 import shutil
 from pathlib import Path
+from datetime import datetime
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
@@ -42,14 +43,22 @@ def test_publish_appends_explicit_version() -> None:
     expected_filename = os.path.join(TEST_DATASET_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
-    _remove_test_directories()
 
 
 def test_publish_appends_version_timestamp() -> None:
     """Tests that publish appends the timestamp to the path when no version is
     given."""
-    # TODO
-    assert False
+    _remove_test_directories()
+    _create_test_dataset()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    start = datetime.now()
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL)
+    end = datetime.now()
+    assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
+    dirname = os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0]
+    publication_time = datetime.fromisoformat(dirname)
+    assert start < publication_time < end
 
 
 def test_publish_local_path_creates_expected_files() -> None:
