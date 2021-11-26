@@ -4,7 +4,10 @@ import os
 import shutil
 from pathlib import Path
 from datetime import datetime
-from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
+import pytest
+from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
+    STRATEGY_COPY, STRATEGY_LINK
+from mlops.errors import PublicationPathAlreadyExistsError
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
 TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/dataset'
@@ -12,8 +15,8 @@ TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/publish'
 TEST_DATASET_FILENAMES = ['file0.txt', 'file1.txt', 'file2.txt']
 
 
-def _remove_test_directories() -> None:
-    """Removes the test directories."""
+def _remove_test_directories_local() -> None:
+    """Removes the local test directories."""
     for dirname in (TEST_DATASET_PATH_LOCAL, TEST_PUBLICATION_PATH_LOCAL):
         try:
             shutil.rmtree(dirname)
@@ -21,8 +24,8 @@ def _remove_test_directories() -> None:
             pass
 
 
-def _create_test_dataset() -> None:
-    """Creates a preset raw dataset at the test dataset path."""
+def _create_test_dataset_local() -> None:
+    """Creates a preset raw dataset at the local test dataset path."""
     path = Path(TEST_DATASET_PATH_LOCAL)
     path.mkdir(parents=True)
     for filename in TEST_DATASET_FILENAMES:
@@ -34,8 +37,8 @@ def _create_test_dataset() -> None:
 
 def test_publish_appends_explicit_version() -> None:
     """Tests that publish appends the version string to the path."""
-    _remove_test_directories()
-    _create_test_dataset()
+    _remove_test_directories_local()
+    _create_test_dataset_local()
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
@@ -48,8 +51,8 @@ def test_publish_appends_explicit_version() -> None:
 def test_publish_appends_version_timestamp() -> None:
     """Tests that publish appends the timestamp to the path when no version is
     given."""
-    _remove_test_directories()
-    _create_test_dataset()
+    _remove_test_directories_local()
+    _create_test_dataset_local()
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     start = datetime.now()
@@ -64,8 +67,20 @@ def test_publish_appends_version_timestamp() -> None:
 def test_publish_local_path_creates_expected_files() -> None:
     """Tests that publish on a local path creates the expected
     files/directories on the local filesystem."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
+    assert os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0] == version
+    publication_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
+    expected_features = {'X_train', 'X_val', 'X_test'}
+    expected_labels = {'y_train', 'y_val', 'y_test'}
+    assert set(os.listdir(publication_dir)) == expected_features.union(
+        expected_labels).union(
+        {'data_processor.pkl', 'meta.json', 'raw'})
 
 
 def test_publish_s3_path_creates_expected_files() -> None:
@@ -78,8 +93,14 @@ def test_publish_s3_path_creates_expected_files() -> None:
 def test_publish_local_path_raises_path_already_exists_error() -> None:
     """Tests that publish on a local path that already exists raises a
     PublicationPathAlreadyExistsError."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    with pytest.raises(PublicationPathAlreadyExistsError):
+        builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
 
 
 def test_publish_s3_path_raises_path_already_exists_error() -> None:
@@ -92,15 +113,36 @@ def test_publish_s3_path_raises_path_already_exists_error() -> None:
 def test_publish_copies_raw_dataset() -> None:
     """Tests that publish copies the entire raw dataset when the copy strategy
     is STRATEGY_COPY."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL,
+                    version,
+                    dataset_copy_strategy=STRATEGY_COPY)
+    raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
+    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES)
 
 
 def test_publish_includes_raw_dataset_link() -> None:
     """Tests that publish includes a link to the raw dataset when the copy
     strategy is STRATEGY_LINK."""
-    # TODO
-    assert False
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL,
+                    version,
+                    dataset_copy_strategy=STRATEGY_LINK)
+    raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
+    link_filename = 'link.txt'
+    assert set(os.listdir(raw_dataset_dir)) == {link_filename}
+    with open(os.path.join(raw_dataset_dir, link_filename),
+              'r',
+              encoding='uft-8') as infile:
+        assert infile.read() == TEST_DATASET_PATH_LOCAL
 
 
 def test_publish_includes_expected_metadata() -> None:
@@ -114,5 +156,26 @@ def test_publish_timestamps_match() -> None:
     """Tests that all 3 timestamps match if no version string is supplied:
     metadata.json's version and created_at fields, and the final directory
     of the published path."""
+    # TODO
+    assert False
+
+
+def test_publish_accepts_path_with_trailing_slash() -> None:
+    """Tests that publish accepts a path with (potentially many) trailing
+    slashes and creates the files as if the trailing slashes were absent."""
+    # TODO
+    assert False
+
+
+def test_same_datasets_have_same_hashes() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same."""
+    # TODO
+    assert False
+
+
+def test_different_datasets_have_different_hashes() -> None:
+    """Tests that the hash values from two datasets that have different files
+    are different."""
     # TODO
     assert False

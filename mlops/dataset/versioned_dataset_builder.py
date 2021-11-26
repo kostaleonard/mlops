@@ -56,7 +56,8 @@ class VersionedDatasetBuilder:
         The contents of meta.json will be:
             {
                 version: (dataset version)
-                hash: (MD5 hash of all objects apart from meta.json)
+                hash: (MD5 hash of all objects apart from data_processor.pkl and
+                    meta.json)
                 created_at: (timestamp)
                 tags: (optional list of tags)
             }
@@ -76,12 +77,12 @@ class VersionedDatasetBuilder:
             STRATEGY_COPY, which recursively copies all files and directories
             from the dataset path supplied at instantiation to the published
             path so that the dataset can be properly versioned. STRATEGY_LINK
-            will instead create a file containing the supplied dataset path;
-            this is desirable if the raw dataset is already stored in a
-            versioned repository, and copying would create an unnecessary
+            will instead create a file 'link.txt' containing the supplied
+            dataset path; this is desirable if the raw dataset is already stored
+            in a versioned repository, and copying would create an unnecessary
             duplicate.
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
-        # TODO update docstring
+        # TODO make sure docstring doesn't get mangled in docs
         # TODO VersionedModelBuilder should match this interface
