@@ -149,6 +149,38 @@ class VersionedDatasetBuilder:
                   'wb') as outfile:
             outfile.write(pickle.dumps(self.data_processor))
 
+    def _publish_local(self,
+                       path: str,
+                       version: str,
+                       dataset_copy_strategy: str,
+                       tags: list[str]) -> None:
+        """Saves the versioned dataset files to the given local path. See
+        publish() for more detailed information.
+
+        :param path: The local path.
+        :param version: A string indicating the dataset version.
+        :param dataset_copy_strategy: The strategy by which to copy the
+            original, raw dataset to the published path.
+        :param tags: A list of string tags to add to the dataset metadata.
+        """
+        # TODO
+
+    def _publish_s3(self,
+                    path: str,
+                    version: str,
+                    dataset_copy_strategy: str,
+                    tags: list[str]) -> None:
+        """Saves the versioned dataset files to the given S3 path. See publish()
+        for more detailed information.
+
+        :param path: The S3 path.
+        :param version: A string indicating the dataset version.
+        :param dataset_copy_strategy: The strategy by which to copy the
+            original, raw dataset to the published path.
+        :param tags: A list of string tags to add to the dataset metadata.
+        """
+        # TODO
+
     @staticmethod
     def _get_hash(files_to_hash: Collection[str]) -> str:
         """Returns the MD5 hex digest string from hashing the content of all the
