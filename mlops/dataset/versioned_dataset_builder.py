@@ -11,7 +11,8 @@ from datetime import datetime
 import json
 import numpy as np
 from mlops.dataset.data_processor import DataProcessor
-from mlops.errors import PublicationPathAlreadyExistsError
+from mlops.errors import PublicationPathAlreadyExistsError, \
+    InvalidDatasetCopyStrategyError
 
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
@@ -132,8 +133,7 @@ class VersionedDatasetBuilder:
                 outfile.write(self.dataset_path)
             files_to_hash.add(link_path)
         else:
-            # TODO custom error
-            raise ValueError
+            raise InvalidDatasetCopyStrategyError
         # Save metadata.
         hash_digest = VersionedDatasetBuilder._get_hash(files_to_hash)
         metadata = {

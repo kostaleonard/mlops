@@ -11,7 +11,8 @@ import boto3
 from botocore.exceptions import ClientError
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
-from mlops.errors import PublicationPathAlreadyExistsError
+from mlops.errors import PublicationPathAlreadyExistsError, \
+    InvalidDatasetCopyStrategyError
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
 TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/raw_dataset'
@@ -229,6 +230,20 @@ def test_publish_includes_raw_dataset_link() -> None:
               'r',
               encoding='utf-8') as infile:
         assert infile.read() == TEST_DATASET_PATH_LOCAL
+
+
+def test_publish_raises_invalid_dataset_copy_strategy_error() -> None:
+    """Tests that publish raises an InvalidDatasetCopyStrategyError when the
+    dataset copy strategy is not one of the available options."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    with pytest.raises(InvalidDatasetCopyStrategyError):
+        builder.publish(TEST_PUBLICATION_PATH_LOCAL,
+                        version,
+                        dataset_copy_strategy='dne')
 
 
 def test_publish_includes_expected_metadata() -> None:
