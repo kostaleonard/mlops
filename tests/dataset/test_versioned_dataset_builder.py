@@ -227,7 +227,7 @@ def test_publish_includes_raw_dataset_link() -> None:
     assert set(os.listdir(raw_dataset_dir)) == {link_filename}
     with open(os.path.join(raw_dataset_dir, link_filename),
               'r',
-              encoding='uft-8') as infile:
+              encoding='utf-8') as infile:
         assert infile.read() == TEST_DATASET_PATH_LOCAL
 
 

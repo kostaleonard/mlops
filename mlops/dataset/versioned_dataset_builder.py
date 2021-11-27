@@ -95,6 +95,7 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
+        # TODO refactor
         # TODO add S3 logic after local implementation complete
         timestamp = datetime.now().isoformat()
         if not version:
@@ -116,12 +117,25 @@ class VersionedDatasetBuilder:
         # Save the raw dataset.
         # TODO dataset_copy_strategy; this could be a function call.
         raw_dataset_path = os.path.join(publication_path, 'raw')
-        shutil.copytree(self.dataset_path, raw_dataset_path)
-        for current_path, _, filenames in os.walk(raw_dataset_path):
-            for filename in filenames:
-                files_to_hash.add(os.path.join(current_path, filename))
-        hash_digest = VersionedDatasetBuilder._get_hash(files_to_hash)
+        if dataset_copy_strategy == STRATEGY_COPY:
+            shutil.copytree(self.dataset_path, raw_dataset_path)
+            for current_path, _, filenames in os.walk(raw_dataset_path):
+                for filename in filenames:
+                    files_to_hash.add(os.path.join(current_path, filename))
+        elif dataset_copy_strategy == STRATEGY_LINK:
+            try:
+                os.mkdir(raw_dataset_path)
+            except FileExistsError:
+                pass
+            link_path = os.path.join(raw_dataset_path, 'link.txt')
+            with open(link_path, 'w', encoding='utf-8') as outfile:
+                outfile.write(self.dataset_path)
+            files_to_hash.add(link_path)
+        else:
+            # TODO custom error
+            raise ValueError
         # Save metadata.
+        hash_digest = VersionedDatasetBuilder._get_hash(files_to_hash)
         metadata = {
             'version': version,
             'hash': hash_digest,
