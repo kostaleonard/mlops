@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import shutil
+from tempfile import TemporaryFile
 from typing import Optional, Collection
 import pickle
 import hashlib
@@ -10,6 +11,8 @@ from functools import partial
 from datetime import datetime
 import json
 import numpy as np
+import s3fs
+
 from mlops.dataset.data_processor import DataProcessor
 from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
@@ -194,13 +197,64 @@ class VersionedDatasetBuilder:
         :param timestamp: The ISO-formatted datetime at which this dataset was
             created.
         """
-        # TODO
+        publication_path = os.path.join(path, version)
+        fs = s3fs.S3FileSystem()
+        try:
+            fs.mkdirs(publication_path, exist_ok=False)
+        except FileExistsError:
+            raise PublicationPathAlreadyExistsError
+        files_to_hash = set()
+        # Save tensors.
+        for name, tensor in {**self.features, **self.labels}.items():
+            file_path = os.path.join(publication_path, f'{name}.npy')
+            files_to_hash.add(file_path)
+            with TemporaryFile() as tmp_file:
+                np.save(tmp_file, tensor)
+                tmp_file.seek(0)
+                with fs.open(file_path, 'wb') as outfile:
+                    outfile.write(tmp_file.read())
+        # Save the raw dataset.
+        raw_dataset_path = os.path.join(publication_path, 'raw')
+        fs.mkdir(raw_dataset_path)
+        if dataset_copy_strategy == STRATEGY_COPY:
+            #fs.copy(self.dataset_path, raw_dataset_path, recursive=True) # TODO works if both paths are in S3
+            for current_path, subdirs, filenames in os.walk(self.dataset_path):
+                for filename in filenames:
+                    s3_file_path = os.path.join(raw_dataset_path,
+                                                *subdirs,
+                                                filename)
+                    local_file_path = os.path.join(current_path, filename)
+                    with fs.open(s3_file_path, 'wb') as outfile:
+                        with open(local_file_path, 'rb') as infile:
+                            outfile.write(infile.read())
+                    files_to_hash.add(s3_file_path)
+        elif dataset_copy_strategy == STRATEGY_LINK:
+            link_path = os.path.join(raw_dataset_path, 'link.txt')
+            with fs.open(link_path, 'w', encoding='utf-8') as outfile:
+                outfile.write(self.dataset_path)
+            files_to_hash.add(link_path)
+        else:
+            raise InvalidDatasetCopyStrategyError
+        # Save metadata.
+        hash_digest = VersionedDatasetBuilder._get_hash_s3(files_to_hash)
+        metadata = {
+            'version': version,
+            'hash': hash_digest,
+            'created_at': timestamp,
+            'tags': tags}
+        metadata_path = os.path.join(publication_path, 'meta.json')
+        with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(metadata))
+        # Save data processor object.
+        with fs.open(os.path.join(publication_path, 'data_processor.pkl'),
+                     'wb') as outfile:
+            outfile.write(pickle.dumps(self.data_processor))
 
     @staticmethod
     def _get_hash(files_to_hash: Collection[str]) -> str:
         """Returns the MD5 hex digest string from hashing the content of all the
-        given files. The files are sorted before hashing so that the process is
-        reproducible.
+        given files on the local filesystem. The files are sorted before hashing
+        so that the process is reproducible.
 
         :param files_to_hash: A collection of paths to files whose contents
             should be hashed.
@@ -210,6 +264,25 @@ class VersionedDatasetBuilder:
         hash_md5 = hashlib.md5()
         for filename in sorted(files_to_hash):
             with open(filename, 'rb') as infile:
+                for chunk in iter(partial(infile.read, CHUNK_SIZE), b''):
+                    hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+
+    @staticmethod
+    def _get_hash_s3(files_to_hash: Collection[str]) -> str:
+        """Returns the MD5 hex digest string from hashing the content of all the
+        given files in S3. The files are sorted before hashing so that the
+        process is reproducible.
+
+        :param files_to_hash: A collection of paths to files whose contents
+            should be hashed.
+        :return: The MD5 hex digest string from hashing the content of all the
+            given files.
+        """
+        hash_md5 = hashlib.md5()
+        fs = s3fs.S3FileSystem()
+        for filename in sorted(files_to_hash):
+            with fs.open(filename, 'rb') as infile:
                 for chunk in iter(partial(infile.read, CHUNK_SIZE), b''):
                     hash_md5.update(chunk)
         return hash_md5.hexdigest()

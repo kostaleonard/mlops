@@ -372,7 +372,7 @@ def test_publish_local_and_s3_create_same_dataset() -> None:
     prefix = parse_result.path[1:]
     contents2 = s3.get_object(Bucket=bucket_name,
                               Key=os.path.join(prefix, version, 'meta.json'))
-    contents2 = json.loads(contents2.decode('utf-8'))
+    contents2 = json.loads(contents2['Body'].read().decode('utf-8'))
     assert contents1['created_at'] != contents2['created_at']
     assert contents1['hash'] == contents2['hash']
 

@@ -5,3 +5,4 @@ numpy
 tensorflow
 boto3
 botocore
+s3fs
