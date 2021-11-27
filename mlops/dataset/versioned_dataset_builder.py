@@ -199,10 +199,10 @@ class VersionedDatasetBuilder:
         """
         publication_path = os.path.join(path, version)
         fs = s3fs.S3FileSystem()
-        try:
-            fs.mkdirs(publication_path, exist_ok=False)
-        except FileExistsError:
+        # fs.mkdirs with exist_ok=False flag does not raise an error, so use ls.
+        if fs.ls(publication_path):
             raise PublicationPathAlreadyExistsError
+        fs.mkdirs(publication_path)
         files_to_hash = set()
         # Save tensors.
         for name, tensor in {**self.features, **self.labels}.items():

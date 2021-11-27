@@ -8,6 +8,7 @@ import json
 from urllib.parse import urlparse
 import pytest
 import boto3
+import s3fs
 from botocore.exceptions import ClientError
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
@@ -35,14 +36,12 @@ def _remove_test_directories_local() -> None:
 
 def _remove_test_directories_s3() -> None:
     """Removes the S3 test directories."""
-    s3 = boto3.resource('s3')
+    fs = s3fs.S3FileSystem()
     for dirname in (TEST_DATASET_PATH_S3, TEST_PUBLICATION_PATH_S3):
-        parse_result = urlparse(dirname)
-        bucket_name = parse_result.netloc
-        # Remove leading slash
-        prefix = parse_result.path[1:]
-        bucket = s3.Bucket(bucket_name)
-        bucket.objects.filter(Prefix=prefix).delete()
+        try:
+            fs.rm(dirname, recursive=True)
+        except FileNotFoundError:
+            pass
 
 
 def _create_test_dataset_local() -> None:
