@@ -96,13 +96,42 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
-        # TODO refactor
-        # TODO add S3 logic after local implementation complete
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
         if not tags:
             tags = []
+        if path.startswith('s3://'):
+            self._publish_s3(path,
+                             version,
+                             dataset_copy_strategy,
+                             tags,
+                             timestamp)
+        else:
+            self._publish_local(path,
+                                version,
+                                dataset_copy_strategy,
+                                tags,
+                                timestamp)
+
+    def _publish_local(self,
+                       path: str,
+                       version: str,
+                       dataset_copy_strategy: str,
+                       tags: list[str],
+                       timestamp: str) -> None:
+        """Saves the versioned dataset files to the given local path. See
+        publish() for more detailed information.
+
+        :param path: The local path.
+        :param version: A string indicating the dataset version.
+        :param dataset_copy_strategy: The strategy by which to copy the
+            original, raw dataset to the published path.
+        :param tags: A list of string tags to add to the dataset metadata.
+        :param timestamp: The ISO-formatted datetime at which this dataset was
+            created.
+        """
+        # TODO refactor
         publication_path = os.path.join(path, version)
         path_obj = Path(publication_path)
         try:
@@ -116,7 +145,6 @@ class VersionedDatasetBuilder:
             files_to_hash.add(file_path)
             np.save(file_path, tensor)
         # Save the raw dataset.
-        # TODO dataset_copy_strategy; this could be a function call.
         raw_dataset_path = os.path.join(publication_path, 'raw')
         if dataset_copy_strategy == STRATEGY_COPY:
             shutil.copytree(self.dataset_path, raw_dataset_path)
@@ -149,27 +177,12 @@ class VersionedDatasetBuilder:
                   'wb') as outfile:
             outfile.write(pickle.dumps(self.data_processor))
 
-    def _publish_local(self,
-                       path: str,
-                       version: str,
-                       dataset_copy_strategy: str,
-                       tags: list[str]) -> None:
-        """Saves the versioned dataset files to the given local path. See
-        publish() for more detailed information.
-
-        :param path: The local path.
-        :param version: A string indicating the dataset version.
-        :param dataset_copy_strategy: The strategy by which to copy the
-            original, raw dataset to the published path.
-        :param tags: A list of string tags to add to the dataset metadata.
-        """
-        # TODO
-
     def _publish_s3(self,
                     path: str,
                     version: str,
                     dataset_copy_strategy: str,
-                    tags: list[str]) -> None:
+                    tags: list[str],
+                    timestamp: str) -> None:
         """Saves the versioned dataset files to the given S3 path. See publish()
         for more detailed information.
 
@@ -178,6 +191,8 @@ class VersionedDatasetBuilder:
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param tags: A list of string tags to add to the dataset metadata.
+        :param timestamp: The ISO-formatted datetime at which this dataset was
+            created.
         """
         # TODO
 
