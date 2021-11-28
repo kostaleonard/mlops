@@ -11,8 +11,9 @@ from functools import partial
 from datetime import datetime
 import json
 import numpy as np
-import s3fs
+from s3fs import S3FileSystem
 
+from mlops import ENDPOINT_LOCAL, ENDPOINT_S3
 from mlops.dataset.data_processor import DataProcessor
 from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
@@ -99,85 +100,159 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
+        # Set variables.
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
         if not tags:
             tags = []
-        if path.startswith('s3://'):
-            self._publish_s3(path,
-                             version,
-                             dataset_copy_strategy,
-                             tags,
-                             timestamp)
-        else:
-            self._publish_local(path,
-                                version,
-                                dataset_copy_strategy,
-                                tags,
-                                timestamp)
-
-    def _publish_local(self,
-                       path: str,
-                       version: str,
-                       dataset_copy_strategy: str,
-                       tags: list[str],
-                       timestamp: str) -> None:
-        """Saves the versioned dataset files to the given local path. See
-        publish() for more detailed information.
-
-        :param path: The local path.
-        :param version: A string indicating the dataset version.
-        :param dataset_copy_strategy: The strategy by which to copy the
-            original, raw dataset to the published path.
-        :param tags: A list of string tags to add to the dataset metadata.
-        :param timestamp: The ISO-formatted datetime at which this dataset was
-            created.
-        """
-        # TODO refactor
+        endpoint = ENDPOINT_S3 if path.startswith('s3://') else ENDPOINT_LOCAL
+        fs = S3FileSystem() if endpoint == ENDPOINT_S3 else None
         publication_path = os.path.join(path, version)
-        path_obj = Path(publication_path)
-        try:
-            path_obj.mkdir(parents=True, exist_ok=False)
-        except FileExistsError:
-            raise PublicationPathAlreadyExistsError
         files_to_hash = set()
+        # Create publication path.
+        if endpoint == ENDPOINT_S3:
+            VersionedDatasetBuilder._make_publication_path_s3(
+                publication_path, fs)
+        else:
+            VersionedDatasetBuilder._make_publication_path_local(
+                publication_path)
         # Save tensors.
         for name, tensor in {**self.features, **self.labels}.items():
             file_path = os.path.join(publication_path, f'{name}.npy')
             files_to_hash.add(file_path)
-            np.save(file_path, tensor)
+            if endpoint == ENDPOINT_S3:
+                VersionedDatasetBuilder._write_tensor_s3(tensor, fs, file_path)
+            else:
+                VersionedDatasetBuilder._write_tensor_local(tensor, file_path)
         # Save the raw dataset.
+        # TODO add ability to read from S3
         raw_dataset_path = os.path.join(publication_path, 'raw')
         if dataset_copy_strategy == STRATEGY_COPY:
-            shutil.copytree(self.dataset_path, raw_dataset_path)
-            for current_path, _, filenames in os.walk(raw_dataset_path):
-                for filename in filenames:
-                    files_to_hash.add(os.path.join(current_path, filename))
+            if endpoint == ENDPOINT_S3:
+                file_paths = self._copy_raw_dataset_s3(raw_dataset_path, fs)
+            else:
+                file_paths = self._copy_raw_dataset_local(raw_dataset_path)
+            files_to_hash = files_to_hash.union(file_paths)
         elif dataset_copy_strategy == STRATEGY_LINK:
-            try:
-                os.mkdir(raw_dataset_path)
-            except FileExistsError:
-                pass
             link_path = os.path.join(raw_dataset_path, 'link.txt')
-            with open(link_path, 'w', encoding='utf-8') as outfile:
-                outfile.write(self.dataset_path)
+            if endpoint == ENDPOINT_S3:
+                self._make_raw_dataset_link_s3(link_path, fs)
+            else:
+                self._make_raw_dataset_link_local(raw_dataset_path, link_path)
             files_to_hash.add(link_path)
         else:
             raise InvalidDatasetCopyStrategyError
         # Save metadata.
-        hash_digest = VersionedDatasetBuilder._get_hash(files_to_hash)
+        if endpoint == ENDPOINT_S3:
+            hash_digest = VersionedDatasetBuilder._get_hash_s3(files_to_hash, fs)
+        else:
+            hash_digest = VersionedDatasetBuilder._get_hash_local(files_to_hash)
         metadata = {
             'version': version,
             'hash': hash_digest,
             'created_at': timestamp,
             'tags': tags}
         metadata_path = os.path.join(publication_path, 'meta.json')
+        if endpoint == ENDPOINT_S3:
+            VersionedDatasetBuilder._write_metadata_s3(metadata, metadata_path, fs)
+        else:
+            VersionedDatasetBuilder._write_metadata_local(metadata, metadata_path)
+        # Save data processor object.
+        if endpoint == ENDPOINT_S3:
+            self._write_data_processor_s3(publication_path, fs)
+        else:
+            self._write_data_processor_local(publication_path)
+
+    @staticmethod
+    def _make_publication_path_local(publication_path: str) -> None:
+        """TODO"""
+        path_obj = Path(publication_path)
+        try:
+            path_obj.mkdir(parents=True, exist_ok=False)
+        except FileExistsError:
+            raise PublicationPathAlreadyExistsError
+
+    @staticmethod
+    def _make_publication_path_s3(publication_path: str, fs: S3FileSystem) -> None:
+        """TODO"""
+        # fs.mkdirs with exist_ok=False does not raise an error, so use ls.
+        if fs.ls(publication_path):
+            raise PublicationPathAlreadyExistsError
+        fs.mkdirs(publication_path)
+
+    @staticmethod
+    def _write_tensor_local(tensor: np.ndarray, path: str) -> None:
+        """TODO"""
+        np.save(path, tensor)
+
+    @staticmethod
+    def _write_tensor_s3(tensor: np.ndarray, fs: S3FileSystem, path: str) -> None:
+        """TODO"""
+        with TemporaryFile() as tmp_file:
+            np.save(tmp_file, tensor)
+            tmp_file.seek(0)
+            with fs.open(path, 'wb') as outfile:
+                outfile.write(tmp_file.read())
+
+    def _copy_raw_dataset_local(self, raw_dataset_path: str) -> set[str]:
+        """TODO"""
+        file_paths = set()
+        shutil.copytree(self.dataset_path, raw_dataset_path)
+        for current_path, _, filenames in os.walk(raw_dataset_path):
+            for filename in filenames:
+                file_paths.add(os.path.join(current_path, filename))
+        return file_paths
+
+    def _copy_raw_dataset_s3(self, raw_dataset_path: str, fs: S3FileSystem) -> set[str]:
+        """TODO"""
+        s3_file_paths = set()
+        fs.mkdir(raw_dataset_path)
+        for current_path, subdirs, filenames in os.walk(self.dataset_path):
+            for filename in filenames:
+                s3_file_path = os.path.join(raw_dataset_path,
+                                            *subdirs,
+                                            filename)
+                local_file_path = os.path.join(current_path, filename)
+                with fs.open(s3_file_path, 'wb') as outfile:
+                    with open(local_file_path, 'rb') as infile:
+                        outfile.write(infile.read())
+                s3_file_paths.add(s3_file_path)
+        return s3_file_paths
+
+    def _make_raw_dataset_link_local(self, raw_dataset_path: str, link_path: str) -> None:
+        """TODO"""
+        os.mkdir(raw_dataset_path)
+        with open(link_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(self.dataset_path)
+
+    def _make_raw_dataset_link_s3(self, link_path: str, fs: S3FileSystem) -> None:
+        """TODO"""
+        with fs.open(link_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(self.dataset_path)
+
+    @staticmethod
+    def _write_metadata_local(metadata: dict, metadata_path: str) -> None:
+        """TODO"""
         with open(metadata_path, 'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(metadata))
-        # Save data processor object.
+
+    @staticmethod
+    def _write_metadata_s3(metadata: dict, metadata_path: str, fs: S3FileSystem) -> None:
+        """TODO"""
+        with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(metadata))
+
+    def _write_data_processor_local(self, publication_path: str) -> None:
+        """TODO"""
         with open(os.path.join(publication_path, 'data_processor.pkl'),
                   'wb') as outfile:
+            outfile.write(pickle.dumps(self.data_processor))
+
+    def _write_data_processor_s3(self, publication_path: str, fs: S3FileSystem) -> None:
+        """TODO"""
+        with fs.open(os.path.join(publication_path, 'data_processor.pkl'),
+                     'wb') as outfile:
             outfile.write(pickle.dumps(self.data_processor))
 
     def _publish_s3(self,
@@ -198,7 +273,7 @@ class VersionedDatasetBuilder:
             created.
         """
         publication_path = os.path.join(path, version)
-        fs = s3fs.S3FileSystem()
+        fs = S3FileSystem()
         # fs.mkdirs with exist_ok=False flag does not raise an error, so use ls.
         if fs.ls(publication_path):
             raise PublicationPathAlreadyExistsError
@@ -217,7 +292,6 @@ class VersionedDatasetBuilder:
         raw_dataset_path = os.path.join(publication_path, 'raw')
         fs.mkdir(raw_dataset_path)
         if dataset_copy_strategy == STRATEGY_COPY:
-            #fs.copy(self.dataset_path, raw_dataset_path, recursive=True) # TODO works if both paths are in S3
             for current_path, subdirs, filenames in os.walk(self.dataset_path):
                 for filename in filenames:
                     s3_file_path = os.path.join(raw_dataset_path,
@@ -236,7 +310,7 @@ class VersionedDatasetBuilder:
         else:
             raise InvalidDatasetCopyStrategyError
         # Save metadata.
-        hash_digest = VersionedDatasetBuilder._get_hash_s3(files_to_hash)
+        hash_digest = VersionedDatasetBuilder._get_hash_s3(files_to_hash, fs)
         metadata = {
             'version': version,
             'hash': hash_digest,
@@ -251,7 +325,7 @@ class VersionedDatasetBuilder:
             outfile.write(pickle.dumps(self.data_processor))
 
     @staticmethod
-    def _get_hash(files_to_hash: Collection[str]) -> str:
+    def _get_hash_local(files_to_hash: Collection[str]) -> str:
         """Returns the MD5 hex digest string from hashing the content of all the
         given files on the local filesystem. The files are sorted before hashing
         so that the process is reproducible.
@@ -269,18 +343,19 @@ class VersionedDatasetBuilder:
         return hash_md5.hexdigest()
 
     @staticmethod
-    def _get_hash_s3(files_to_hash: Collection[str]) -> str:
+    def _get_hash_s3(files_to_hash: Collection[str],
+                     fs: S3FileSystem) -> str:
         """Returns the MD5 hex digest string from hashing the content of all the
         given files in S3. The files are sorted before hashing so that the
         process is reproducible.
 
         :param files_to_hash: A collection of paths to files whose contents
             should be hashed.
+        :param fs: TODO
         :return: The MD5 hex digest string from hashing the content of all the
             given files.
         """
         hash_md5 = hashlib.md5()
-        fs = s3fs.S3FileSystem()
         for filename in sorted(files_to_hash):
             with fs.open(filename, 'rb') as infile:
                 for chunk in iter(partial(infile.read, CHUNK_SIZE), b''):

@@ -8,7 +8,7 @@ import json
 from urllib.parse import urlparse
 import pytest
 import boto3
-import s3fs
+from s3fs import S3FileSystem
 from botocore.exceptions import ClientError
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
@@ -36,7 +36,7 @@ def _remove_test_directories_local() -> None:
 
 def _remove_test_directories_s3() -> None:
     """Removes the S3 test directories."""
-    fs = s3fs.S3FileSystem()
+    fs = S3FileSystem()
     for dirname in (TEST_DATASET_PATH_S3, TEST_PUBLICATION_PATH_S3):
         try:
             fs.rm(dirname, recursive=True)
@@ -384,8 +384,10 @@ def test_hash_is_reproducible() -> None:
                              for filename in TEST_DATASET_FILENAMES]
     files_to_hash_reverse = [os.path.join(TEST_DATASET_PATH_LOCAL, filename)
                              for filename in TEST_DATASET_FILENAMES[::-1]]
-    hash_forward = VersionedDatasetBuilder._get_hash(files_to_hash_forward)
-    hash_reverse = VersionedDatasetBuilder._get_hash(files_to_hash_reverse)
+    hash_forward = VersionedDatasetBuilder._get_hash_local(
+        files_to_hash_forward)
+    hash_reverse = VersionedDatasetBuilder._get_hash_local(
+        files_to_hash_reverse)
     assert hash_forward
     assert hash_reverse
     assert hash_forward == hash_reverse
