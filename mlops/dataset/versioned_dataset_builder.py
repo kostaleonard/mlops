@@ -26,6 +26,7 @@ class VersionedDatasetBuilder:
     This object is only used to ensure a standard format for datasets stored in
     a dataset archive (such as the local filesystem or S3), and is not meant for
     consumption by downstream models."""
+    # pylint: disable=too-few-public-methods
 
     def __init__(self,
                  dataset_path: str,
@@ -150,6 +151,7 @@ class VersionedDatasetBuilder:
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
         """
+        # pylint: disable=too-many-arguments
         files_to_hash = set()
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
@@ -191,6 +193,7 @@ class VersionedDatasetBuilder:
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
         """
+        # pylint: disable=too-many-arguments
         fs = S3FileSystem()
         files_to_hash = set()
         # Create publication path.
@@ -222,8 +225,8 @@ class VersionedDatasetBuilder:
         path_obj = Path(publication_path)
         try:
             path_obj.mkdir(parents=True, exist_ok=False)
-        except FileExistsError:
-            raise PublicationPathAlreadyExistsError
+        except FileExistsError as err:
+            raise PublicationPathAlreadyExistsError from err
 
     @staticmethod
     def _make_publication_path_s3(publication_path: str,
