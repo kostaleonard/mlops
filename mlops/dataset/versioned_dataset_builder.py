@@ -140,6 +140,7 @@ class VersionedDatasetBuilder:
         :param publication_path: The local path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.
         :param link_path: The path to the file containing the raw dataset link.
+        :param metadata_path: The path to which the metadata should be saved.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
@@ -150,8 +151,8 @@ class VersionedDatasetBuilder:
         # Save tensors.
         self._write_tensors_local(publication_path)
         # Save the raw dataset.
-        # TODO add ability to read from S3
         if dataset_copy_strategy == STRATEGY_COPY:
+            # TODO add ability to read from S3
             file_paths = self._copy_raw_dataset_local(copy_path)
             files_to_hash = files_to_hash.union(file_paths)
         elif dataset_copy_strategy == STRATEGY_LINK:
@@ -179,6 +180,7 @@ class VersionedDatasetBuilder:
         :param publication_path: The local path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.
         :param link_path: The path to the file containing the raw dataset link.
+        :param metadata_path: The path to which the metadata should be saved.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
@@ -258,26 +260,42 @@ class VersionedDatasetBuilder:
     def _copy_raw_dataset_local(self, copy_path: str) -> set[str]:
         """TODO"""
         file_paths = set()
-        shutil.copytree(self.dataset_path, copy_path)
-        for current_path, _, filenames in os.walk(copy_path):
-            for filename in filenames:
-                file_paths.add(os.path.join(current_path, filename))
+        if self.dataset_path.startswith('s3://'):
+            # Copy raw dataset from S3.
+            fs = S3FileSystem()
+            fs.get(self.dataset_path, copy_path, recursive=True)
+        else:
+            # Copy raw dataset from local filesystem.
+            shutil.copytree(self.dataset_path, copy_path)
+            for current_path, _, filenames in os.walk(copy_path):
+                for filename in filenames:
+                    file_paths.add(os.path.join(current_path, filename))
         return file_paths
 
     def _copy_raw_dataset_s3(self, copy_path: str, fs: S3FileSystem) -> set[str]:
         """TODO"""
         s3_file_paths = set()
-        fs.mkdir(copy_path)
-        for current_path, subdirs, filenames in os.walk(self.dataset_path):
-            for filename in filenames:
-                s3_file_path = os.path.join(copy_path,
-                                            *subdirs,
-                                            filename)
-                local_file_path = os.path.join(current_path, filename)
-                with fs.open(s3_file_path, 'wb') as outfile:
-                    with open(local_file_path, 'rb') as infile:
-                        outfile.write(infile.read())
-                s3_file_paths.add(s3_file_path)
+        if self.dataset_path.startswith('s3://'):
+            for current_path, subdirs, filenames in fs.walk(self.dataset_path):
+                for filename in filenames:
+                    infile_path = os.path.join(current_path,
+                                               filename)
+                    outfile_path = os.path.join(copy_path,
+                                                *subdirs,
+                                                filename)
+                    fs.copy(infile_path, outfile_path)
+        else:
+            fs.mkdir(copy_path)
+            for current_path, subdirs, filenames in os.walk(self.dataset_path):
+                for filename in filenames:
+                    s3_file_path = os.path.join(copy_path,
+                                                *subdirs,
+                                                filename)
+                    local_file_path = os.path.join(current_path, filename)
+                    with fs.open(s3_file_path, 'wb') as outfile:
+                        with open(local_file_path, 'rb') as infile:
+                            outfile.write(infile.read())
+                    s3_file_paths.add(s3_file_path)
         return s3_file_paths
 
     def _make_raw_dataset_link_local(self, copy_path: str, link_path: str) -> None:

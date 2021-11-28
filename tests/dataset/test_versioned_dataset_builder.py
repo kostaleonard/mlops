@@ -59,20 +59,11 @@ def _create_test_dataset_s3() -> None:
     """Creates a preset raw dataset at the S3 test dataset path."""
     _remove_test_directories_local()
     _create_test_dataset_local()
-    s3 = boto3.client('s3')
-    parse_result = urlparse(TEST_DATASET_PATH_S3)
-    bucket_name = parse_result.netloc
-    # Remove leading slash
-    prefix = parse_result.path[1:]
+    fs = S3FileSystem()
     for filename in TEST_DATASET_FILENAMES:
         local_path = os.path.join(TEST_DATASET_PATH_LOCAL, filename)
-        s3_path = os.path.join(prefix, filename)
-        try:
-            _ = s3.upload_file(local_path,
-                               bucket_name,
-                               s3_path)
-        except ClientError as exc:
-            raise exc
+        s3_path = os.path.join(TEST_DATASET_PATH_S3, filename)
+        fs.put(local_path, s3_path)
 
 
 def test_publish_appends_explicit_version() -> None:
@@ -155,9 +146,9 @@ def test_publish_s3_path_creates_expected_files() -> None:
     assert any(key.startswith(raw_directory_key) for key in item_keys)
 
 
-def test_publish_from_raw_dataset_in_s3() -> None:
+def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
-    in S3."""
+    in S3 and writes to the local filesystem."""
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -167,6 +158,24 @@ def test_publish_from_raw_dataset_in_s3() -> None:
     builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
     assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES)
+
+
+def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
+    """Tests that publish correctly reads the dataset path when the dataset is
+    in S3 and writes to S3."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
+    fs = S3FileSystem()
+    s3_filenames = {f's3://{key}' for key in fs.ls(raw_dataset_dir)}
+    dataset_filenames = {os.path.join(raw_dataset_dir, name)
+                         for name in TEST_DATASET_FILENAMES}
+    assert s3_filenames == dataset_filenames
 
 
 def test_publish_local_path_raises_path_already_exists_error() -> None:
