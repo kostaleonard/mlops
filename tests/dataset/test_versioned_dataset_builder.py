@@ -9,7 +9,6 @@ from urllib.parse import urlparse
 import pytest
 import boto3
 from s3fs import S3FileSystem
-from botocore.exceptions import ClientError
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_COPY, STRATEGY_LINK
 from mlops.errors import PublicationPathAlreadyExistsError, \
@@ -22,7 +21,11 @@ TEST_DATASET_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
                         'raw_dataset')
 TEST_PUBLICATION_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
                             'datasets')
-TEST_DATASET_FILENAMES = ['file0.txt', 'file1.txt', 'file2.txt']
+TEST_DATASET_FILENAMES = ['file0.txt',
+                          'file1.txt',
+                          'file2.txt',
+                          'sub1/file3.txt',
+                          'sub1/sub2/file4.txt']
 
 
 def _remove_test_directories_local() -> None:
@@ -46,9 +49,11 @@ def _remove_test_directories_s3() -> None:
 
 def _create_test_dataset_local() -> None:
     """Creates a preset raw dataset at the local test dataset path."""
-    path = Path(TEST_DATASET_PATH_LOCAL)
-    path.mkdir(parents=True)
     for filename in TEST_DATASET_FILENAMES:
+        dirname = os.path.dirname(os.path.join(TEST_DATASET_PATH_LOCAL,
+                                               filename))
+        dirpath = Path(dirname)
+        dirpath.mkdir(parents=True, exist_ok=True)
         with open(os.path.join(TEST_DATASET_PATH_LOCAL, filename),
                   'w',
                   encoding='utf-8') as outfile:
