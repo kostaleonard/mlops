@@ -44,7 +44,7 @@ class VersionedDatasetBuilder:
             features and labels can be "unpreprocessed" to match their original
             representations.
         """
-        self.dataset_path = dataset_path
+        self.dataset_path = dataset_path.rstrip('/')
         self.data_processor = data_processor
         self.features = data_processor.get_preprocessed_features(dataset_path)
         self.labels = data_processor.get_preprocessed_labels(dataset_path)
