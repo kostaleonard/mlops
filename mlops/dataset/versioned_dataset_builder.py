@@ -265,9 +265,9 @@ class VersionedDatasetBuilder:
         else:
             # Copy raw dataset from local filesystem to local filesystem.
             shutil.copytree(self.dataset_path, copy_path)
-            for current_path, _, filenames in os.walk(copy_path):
-                for filename in filenames:
-                    file_paths.add(os.path.join(current_path, filename))
+        for current_path, _, filenames in os.walk(copy_path):
+            for filename in filenames:
+                file_paths.add(os.path.join(current_path, filename))
         return file_paths
 
     def _copy_raw_dataset_s3(self, copy_path: str, fs: S3FileSystem) -> set[str]:
@@ -277,7 +277,7 @@ class VersionedDatasetBuilder:
             # Copy raw dataset from S3 to S3.
             dataset_path_no_prefix = self.dataset_path.replace('s3://', '', 1)
             copy_path_no_prefix = copy_path.replace('s3://', '', 1)
-            for current_path, subdirs, filenames in fs.walk(self.dataset_path):
+            for current_path, _, filenames in fs.walk(self.dataset_path):
                 subdirs = current_path.replace(dataset_path_no_prefix,
                                                copy_path_no_prefix, 1)
                 for filename in filenames:
@@ -289,6 +289,11 @@ class VersionedDatasetBuilder:
         else:
             # Copy raw dataset from local filesystem to S3.
             fs.put(self.dataset_path, copy_path, recursive=True)
+        for current_path, _, filenames in fs.walk(copy_path):
+            for filename in filenames:
+                s3_file_path = os.path.join(current_path,
+                                            filename)
+                s3_file_paths.add(s3_file_path)
         return s3_file_paths
 
     def _make_raw_dataset_link_local(self, copy_path: str, link_path: str) -> None:

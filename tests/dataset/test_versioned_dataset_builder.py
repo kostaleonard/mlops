@@ -416,3 +416,33 @@ def test_hash_is_reproducible() -> None:
     assert hash_forward
     assert hash_reverse
     assert hash_forward == hash_reverse
+
+
+def test_publish_local_with_trailing_slash() -> None:
+    """Tests that publishing to a local path with a trailing slash works
+    properly."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL + '/', processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version)
+    expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
+
+
+def test_publish_s3_with_trailing_slash() -> None:
+    """Tests that publishing to an S3 path with a trailing slash works
+    properly."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3 + '/', processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3 + '/', version)
+    fs = S3FileSystem()
+    expected_filename = os.path.join(TEST_DATASET_PATH_S3, version)
+    assert fs.ls(expected_filename)
+    assert fs.isdir(expected_filename)
