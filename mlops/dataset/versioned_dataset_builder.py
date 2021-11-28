@@ -278,12 +278,12 @@ class VersionedDatasetBuilder:
             dataset_path_no_prefix = self.dataset_path.replace('s3://', '', 1)
             copy_path_no_prefix = copy_path.replace('s3://', '', 1)
             for current_path, _, filenames in fs.walk(self.dataset_path):
-                subdirs = current_path.replace(dataset_path_no_prefix,
-                                               copy_path_no_prefix, 1)
+                outfile_prefix = current_path.replace(dataset_path_no_prefix,
+                                                      copy_path_no_prefix, 1)
                 for filename in filenames:
                     infile_path = os.path.join(current_path,
                                                filename)
-                    outfile_path = os.path.join(subdirs,
+                    outfile_path = os.path.join(outfile_prefix,
                                                 filename)
                     fs.copy(infile_path, outfile_path)
         else:
@@ -291,8 +291,7 @@ class VersionedDatasetBuilder:
             fs.put(self.dataset_path, copy_path, recursive=True)
         for current_path, _, filenames in fs.walk(copy_path):
             for filename in filenames:
-                s3_file_path = os.path.join(current_path,
-                                            filename)
+                s3_file_path = os.path.join(current_path, filename)
                 s3_file_paths.add(s3_file_path)
         return s3_file_paths
 

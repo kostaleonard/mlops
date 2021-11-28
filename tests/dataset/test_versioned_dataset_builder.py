@@ -5,7 +5,10 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 import json
+import pickle
 from urllib.parse import urlparse
+
+import numpy as np
 import pytest
 import boto3
 from s3fs import S3FileSystem
@@ -15,7 +18,6 @@ from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
-# TODO test publish with trailing slashes
 TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/raw_dataset'
 TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/datasets'
 TEST_DATASET_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
@@ -446,3 +448,29 @@ def test_publish_s3_with_trailing_slash() -> None:
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)
     assert fs.ls(expected_filename)
     assert fs.isdir(expected_filename)
+
+
+def test_published_data_processor_reproduces_dataset() -> None:
+    """Tests that the published data processor object can be loaded from the
+    pickled file and used to reproduce the dataset."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    processor_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                                      version,
+                                      'data_processor.pkl')
+    with open(processor_filename, 'rb') as infile:
+        processor_loaded = pickle.load(infile)
+    assert isinstance(processor_loaded, PresetDataProcessor)
+    original_features = processor.get_preprocessed_features(
+        TEST_DATASET_PATH_LOCAL)
+    loaded_features = processor_loaded.get_preprocessed_features(
+        TEST_DATASET_PATH_LOCAL)
+    assert set(original_features.keys()) == set(loaded_features.keys())
+    for name in original_features.keys():
+        original_tensor = original_features[name]
+        loaded_tensor = loaded_features[name]
+        assert np.array_equal(original_tensor, loaded_tensor)
