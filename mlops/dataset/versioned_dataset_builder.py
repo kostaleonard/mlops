@@ -107,6 +107,7 @@ class VersionedDatasetBuilder:
         copy_path = os.path.join(publication_path, 'raw')
         link_path = os.path.join(copy_path, 'link.txt')
         metadata_path = os.path.join(publication_path, 'meta.json')
+        processor_path = os.path.join(publication_path, 'data_processor.pkl')
         metadata = {
             'version': version,
             'hash': 'TDB',
@@ -117,6 +118,7 @@ class VersionedDatasetBuilder:
                              copy_path,
                              link_path,
                              metadata_path,
+                             processor_path,
                              dataset_copy_strategy,
                              metadata)
         else:
@@ -124,6 +126,7 @@ class VersionedDatasetBuilder:
                                 copy_path,
                                 link_path,
                                 metadata_path,
+                                processor_path,
                                 dataset_copy_strategy,
                                 metadata)
 
@@ -132,6 +135,7 @@ class VersionedDatasetBuilder:
                        copy_path: str,
                        link_path: str,
                        metadata_path: str,
+                       processor_path: str,
                        dataset_copy_strategy: str,
                        metadata: dict) -> None:
         """Saves the versioned dataset files to the given local path. See
@@ -141,6 +145,7 @@ class VersionedDatasetBuilder:
         :param copy_path: The path to which the raw dataset is copied.
         :param link_path: The path to the file containing the raw dataset link.
         :param metadata_path: The path to which the metadata should be saved.
+        :param processor_path: The path to which to write the data processor.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
@@ -155,7 +160,7 @@ class VersionedDatasetBuilder:
             file_paths = self._copy_raw_dataset_local(copy_path)
             files_to_hash = files_to_hash.union(file_paths)
         elif dataset_copy_strategy == STRATEGY_LINK:
-            self._make_raw_dataset_link_local(copy_path, link_path)
+            self._make_raw_dataset_link_local(link_path)
             files_to_hash.add(link_path)
         else:
             raise InvalidDatasetCopyStrategyError
@@ -164,22 +169,24 @@ class VersionedDatasetBuilder:
         metadata['hash'] = hash_digest
         VersionedDatasetBuilder._write_metadata_local(metadata, metadata_path)
         # Save data processor object.
-        self._write_data_processor_local(publication_path)
+        self._write_data_processor_local(processor_path)
 
     def _publish_s3(self,
                     publication_path: str,
                     copy_path: str,
                     link_path: str,
                     metadata_path: str,
+                    processor_path: str,
                     dataset_copy_strategy: str,
                     metadata: dict) -> None:
         """Saves the versioned dataset files to the given S3 path. See publish()
         for more detailed information.
 
-        :param publication_path: The local path to which to publish the dataset.
+        :param publication_path: The path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.
         :param link_path: The path to the file containing the raw dataset link.
         :param metadata_path: The path to which the metadata should be saved.
+        :param processor_path: The path to which to write the data processor.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
@@ -204,11 +211,14 @@ class VersionedDatasetBuilder:
         metadata['hash'] = hash_digest
         VersionedDatasetBuilder._write_metadata_s3(metadata, metadata_path, fs)
         # Save data processor object.
-        self._write_data_processor_s3(publication_path, fs)
+        self._write_data_processor_s3(processor_path, fs)
 
     @staticmethod
     def _make_publication_path_local(publication_path: str) -> None:
-        """TODO"""
+        """Creates the directories that compose the publication path.
+
+        :param publication_path: The path to which to publish the dataset.
+        """
         path_obj = Path(publication_path)
         try:
             path_obj.mkdir(parents=True, exist_ok=False)
@@ -216,15 +226,25 @@ class VersionedDatasetBuilder:
             raise PublicationPathAlreadyExistsError
 
     @staticmethod
-    def _make_publication_path_s3(publication_path: str, fs: S3FileSystem) -> None:
-        """TODO"""
+    def _make_publication_path_s3(publication_path: str,
+                                  fs: S3FileSystem) -> None:
+        """Creates the directories that compose the publication path.
+
+        :param publication_path: The path to which to publish the dataset.
+        :param fs: The S3 filesystem object to interface with S3.
+        """
         # fs.mkdirs with exist_ok=False does not raise an error, so use ls.
         if fs.ls(publication_path):
             raise PublicationPathAlreadyExistsError
         fs.mkdirs(publication_path)
 
     def _write_tensors_local(self, publication_path: str) -> set[str]:
-        """TODO"""
+        """Writes the feature and label tensors to the publication path
+        directory and returns the paths to the created files for hashing.
+
+        :param publication_path: The path to which to publish the dataset.
+        :return: The paths to all created files.
+        """
         file_paths = set()
         for name, tensor in {**self.features, **self.labels}.items():
             file_path = os.path.join(publication_path, f'{name}.npy')
@@ -232,8 +252,16 @@ class VersionedDatasetBuilder:
             VersionedDatasetBuilder._write_tensor_local(tensor, file_path)
         return file_paths
 
-    def _write_tensors_s3(self, publication_path: str, fs: S3FileSystem) -> set[str]:
-        """TODO"""
+    def _write_tensors_s3(self,
+                          publication_path: str,
+                          fs: S3FileSystem) -> set[str]:
+        """Writes the feature and label tensors to the publication path
+        directory and returns the paths to the created files for hashing.
+
+        :param publication_path: The path to which to publish the dataset.
+        :param fs: The S3 filesystem object to interface with S3.
+        :return: The paths to all created files.
+        """
         file_paths = set()
         for name, tensor in {**self.features, **self.labels}.items():
             file_path = os.path.join(publication_path, f'{name}.npy')
@@ -243,12 +271,23 @@ class VersionedDatasetBuilder:
 
     @staticmethod
     def _write_tensor_local(tensor: np.ndarray, path: str) -> None:
-        """TODO"""
+        """Writes the tensor to the given path.
+
+        :param tensor: The tensor to save.
+        :param path: The path to which to save the tensor.
+        """
         np.save(path, tensor)
 
     @staticmethod
-    def _write_tensor_s3(tensor: np.ndarray, path: str, fs: S3FileSystem) -> None:
-        """TODO"""
+    def _write_tensor_s3(tensor: np.ndarray,
+                         path: str,
+                         fs: S3FileSystem) -> None:
+        """Writes the tensor to the given path.
+
+        :param tensor: The tensor to save.
+        :param path: The path to which to save the tensor.
+        :param fs: The S3 filesystem object to interface with S3.
+        """
         with TemporaryFile() as tmp_file:
             np.save(tmp_file, tensor)
             tmp_file.seek(0)
@@ -256,7 +295,12 @@ class VersionedDatasetBuilder:
                 outfile.write(tmp_file.read())
 
     def _copy_raw_dataset_local(self, copy_path: str) -> set[str]:
-        """TODO"""
+        """Copies the raw dataset to the given path, and returns the paths to
+        all created files for hashing.
+
+        :param copy_path: The path to which to copy the raw dataset.
+        :return: The paths to all created files.
+        """
         file_paths = set()
         if self.dataset_path.startswith('s3://'):
             # Copy raw dataset from S3 to local filesystem.
@@ -270,8 +314,16 @@ class VersionedDatasetBuilder:
                 file_paths.add(os.path.join(current_path, filename))
         return file_paths
 
-    def _copy_raw_dataset_s3(self, copy_path: str, fs: S3FileSystem) -> set[str]:
-        """TODO"""
+    def _copy_raw_dataset_s3(self,
+                             copy_path: str,
+                             fs: S3FileSystem) -> set[str]:
+        """Copies the raw dataset to the given path, and returns the paths to
+        all created files for hashing.
+
+        :param copy_path: The path to which to copy the raw dataset.
+        :param fs: The S3 filesystem object to interface with S3.
+        :return: The paths to all created files.
+        """
         s3_file_paths = set()
         if self.dataset_path.startswith('s3://'):
             # Copy raw dataset from S3 to S3.
@@ -295,39 +347,66 @@ class VersionedDatasetBuilder:
                 s3_file_paths.add(s3_file_path)
         return s3_file_paths
 
-    def _make_raw_dataset_link_local(self, copy_path: str, link_path: str) -> None:
-        """TODO"""
-        os.mkdir(copy_path)
+    def _make_raw_dataset_link_local(self, link_path: str) -> None:
+        """Creates a file that contains the path/link to the raw dataset.
+
+        :param link_path: The path to which to create the link file.
+        """
+        os.mkdir(os.path.dirname(link_path))
         with open(link_path, 'w', encoding='utf-8') as outfile:
             outfile.write(self.dataset_path)
 
-    def _make_raw_dataset_link_s3(self, link_path: str, fs: S3FileSystem) -> None:
-        """TODO"""
+    def _make_raw_dataset_link_s3(self,
+                                  link_path: str,
+                                  fs: S3FileSystem) -> None:
+        """Creates a file that contains the path/link to the raw dataset.
+
+        :param link_path: The path to which to create the link file.
+        :param fs: The S3 filesystem object to interface with S3.
+        """
         with fs.open(link_path, 'w', encoding='utf-8') as outfile:
             outfile.write(self.dataset_path)
 
     @staticmethod
     def _write_metadata_local(metadata: dict, metadata_path: str) -> None:
-        """TODO"""
+        """Writes the metadata dictionary as a JSON file at the given path.
+
+        :param metadata: The metadata to write.
+        :param metadata_path: The path to which to write the metadata.
+        """
         with open(metadata_path, 'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(metadata))
 
     @staticmethod
-    def _write_metadata_s3(metadata: dict, metadata_path: str, fs: S3FileSystem) -> None:
-        """TODO"""
+    def _write_metadata_s3(metadata: dict,
+                           metadata_path: str,
+                           fs: S3FileSystem) -> None:
+        """Writes the metadata dictionary as a JSON file at the given path.
+
+        :param metadata: The metadata to write.
+        :param metadata_path: The path to which to write the metadata.
+        :param fs: The S3 filesystem object to interface with S3.
+        """
         with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(metadata))
 
-    def _write_data_processor_local(self, publication_path: str) -> None:
-        """TODO"""
-        with open(os.path.join(publication_path, 'data_processor.pkl'),
-                  'wb') as outfile:
+    def _write_data_processor_local(self, processor_path: str) -> None:
+        """Writes the data processor object to the given path
+
+        :param processor_path: The path to which to write the data processor.
+        """
+        with open(processor_path, 'wb') as outfile:
             outfile.write(pickle.dumps(self.data_processor))
 
-    def _write_data_processor_s3(self, publication_path: str, fs: S3FileSystem) -> None:
-        """TODO"""
-        with fs.open(os.path.join(publication_path, 'data_processor.pkl'),
-                     'wb') as outfile:
+    def _write_data_processor_s3(self,
+                                 processor_path: str,
+                                 fs: S3FileSystem) -> None:
+        """Writes the data processor object to the given path
+
+        :param processor_path: The path to which to write the data processor.
+        :param fs: The S3 filesystem object to interface with S3.
+        """
+        with fs.open(processor_path, 'wb') as outfile:
             outfile.write(pickle.dumps(self.data_processor))
 
     @staticmethod
@@ -357,7 +436,7 @@ class VersionedDatasetBuilder:
 
         :param files_to_hash: A collection of paths to files whose contents
             should be hashed.
-        :param fs: TODO
+        :param fs: The S3 filesystem object to interface with S3.
         :return: The MD5 hex digest string from hashing the content of all the
             given files.
         """
