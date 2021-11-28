@@ -15,6 +15,7 @@ from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
+# TODO test publish with trailing slashes
 TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/raw_dataset'
 TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/datasets'
 TEST_DATASET_PATH_S3 = ('s3://kosta-mlops/test_versioned_dataset_builder/'
@@ -162,7 +163,12 @@ def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
-    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES)
+    raw_dataset_paths = set()
+    for current_path, _, filenames in os.walk(raw_dataset_dir):
+        for filename in filenames:
+            raw_dataset_paths.add(os.path.join(current_path, filename).replace(
+                raw_dataset_dir + '/', '', 1))
+    assert raw_dataset_paths == set(TEST_DATASET_FILENAMES)
 
 
 def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
@@ -177,7 +183,7 @@ def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
     builder.publish(TEST_PUBLICATION_PATH_S3, version)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
     fs = S3FileSystem()
-    s3_filenames = {f's3://{key}' for key in fs.ls(raw_dataset_dir)}
+    s3_filenames = {f's3://{key}' for key in fs.find(raw_dataset_dir)}
     dataset_filenames = {os.path.join(raw_dataset_dir, name)
                          for name in TEST_DATASET_FILENAMES}
     assert s3_filenames == dataset_filenames
@@ -222,7 +228,12 @@ def test_publish_copies_raw_dataset() -> None:
                     version,
                     dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
-    assert set(os.listdir(raw_dataset_dir)) == set(TEST_DATASET_FILENAMES)
+    raw_dataset_paths = set()
+    for current_path, _, filenames in os.walk(raw_dataset_dir):
+        for filename in filenames:
+            raw_dataset_paths.add(os.path.join(current_path, filename).replace(
+                raw_dataset_dir + '/', '', 1))
+    assert raw_dataset_paths == set(TEST_DATASET_FILENAMES)
 
 
 def test_publish_includes_raw_dataset_link() -> None:
