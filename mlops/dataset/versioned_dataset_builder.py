@@ -201,6 +201,7 @@ class VersionedDatasetBuilder:
         # Save tensors.
         self._write_tensors_s3(publication_path, fs)
         # Save the raw dataset.
+        # TODO lines 208-211 are uncovered
         if dataset_copy_strategy == STRATEGY_COPY:
             file_paths = self._copy_raw_dataset_s3(copy_path, fs)
             files_to_hash = files_to_hash.union(file_paths)
@@ -367,6 +368,7 @@ class VersionedDatasetBuilder:
         :param link_path: The path to which to create the link file.
         :param fs: The S3 filesystem object to interface with S3.
         """
+        # TODO no coverage here.
         with fs.open(link_path, 'w', encoding='utf-8') as outfile:
             outfile.write(self.dataset_path)
 

@@ -7,7 +7,6 @@ from datetime import datetime
 import json
 import pickle
 from urllib.parse import urlparse
-
 import numpy as np
 import pytest
 import boto3
@@ -122,6 +121,7 @@ def test_publish_local_path_creates_expected_files() -> None:
         {'data_processor.pkl', 'meta.json', 'raw'})
 
 
+@pytest.mark.awstest
 def test_publish_s3_path_creates_expected_files() -> None:
     """Tests that publish on an S3 path creates the expected files/directories
     on S3."""
@@ -154,6 +154,7 @@ def test_publish_s3_path_creates_expected_files() -> None:
     assert any(key.startswith(raw_directory_key) for key in item_keys)
 
 
+@pytest.mark.awstest
 def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3 and writes to the local filesystem."""
@@ -173,6 +174,7 @@ def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     assert raw_dataset_paths == set(TEST_DATASET_FILENAMES)
 
 
+@pytest.mark.awstest
 def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3 and writes to S3."""
@@ -204,6 +206,7 @@ def test_publish_local_path_raises_path_already_exists_error() -> None:
         builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
 
 
+@pytest.mark.awstest
 def test_publish_s3_path_raises_path_already_exists_error() -> None:
     """Tests that publish on an S3 path that already exists raises a
     PublicationPathAlreadyExistsError."""
@@ -255,6 +258,31 @@ def test_publish_includes_raw_dataset_link() -> None:
     with open(os.path.join(raw_dataset_dir, link_filename),
               'r',
               encoding='utf-8') as infile:
+        assert infile.read() == TEST_DATASET_PATH_LOCAL
+
+
+@pytest.mark.awstest
+def test_publish_includes_raw_dataset_link_s3() -> None:
+    """Tests that publish to S3 includes a link to the raw dataset when the copy
+    strategy is STRATEGY_LINK."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    _remove_test_directories_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3,
+                    version,
+                    dataset_copy_strategy=STRATEGY_LINK)
+    raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
+    link_filename = 'link.txt'
+    fs = S3FileSystem()
+    # Remove 's3://' from latter path.
+    assert set(fs.ls(raw_dataset_dir)) == {os.path.join(raw_dataset_dir,
+                                                        link_filename)[5:]}
+    with fs.open(os.path.join(raw_dataset_dir, link_filename),
+                 'r',
+                 encoding='utf-8') as infile:
         assert infile.read() == TEST_DATASET_PATH_LOCAL
 
 
@@ -375,6 +403,7 @@ def test_different_datasets_have_different_hashes() -> None:
     assert contents1['hash'] != contents2['hash']
 
 
+@pytest.mark.awstest
 def test_publish_local_and_s3_create_same_dataset() -> None:
     """Tests that publishing locally or remotely on S3 produces the same
     dataset. Verifies identity by comparing dataset hashes."""
@@ -434,6 +463,7 @@ def test_publish_local_with_trailing_slash() -> None:
     assert os.path.isdir(expected_filename)
 
 
+@pytest.mark.awstest
 def test_publish_s3_with_trailing_slash() -> None:
     """Tests that publishing to an S3 path with a trailing slash works
     properly."""

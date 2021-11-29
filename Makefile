@@ -11,10 +11,16 @@ pylint:
 	pylint tests
 
 pytest:
-	pytest -m "not slowtest" --cov=mlops tests
+	pytest -m "not slowtest and not awstest" --cov=mlops tests
+	coverage xml
 
-pytest_include_slow:
-	pytest --cov=mlops tests
+pytest_slow:
+	pytest -m "slowtest" --cov=mlops tests
+	coverage xml
+
+pytest_aws:
+	pytest -m "awstest" --cov=mlops tests
+	coverage xml
 
 documentation:
 	# TODO see adjutant
