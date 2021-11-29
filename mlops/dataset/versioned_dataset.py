@@ -4,6 +4,7 @@ import os
 import json
 import pickle
 import numpy as np
+from s3fs import S3FileSystem
 
 
 class VersionedDataset:
@@ -19,8 +20,27 @@ class VersionedDataset:
         """
         self.path = path
         if path.startswith('s3://'):
-            # TODO read from s3
-            pass
+            fs = S3FileSystem()
+            # Get tensors.
+            tensor_paths = {tensor_path
+                            for tensor_path in fs.ls(path)
+                            if tensor_path.endswith('.npy')}
+            for tensor_path in tensor_paths:
+                attr_name = tensor_path.split('.npy')[0].split('/')[-1]
+                with fs.open(tensor_path, 'rb') as infile:
+                    tensor = np.load(infile)
+                setattr(self, attr_name, tensor)
+            # Get hash.
+            with fs.open(os.path.join(path, 'meta.json'),
+                         'r',
+                         encoding='utf-8') as infile:
+                metadata = json.loads(infile.read())
+            setattr(self, 'md5', metadata['hash'])
+            # Get data processor.
+            with fs.open(os.path.join(path, 'data_processor.pkl'),
+                         'rb') as infile:
+                processor = pickle.loads(infile.read())
+            setattr(self, 'data_processor', processor)
         else:
             # Get tensors.
             tensor_filenames = {tensor_filename
@@ -57,5 +77,3 @@ class VersionedDataset:
         :return: The object's hashcode based on the loaded MD5 hashcode.
         """
         return hash(self.md5)
-
-    # TODO search (by version, by tag, by timestamp)
