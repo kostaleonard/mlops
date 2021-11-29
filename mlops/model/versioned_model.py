@@ -40,6 +40,4 @@ class VersionedModel:
         """
         # TODO
 
-    # TODO search (by version, by tag, by timestamp)
-
     # TODO mirror VersionedDataset interface
