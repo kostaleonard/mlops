@@ -42,6 +42,20 @@ class VersionedDataset:
                 processor = pickle.loads(infile.read())
             setattr(self, 'data_processor', processor)
 
-    # TODO __eq__ and __hash__ based on self.md5
+    def __eq__(self, other: 'VersionedDataset') -> bool:
+        """Returns True if the two objects have the same loaded MD5 hash code,
+        False otherwise.
+
+        :param other: The dataset with which to compare this object.
+        :return: True if the object MD5 hashes match.
+        """
+        return self.md5 == other.md5
+
+    def __hash__(self) -> int:
+        """Returns this object's hashcode based on the loaded MD5 hashcode.
+
+        :return: The object's hashcode based on the loaded MD5 hashcode.
+        """
+        return hash(self.md5)
 
     # TODO search (by version, by tag, by timestamp)

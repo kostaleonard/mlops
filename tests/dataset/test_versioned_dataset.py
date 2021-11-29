@@ -43,11 +43,8 @@ def test_init_creates_expected_attributes_local() -> None:
     data processor as attributes when the dataset is on the local filesystem."""
     _publish_test_dataset_local()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1'))
-    print(dir(dataset))
     for attribute in EXPECTED_ATTRIBUTES:
-        print(attribute)
         assert hasattr(dataset, attribute)
-        print(getattr(dataset, attribute))
 
 
 @pytest.mark.awstest
@@ -58,3 +55,21 @@ def test_init_creates_expected_attributes_s3() -> None:
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_S3, 'v1'))
     for attribute in EXPECTED_ATTRIBUTES:
         assert hasattr(dataset, attribute)
+
+
+def test_versioned_datasets_from_same_files_are_equal() -> None:
+    """Tests that two versioned datasets loaded from the same files are
+    considered equal in comparisons."""
+    _publish_test_dataset_local()
+    dataset_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1')
+    dataset1 = VersionedDataset(dataset_path)
+    dataset2 = VersionedDataset(dataset_path)
+    assert dataset1 == dataset2
+
+
+def test_hashcode_is_hash_of_md5_digest() -> None:
+    """Tests that the hashcode of the dataset object is the hash of the loaded
+    MD5 digest."""
+    _publish_test_dataset_local()
+    dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1'))
+    assert hash(dataset) == hash(dataset.md5)
