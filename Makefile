@@ -22,6 +22,10 @@ pytest_aws:
 	pytest -m "awstest" --cov=mlops tests
 	coverage xml
 
+pytest_full:
+	pytest --cov=mlops tests
+	coverage xml
+
 documentation:
 	# TODO see adjutant
 

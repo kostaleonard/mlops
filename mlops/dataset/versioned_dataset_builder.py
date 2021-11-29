@@ -104,6 +104,8 @@ class VersionedDatasetBuilder:
             version = timestamp
         if not tags:
             tags = []
+        if dataset_copy_strategy not in {STRATEGY_COPY, STRATEGY_LINK}:
+            raise InvalidDatasetCopyStrategyError
         publication_path = os.path.join(path, version)
         copy_path = os.path.join(publication_path, 'raw')
         link_path = os.path.join(copy_path, 'link.txt')
@@ -158,14 +160,12 @@ class VersionedDatasetBuilder:
         # Save tensors.
         self._write_tensors_local(publication_path)
         # Save the raw dataset.
-        if dataset_copy_strategy == STRATEGY_COPY:
-            file_paths = self._copy_raw_dataset_local(copy_path)
-            files_to_hash = files_to_hash.union(file_paths)
-        elif dataset_copy_strategy == STRATEGY_LINK:
+        if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_local(link_path)
             files_to_hash.add(link_path)
         else:
-            raise InvalidDatasetCopyStrategyError
+            file_paths = self._copy_raw_dataset_local(copy_path)
+            files_to_hash = files_to_hash.union(file_paths)
         # Save metadata.
         hash_digest = VersionedDatasetBuilder._get_hash_local(files_to_hash)
         metadata['hash'] = hash_digest
@@ -201,15 +201,12 @@ class VersionedDatasetBuilder:
         # Save tensors.
         self._write_tensors_s3(publication_path, fs)
         # Save the raw dataset.
-        # TODO lines 208-211 are uncovered
-        if dataset_copy_strategy == STRATEGY_COPY:
-            file_paths = self._copy_raw_dataset_s3(copy_path, fs)
-            files_to_hash = files_to_hash.union(file_paths)
-        elif dataset_copy_strategy == STRATEGY_LINK:
+        if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_s3(link_path, fs)
             files_to_hash.add(link_path)
         else:
-            raise InvalidDatasetCopyStrategyError
+            file_paths = self._copy_raw_dataset_s3(copy_path, fs)
+            files_to_hash = files_to_hash.union(file_paths)
         # Save metadata.
         hash_digest = VersionedDatasetBuilder._get_hash_s3(files_to_hash, fs)
         metadata['hash'] = hash_digest
@@ -368,7 +365,6 @@ class VersionedDatasetBuilder:
         :param link_path: The path to which to create the link file.
         :param fs: The S3 filesystem object to interface with S3.
         """
-        # TODO no coverage here.
         with fs.open(link_path, 'w', encoding='utf-8') as outfile:
             outfile.write(self.dataset_path)
 
