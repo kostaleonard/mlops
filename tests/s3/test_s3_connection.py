@@ -1,6 +1,7 @@
 """Tests connection to S3."""
 
 import os
+import pytest
 import boto3
 from botocore.exceptions import ClientError
 
@@ -9,6 +10,7 @@ TEST_FILENAME = 's3_conn_test.txt'
 TEST_FILE_PATH = os.path.join('/tmp', TEST_FILENAME)
 
 
+@pytest.mark.awstest
 def test_connection_to_project_s3_bucket() -> None:
     """Tests that the project S3 bucket (s3://kosta-mlops) can be reached."""
     s3 = boto3.client('s3')
@@ -18,6 +20,7 @@ def test_connection_to_project_s3_bucket() -> None:
     assert len(bucket_matches) == 1
 
 
+@pytest.mark.awstest
 def test_project_s3_bucket_read_write() -> None:
     """Tests that the project S3 bucket (s3://kosta-mlops) can be read from and
     written to."""
