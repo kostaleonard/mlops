@@ -1,44 +1,72 @@
 """Tests pokemon_classification_data_processor.py."""
 
+import numpy as np
+from mlops.examples.image.classification.pokemon_classifcation_data_processor \
+    import PokemonClassificationDataProcessor, \
+    DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
+    HEIGHT, WIDTH, CHANNELS
+
+EXPECTED_NUM_TRAINVALTEST = 10
+EXPECTED_NUM_TRAIN = 7
+EXPECTED_NUM_VAL = 2
+EXPECTED_NUM_PRED = 3
+PIXEL_MIN = 0
+PIXEL_MAX = 255
+
 
 def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
     """Tests that get_raw_features returns the expected keys {'X_train',
     'X_val', 'X_test'} when called on the train/val/test directory."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    assert set(raw.keys()) == {'X_train', 'X_val', 'X_test'}
 
 
 def test_get_raw_features_pred_returns_expected_keys() -> None:
     """Tests that get_raw_features returns the expected keys {'X_pred'} when
     called on the prediction directory.
     """
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_PRED_PATH)
+    assert set(raw.keys()) == {'X_pred'}
 
 
 def test_get_raw_features_trainvaltest_correct_split() -> None:
     """Tests that the train/val/test datasets are split into the expected
     sizes."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    num_examples = sum(map(len, raw.values()))
+    assert num_examples == EXPECTED_NUM_TRAINVALTEST
+    assert raw['X_train'] == EXPECTED_NUM_TRAIN
+    assert raw['X_val'] == EXPECTED_NUM_VAL
+    assert raw['X_test'] == EXPECTED_NUM_TRAINVALTEST - EXPECTED_NUM_TRAIN - \
+           EXPECTED_NUM_VAL
 
 
 def test_get_raw_features_correct_tensor_shapes() -> None:
     """Tests that get_raw_features returns tensors of the expected shapes."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert tensor.shape[1:] == (HEIGHT, WIDTH, CHANNELS)
 
 
 def test_get_raw_features_correct_dtype() -> None:
     """Tests that get_raw_features returns tensors with dtype uint8."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert tensor.dtype == np.uint8
 
 
 def test_get_raw_features_correct_value_range() -> None:
     """Tests that get_raw_features returns tensors in the range [0, 255]."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert tensor.min() >= PIXEL_MIN
+        assert tensor.max() <= PIXEL_MAX
 
 
 def test_get_raw_features_no_na() -> None:
