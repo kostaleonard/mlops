@@ -48,7 +48,7 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         of examples. All entries are strings from CLASSES indicating 1 or 2
         (if multi-typed) types belonging to the sample. If the sample has 2
         types, then the string will be comma separated as follows:
-        'type1,type2'.
+        'typeA,typeB', where the comma-separated types are not ordered.
 
         :param dataset_path: The path to the file or directory on the local or
             remote filesystem containing the dataset.

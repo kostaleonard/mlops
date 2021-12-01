@@ -91,3 +91,79 @@ def test_get_raw_labels_valid_classes() -> None:
     """Tests that all raw label classes are valid Pokemon types."""
     # TODO
     assert False
+
+
+def test_get_raw_labels_no_na() -> None:
+    """Tests that there are no missing values in the raw labels."""
+    # TODO
+    assert False
+
+
+def test_preprocessed_features_same_shape_as_raw() -> None:
+    """Tests that the preprocessed features have the same shape as the raw
+    features."""
+    # TODO
+    assert False
+
+
+def test_preprocess_features_correct_dtype() -> None:
+    """Tests that preprocessed features are of dtype float32."""
+    # TODO
+    assert False
+
+
+def test_preprocess_features_no_na() -> None:
+    """Tests that preprocessed features have no missing values."""
+    # TODO
+    assert False
+
+
+def test_preprocessed_features_scaled() -> None:
+    """Tests that preprocessing scales the features to the range [0, 1]."""
+    # TODO
+    assert False
+
+
+def test_preprocess_labels_correct_shape() -> None:
+    """Tests that the preprocessed labels have the correct shape."""
+    # TODO
+    assert False
+
+
+def test_preprocess_labels_correct_dtype() -> None:
+    """Tests that the preprocessed labels are of dtype float32."""
+    # TODO
+    assert False
+
+
+def test_preprocess_labels_no_na() -> None:
+    """Tests that the preprocessed labels have no missing values."""
+    # TODO
+    assert False
+
+
+def test_preprocess_labels_binary() -> None:
+    """Tests that the preprocessed labels have values in the set {0, 1}."""
+    # TODO
+    assert False
+
+
+def test_preprocess_labels_min_one_max_two_classes() -> None:
+    """Tests that each preprocessed label has at least one and at most two
+    ones indicating the class(es)."""
+    # TODO
+    assert False
+
+
+def test_unpreprocess_features_inverts_transformation() -> None:
+    """Tests that unpreprocessing the preprocessed features results in the raw
+    features."""
+    # TODO
+    assert False
+
+
+def test_unpreprocess_labels_inverts_transformation() -> None:
+    """Tests that unpreprocessing the preprocessed labels results in the raw
+    labels. """
+    # TODO
+    assert False
