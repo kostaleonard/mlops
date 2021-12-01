@@ -102,9 +102,9 @@ class DataProcessor(ABC):
         """Returns the preprocessed label tensor from the raw tensor. The
         preprocessed labels are how training/validation/test as well as
         prediction data are fed into downstream models. For example, in a
-        classification task, the raw labels may be tensors of shape m x k, where
-        m is the number of examples, and k is the number of classes, where each
-        of the k-length vectors are one-hot encoded.
+        classification task, the preprocessed labels may be tensors of shape
+        m x k, where m is the number of examples, and k is the number of
+        classes, where each of the k-length vectors are one-hot encoded.
 
         :param raw_label_tensor: The raw labels to be preprocessed.
         :return: The preprocessed label tensor. This tensor is ready for
