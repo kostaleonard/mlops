@@ -1,8 +1,13 @@
 """Contains the PokemonClassificationDataProcessor class."""
 
+import os
 import numpy as np
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
 
+# TODO should these be defined in the model training script?
+DEFAULT_DATASET_TRAINVALTEST_PATH = os.path.join('sample_data', 'pokemon',
+                                                 'trainvaltest')
+DEFAULT_DATASET_PRED_PATH = os.path.join('sample_data', 'pokemon', 'pred')
 TRAIN_SPLIT = 0.7
 VAL_SPLIT = 0.2
 CLASSES = ['Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting',
@@ -51,7 +56,7 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
             corresponding keys are the names by which those tensors should be
             referenced. The returned keys will be {'y_train', 'y_val', 'y_test'}
             if the directory indicated by dataset_path ends with 'trainvaltest',
-            and {'y_pred'} if dataset_path ends with 'pred'.
+            and {} otherwise (no labels are available).
         """
         # TODO add support for loading dataset from S3
         # TODO
