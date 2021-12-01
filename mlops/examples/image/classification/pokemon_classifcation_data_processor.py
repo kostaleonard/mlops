@@ -84,3 +84,23 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
             downstream model consumption.
         """
         # TODO encode labels
+
+    def unpreprocess_features(self, feature_tensor: np.ndarray) -> np.ndarray:
+        """Returns the raw feature tensor from the preprocessed tensor; inverts
+        preprocessing. Improves model interpretability by enabling users to
+        transform model inputs into real-world values.
+
+        :param feature_tensor: The preprocessed features to be inverted.
+        :return: The raw feature tensor.
+        """
+        # TODO
+
+    def unpreprocess_labels(self, label_tensor: np.ndarray) -> np.ndarray:
+        """Returns the raw label tensor from the preprocessed tensor; inverts
+        preprocessing. Improves model interpretability by enabling users to
+        transform model outputs into real-world values.
+
+        :param label_tensor: The preprocessed labels to be inverted.
+        :return: The raw label tensor.
+        """
+        # TODO
