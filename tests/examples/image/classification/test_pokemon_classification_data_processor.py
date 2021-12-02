@@ -4,7 +4,7 @@ import numpy as np
 from mlops.examples.image.classification.pokemon_classifcation_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
-    HEIGHT, WIDTH, CHANNELS
+    HEIGHT, WIDTH, CHANNELS, CLASSES
 
 EXPECTED_NUM_TRAINVALTEST = 10
 EXPECTED_NUM_TRAIN = 7
@@ -123,6 +123,10 @@ def test_get_raw_labels_correct_tensor_shapes() -> None:
 
 def test_get_raw_labels_correct_dtype() -> None:
     """Tests that get_raw_labels returns tensors of type object (string)."""
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert tensor.dtype == np.unicode
     # TODO
     assert False
 
@@ -130,20 +134,30 @@ def test_get_raw_labels_correct_dtype() -> None:
 def test_get_raw_labels_min_one_max_two_classes() -> None:
     """Tests that all raw labels have at a minimum one and a maximum two
     classes."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        for row in tensor:
+            assert row.count(',') in {0, 1}
 
 
 def test_get_raw_labels_valid_classes() -> None:
     """Tests that all raw label classes are valid Pokemon types."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        for row in tensor:
+            labels = row.split(',')
+            for label in labels:
+                assert label in CLASSES
 
 
 def test_get_raw_labels_no_na() -> None:
     """Tests that there are no missing values in the raw labels."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert not np.isnan(tensor).any()
 
 
 def test_preprocessed_features_same_shape_as_raw() -> None:
