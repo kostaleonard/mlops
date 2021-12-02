@@ -71,35 +71,54 @@ def test_get_raw_features_correct_value_range() -> None:
 
 def test_get_raw_features_no_na() -> None:
     """Tests that get_raw_features returns tensors with no missing values."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert not np.isnan(tensor).any()
 
 
 def test_get_raw_features_have_multiple_pixel_values() -> None:
     """Tests that the images were loaded correctly by ensuring that more than
     one pixel value exists in the tensors."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert len(np.unique(tensor)) > 1
 
 
 def test_get_raw_labels_trainvaltest_returns_expected_keys() -> None:
     """Tests that get_raw_labels returns the expected keys {'y_train', 'y_val',
     'y_test'} when called on the train/val/test directory."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    assert set(raw.keys()) == {'y_train', 'y_val', 'y_test'}
 
 
 def test_get_raw_labels_pred_returns_empty_dict() -> None:
     """Tests that get_raw_labels returns the empty dict when called on the
     prediction directory (no labels exist for prediction)."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_PRED_PATH)
+    assert not raw
+
+
+def test_get_raw_labels_trainvaltest_lengths_match_features() -> None:
+    """Tests that all entries in the raw label dictionary have the same number
+    of examples as their counterpart features."""
+    processor = PokemonClassificationDataProcessor()
+    raw_features = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    raw_labels = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    assert len(raw_features['X_train']) == len(raw_labels['y_train'])
+    assert len(raw_features['X_val']) == len(raw_labels['y_val'])
+    assert len(raw_features['X_test']) == len(raw_labels['y_test'])
 
 
 def test_get_raw_labels_correct_tensor_shapes() -> None:
     """Tests that get_raw_labels returns tensors of the correct shape."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        assert len(tensor.shape) == 1
 
 
 def test_get_raw_labels_correct_dtype() -> None:
