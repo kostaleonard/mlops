@@ -163,68 +163,105 @@ def test_get_raw_labels_no_na() -> None:
 def test_preprocessed_features_same_shape_as_raw() -> None:
     """Tests that the preprocessed features have the same shape as the raw
     features."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_features(tensor)
+        assert tensor.shape == preprocessed.shape
 
 
 def test_preprocess_features_correct_dtype() -> None:
     """Tests that preprocessed features are of dtype float32."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_features(tensor)
+        assert preprocessed.dtype == np.float32
 
 
 def test_preprocess_features_no_na() -> None:
     """Tests that preprocessed features have no missing values."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_features(tensor)
+        assert not np.isnan(preprocessed).any()
 
 
 def test_preprocessed_features_scaled() -> None:
     """Tests that preprocessing scales the features to the range [0, 1]."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_features(tensor)
+        assert preprocessed.min() >= 0
+        assert preprocessed.max() <= 1
 
 
 def test_preprocess_labels_correct_shape() -> None:
     """Tests that the preprocessed labels have the correct shape."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        assert preprocessed.shape == (len(tensor), len(CLASSES))
 
 
 def test_preprocess_labels_correct_dtype() -> None:
     """Tests that the preprocessed labels are of dtype float32."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        assert preprocessed.dtype == np.float32
 
 
 def test_preprocess_labels_no_na() -> None:
     """Tests that the preprocessed labels have no missing values."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        assert not np.isnan(preprocessed).any()
 
 
 def test_preprocess_labels_binary() -> None:
     """Tests that the preprocessed labels have values in the set {0, 1}."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        assert set(np.unique(preprocessed)) == {0, 1}
 
 
 def test_preprocess_labels_min_one_max_two_classes() -> None:
     """Tests that each preprocessed label has at least one and at most two
     ones indicating the class(es)."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        row_sums = preprocessed.sum(axis=1)
+        assert set(np.unique(row_sums)) == {1, 2}
 
 
 def test_unpreprocess_features_inverts_transformation() -> None:
     """Tests that unpreprocessing the preprocessed features results in the raw
     features."""
-    # TODO
-    assert False
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_features(tensor)
+        unpreprocessed = processor.unpreprocess_features(preprocessed)
+        assert (unpreprocessed == tensor).all()
 
 
 def test_unpreprocess_labels_inverts_transformation() -> None:
     """Tests that unpreprocessing the preprocessed labels results in the raw
-    labels. """
-    # TODO
-    assert False
+    labels."""
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in raw.values():
+        preprocessed = processor.preprocess_labels(tensor)
+        unpreprocessed = processor.unpreprocess_labels(preprocessed)
+        assert (unpreprocessed == tensor).all()
