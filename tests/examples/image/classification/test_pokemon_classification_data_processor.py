@@ -99,7 +99,7 @@ def test_get_raw_labels_pred_returns_empty_dict() -> None:
     prediction directory (no labels exist for prediction)."""
     processor = PokemonClassificationDataProcessor()
     raw = processor.get_raw_labels(DEFAULT_DATASET_PRED_PATH)
-    assert not raw
+    assert raw == {}
 
 
 def test_get_raw_labels_trainvaltest_lengths_match_features() -> None:
