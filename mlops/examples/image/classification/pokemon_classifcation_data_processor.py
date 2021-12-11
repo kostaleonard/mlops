@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 from matplotlib.image import imread
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
-from mlops.examples.image.classification.errors import \
-    TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError
 
 # TODO should these be defined in the model training script?
 DEFAULT_DATASET_TRAINVALTEST_PATH = os.path.join('sample_data', 'pokemon',
@@ -35,6 +33,15 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         data for prediction, because in some cases the features and labels need
         to be read simultaneously to ensure proper ordering of features and
         labels.
+
+        Raw features are tensors of shape m x h x w x c, where m is the number
+        of images, h is the image height, w is the image width, and c is the
+        number of channels (3 for RGB), with all values in the interval
+        [0, 255]. Raw labels are tensors of shape m, where m is the number of
+        examples. All entries are strings from CLASSES indicating 1 or 2 (if
+        multi-typed) types belonging to the sample. If the sample has 2 types,
+        then the string will be comma separated as follows: 'typeA,typeB',
+        where the comma-separated types are not ordered.
 
         :param dataset_path: The path to the file or directory on the local or
             remote filesystem containing the dataset, specifically
@@ -65,27 +72,6 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         """
         # TODO add support for loading dataset from S3
         # TODO raise error on 'trainvaltest' because labels have to be grabbed at the same time.
-
-    def get_raw_labels(self, dataset_path: str) -> dict[str, np.ndarray]:
-        """Returns the raw label tensors from the dataset path. The raw labels
-        are how training/validation/test as well as prediction data enter the
-        data pipeline. Raw labels are tensors of shape m, where m is the number
-        of examples. All entries are strings from CLASSES indicating 1 or 2
-        (if multi-typed) types belonging to the sample. If the sample has 2
-        types, then the string will be comma separated as follows:
-        'typeA,typeB', where the comma-separated types are not ordered.
-
-        :param dataset_path: The path to the file or directory on the local or
-            remote filesystem containing the dataset.
-        :return: A dictionary whose values are label tensors and whose
-            corresponding keys are the names by which those tensors should be
-            referenced. The returned keys will be {'y_train', 'y_val', 'y_test'}
-            if the directory indicated by dataset_path ends with 'trainvaltest',
-            and {} otherwise (no labels are available).
-        """
-        # TODO add support for loading dataset from S3
-        # TODO raise error on 'trainvaltest' because features have to be grabbed at the same time.
-        # TODO
 
     def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor. The
