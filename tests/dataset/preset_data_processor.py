@@ -33,8 +33,10 @@ class PresetDataProcessor(InvertibleDataProcessor):
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
-        return (self.get_raw_features(dataset_path),
-                self.get_raw_labels(dataset_path))
+        labels = {'y_train': PRESET_RAW_LABELS[:TRAIN_END],
+                  'y_val': PRESET_RAW_LABELS[TRAIN_END:VAL_EMD],
+                  'y_test': PRESET_RAW_LABELS[VAL_EMD:]}
+        return self.get_raw_features(dataset_path), labels
 
     def get_raw_features(self,
                          dataset_path: str) -> dict[str, np.ndarray]:
@@ -49,19 +51,6 @@ class PresetDataProcessor(InvertibleDataProcessor):
         return {'X_train': PRESET_RAW_FEATURES[:TRAIN_END],
                 'X_val': PRESET_RAW_FEATURES[TRAIN_END:VAL_EMD],
                 'X_test': PRESET_RAW_FEATURES[VAL_EMD:]}
-
-    def get_raw_labels(self, dataset_path: str) -> dict[str, np.ndarray]:
-        """Returns the preset raw label tensors.
-
-        :param dataset_path: Unused.
-        :return: A dictionary containing the following entries.
-            'y_train': The training labels. 70% of the dataset.
-            'y_val': The validation labels. 20% of the dataset.
-            'y_test': The test labels. 10% of the dataset.
-        """
-        return {'y_train': PRESET_RAW_LABELS[:TRAIN_END],
-                'y_val': PRESET_RAW_LABELS[TRAIN_END:VAL_EMD],
-                'y_test': PRESET_RAW_LABELS[VAL_EMD:]}
 
     def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor.

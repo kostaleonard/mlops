@@ -50,26 +50,6 @@ class DataProcessor(ABC):
         return {name: self.preprocess_features(raw_feature_tensor)
                 for name, raw_feature_tensor in raw_feature_tensors.items()}
 
-    def get_preprocessed_labels(self, dataset_path: str) -> \
-            dict[str, np.ndarray]:
-        """Transforms the raw data at the given file or directory into labels
-        that can be used by downstream models. The data in the directory may be
-        the training/validation/test data, or it may be a batch of user data
-        that is intended for prediction, or data in some other format.
-        Downstream models can expect the labels returned by this function to
-        be preprocessed in any way required for model consumption.
-
-        :param dataset_path: The path to the file or directory on the local or
-            remote filesystem containing the dataset.
-        :return: A dictionary whose values are label tensors and whose
-            corresponding keys are the names by which those tensors should be
-            referenced. For example, the training labels (value) may be called
-            'y_train' (key).
-        """
-        raw_label_tensors = self.get_raw_labels(dataset_path)
-        return {name: self.preprocess_labels(raw_label_tensor)
-                for name, raw_label_tensor in raw_label_tensors.items()}
-
     @abstractmethod
     def get_raw_features_and_labels(self, dataset_path: str) -> \
             (dict[str, np.ndarray], dict[str, np.ndarray]):
@@ -78,6 +58,13 @@ class DataProcessor(ABC):
         data for prediction, because in some cases the features and labels need
         to be read simultaneously to ensure proper ordering of features and
         labels.
+
+        For example, when handling image data, the raw features would likely be
+        tensors of shape m x h x w x c, where m is the number of images, h is
+        the image height, w is the image width, and c is the number of channels
+        (3 for RGB), with all values in the interval [0, 255]. The raw labels
+        may be tensors of shape m, where m is the number of examples, with all
+        values in the set {0, ..., k - 1} indicating the class.
 
         :param dataset_path: The path to the file or directory on the local or
             remote filesystem containing the dataset, specifically
@@ -102,22 +89,6 @@ class DataProcessor(ABC):
             corresponding keys are the names by which those tensors should be
             referenced. For example, the training features (value) may be called
             'X_train' (key).
-        """
-
-    @abstractmethod
-    def get_raw_labels(self, dataset_path: str) -> dict[str, np.ndarray]:
-        """Returns the raw label tensors from the dataset path. The raw labels
-        are how training/validation/test as well as prediction data enter the
-        data pipeline. For example, in a classification task, the raw labels may
-        be tensors of shape m, where m is the number of examples, with all
-        values in the set {0, ..., k - 1} indicating the class.
-
-        :param dataset_path: The path to the file or directory on the local or
-            remote filesystem containing the dataset.
-        :return: A dictionary whose values are label tensors and whose
-            corresponding keys are the names by which those tensors should be
-            referenced. For example, the training labels (value) may be called
-            'y_train' (key).
         """
 
     @abstractmethod

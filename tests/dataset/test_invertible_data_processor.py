@@ -25,8 +25,10 @@ def test_unpreprocess_features_returns_raw_features() -> None:
 def test_unpreprocess_labels_returns_raw_labels() -> None:
     """Tests that unpreprocess_labels inverts label preprocessing."""
     processor = PresetDataProcessor()
-    labels = processor.get_preprocessed_labels('path/to/my/labels')
-    raw_labels = processor.get_raw_labels('path/to/my/labels')
+    _, labels = processor.get_preprocessed_features_and_labels(
+        'path/to/my/dataset')
+    _, raw_labels = processor.get_raw_features_and_labels(
+        'path/to/my/dataset')
     for name in labels:
         inverted_labels = processor.unpreprocess_labels(labels[name])
         assert np.array_equal(inverted_labels, raw_labels[name])
