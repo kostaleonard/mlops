@@ -66,7 +66,23 @@ def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
     assert set(raw.keys()) == {'X_train', 'X_val', 'X_test'}
 
 
-# TODO test that raw features are the same either way.
+def test_get_raw_features_match() -> None:
+    """Tests that the features produced by get_raw_features_and_labels and
+    get_raw_features are the same features."""
+    processor = PokemonClassificationDataProcessor()
+    features, _ = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    X_all = np.concatenate((features['X_train'],
+                            features['X_val'],
+                            features['X_test']))
+    features_only = processor.get_raw_features(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    X_all_only = np.concatenate((features_only['X_train'],
+                                 features_only['X_val'],
+                                 features_only['X_test']))
+    X_all.sort(axis=0)
+    X_all_only.sort(axis=0)
+    assert np.array_equal(X_all, X_all_only)
 
 
 def test_get_raw_features_pred_returns_expected_keys() -> None:
