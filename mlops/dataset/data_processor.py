@@ -8,6 +8,29 @@ class DataProcessor(ABC):
     """Transforms a raw dataset into features and labels for downstream model
     training, prediction, etc."""
 
+    def get_preprocessed_features_and_labels(self, dataset_path: str) -> \
+            (dict[str, np.ndarray], dict[str, np.ndarray]):
+        """Returns the preprocessed feature and label tensors from the dataset
+        path. This method is specifically used for the train/val/test sets and
+        not input data for prediction, because in some cases the features and
+        labels need to be read simultaneously to ensure proper ordering of
+        features and labels.
+
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset, specifically
+            train/val/test and not prediction data.
+        :return: A 2-tuple of the features dictionary and labels dictionary,
+            with matching keys and ordered tensors.
+        """
+        # TODO test
+        raw_feature_tensors, raw_label_tensors = \
+            self.get_raw_features_and_labels(dataset_path)
+        features = {name: self.preprocess_features(raw_feature_tensor)
+                    for name, raw_feature_tensor in raw_feature_tensors.items()}
+        labels = {name: self.preprocess_labels(raw_label_tensor)
+                  for name, raw_label_tensor in raw_label_tensors.items()}
+        return features, labels
+
     def get_preprocessed_features(self, dataset_path: str) -> \
             dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
@@ -47,6 +70,23 @@ class DataProcessor(ABC):
         raw_label_tensors = self.get_raw_labels(dataset_path)
         return {name: self.preprocess_labels(raw_label_tensor)
                 for name, raw_label_tensor in raw_label_tensors.items()}
+
+    @abstractmethod
+    def get_raw_features_and_labels(self, dataset_path: str) -> \
+            (dict[str, np.ndarray], dict[str, np.ndarray]):
+        """Returns the raw feature and label tensors from the dataset path. This
+        method is specifically used for the train/val/test sets and not input
+        data for prediction, because in some cases the features and labels need
+        to be read simultaneously to ensure proper ordering of features and
+        labels.
+
+        :param dataset_path: The path to the file or directory on the local or
+            remote filesystem containing the dataset, specifically
+            train/val/test and not prediction data.
+        :return: A 2-tuple of the features dictionary and labels dictionary,
+            with matching keys and ordered tensors.
+        """
+        # TODO test
 
     @abstractmethod
     def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:

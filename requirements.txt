@@ -2,7 +2,9 @@ pylint
 pytest
 pytest-cov
 numpy
+pandas
 tensorflow
 boto3
 botocore
 s3fs
+matplotlib

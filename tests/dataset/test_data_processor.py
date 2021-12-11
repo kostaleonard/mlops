@@ -92,3 +92,34 @@ def test_preprocessed_labels_match() -> None:
         manually_preprocessed_labels = processor.preprocess_labels(
             raw_labels[name])
         assert np.array_equal(manually_preprocessed_labels, labels[name])
+
+
+def test_get_raw_features_and_labels_gets_features_and_labels() -> None:
+    """Tests that get_raw_features_and_labels returns both the features and the
+    labels."""
+    processor = PresetDataProcessor()
+    features, labels = processor.get_raw_features_and_labels('path/to/dataset')
+    features_only = processor.get_raw_features('path/to/my/features')
+    labels_only = processor.get_raw_labels('path/to/my/labels')
+    assert set(features.keys()) == set(features_only.keys())
+    assert set(labels.keys()) == set(labels_only.keys())
+    for name in features:
+        assert np.array_equal(features[name], features_only[name])
+    for name in labels:
+        assert np.array_equal(labels[name], labels_only[name])
+
+
+def test_get_preprocessed_features_and_labels_correct_preprocessing() -> None:
+    """Tests that get_preprocessed_features_and_labels returns correctly
+    preprocessed features and labels."""
+    processor = PresetDataProcessor()
+    features, labels = processor.get_preprocessed_features_and_labels(
+        'path/to/dataset')
+    features_only = processor.get_preprocessed_features('path/to/my/features')
+    labels_only = processor.get_preprocessed_labels('path/to/my/labels')
+    assert set(features.keys()) == set(features_only.keys())
+    assert set(labels.keys()) == set(labels_only.keys())
+    for name in features:
+        assert np.array_equal(features[name], features_only[name])
+    for name in labels:
+        assert np.array_equal(labels[name], labels_only[name])

@@ -25,6 +25,17 @@ SCALING_FACTOR = 10
 class PresetDataProcessor(InvertibleDataProcessor):
     """Processes a preset dataset, with no file I/O."""
 
+    def get_raw_features_and_labels(self, dataset_path: str) -> \
+            (dict[str, np.ndarray], dict[str, np.ndarray]):
+        """Returns preset raw feature and label tensors.
+
+        :param dataset_path: Unused
+        :return: A 2-tuple of the features dictionary and labels dictionary,
+            with matching keys and ordered tensors.
+        """
+        return (self.get_raw_features(dataset_path),
+                self.get_raw_labels(dataset_path))
+
     def get_raw_features(self,
                          dataset_path: str) -> dict[str, np.ndarray]:
         """Returns the preset raw features.
