@@ -22,7 +22,6 @@ class DataProcessor(ABC):
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
-        # TODO test
         raw_feature_tensors, raw_label_tensors = \
             self.get_raw_features_and_labels(dataset_path)
         features = {name: self.preprocess_features(raw_feature_tensor)
@@ -86,7 +85,6 @@ class DataProcessor(ABC):
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
-        # TODO test
 
     @abstractmethod
     def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:

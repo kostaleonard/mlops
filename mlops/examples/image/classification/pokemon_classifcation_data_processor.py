@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from matplotlib.image import imread
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
+from mlops.examples.image.classification.errors import \
+    TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError
 
 # TODO should these be defined in the model training script?
 DEFAULT_DATASET_TRAINVALTEST_PATH = os.path.join('sample_data', 'pokemon',

@@ -1,10 +1,14 @@
 """Tests pokemon_classification_data_processor.py."""
 
+import pytest
 import numpy as np
 from mlops.examples.image.classification.pokemon_classifcation_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
     HEIGHT, WIDTH, CHANNELS, CLASSES
+from mlops.examples.image.classification.errors import \
+    TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError, \
+    AttemptedToLoadPredictionLabelsError
 
 EXPECTED_NUM_TRAINVALTEST = 10
 EXPECTED_NUM_TRAIN = 7
@@ -18,12 +22,33 @@ CHARIZARD_IMG_MEAN = 43.64101851851852
 CHARIZARD_LABEL = 'Fire,Flying'
 
 
-def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
-    """Tests that get_raw_features returns the expected keys {'X_train',
-    'X_val', 'X_test'} when called on the train/val/test directory."""
+def test_get_raw_features_and_labels_returns_expected_keys() -> None:
+    """Tests that get_raw_features_and_labels returns the expected keys for the
+    train/val/test dataset."""
     processor = PokemonClassificationDataProcessor()
-    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
-    assert set(raw.keys()) == {'X_train', 'X_val', 'X_test'}
+    features, labels = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    assert set(features.keys()) == {'X_train', 'X_val', 'X_test'}
+    assert set(labels.keys()) == {'y_train', 'y_val', 'y_test'}
+
+
+def test_get_raw_features_and_labels_pred_raises_error() -> None:
+    """Tests that get_raw_features_and_labels raises
+    AttemptedToLoadPredictionLabelsError when called on the prediction
+    directory."""
+    processor = PokemonClassificationDataProcessor()
+    with pytest.raises(AttemptedToLoadPredictionLabelsError):
+        _ = processor.get_raw_features_and_labels(DEFAULT_DATASET_PRED_PATH)
+
+
+def test_get_raw_features_trainvaltest_raises_error() -> None:
+    """Tests that get_raw_features raises
+    TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError when called on the
+    train/val/test directory."""
+    processor = PokemonClassificationDataProcessor()
+    with pytest.raises(
+            TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError):
+        _ = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
 
 
 def test_get_raw_features_pred_returns_expected_keys() -> None:
@@ -35,23 +60,64 @@ def test_get_raw_features_pred_returns_expected_keys() -> None:
     assert set(raw.keys()) == {'X_pred'}
 
 
-def test_get_raw_features_trainvaltest_correct_split() -> None:
+def test_get_raw_features_and_labels_trainvaltest_correct_split() -> None:
     """Tests that the train/val/test datasets are split into the expected
     sizes."""
     processor = PokemonClassificationDataProcessor()
-    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
-    num_examples = sum(map(len, raw.values()))
+    features, labels = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    num_examples = sum(map(len, features.values()))
     assert num_examples == EXPECTED_NUM_TRAINVALTEST
-    assert raw['X_train'] == EXPECTED_NUM_TRAIN
-    assert raw['X_val'] == EXPECTED_NUM_VAL
-    assert raw['X_test'] == EXPECTED_NUM_TRAINVALTEST - EXPECTED_NUM_TRAIN - \
-           EXPECTED_NUM_VAL
+    assert len(features['X_train']) == EXPECTED_NUM_TRAIN
+    assert len(features['X_val']) == EXPECTED_NUM_VAL
+    assert len(features['X_test']) == EXPECTED_NUM_TRAINVALTEST - \
+           EXPECTED_NUM_TRAIN - EXPECTED_NUM_VAL
+    assert len(features['X_train']) == len(labels['y_train'])
+    assert len(features['X_val']) == len(labels['y_val'])
+    assert len(features['X_test']) == len(labels['y_test'])
 
 
-def test_get_raw_features_correct_tensor_shapes() -> None:
-    """Tests that get_raw_features returns tensors of the expected shapes."""
+def test_get_raw_features_and_labels_correct_tensor_shapes() -> None:
+    """Tests that get_raw_features_and_labels returns tensors of the expected
+    shapes."""
     processor = PokemonClassificationDataProcessor()
-    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    features, labels = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in features.values():
+        assert tensor.shape[1:] == (HEIGHT, WIDTH, CHANNELS)
+    for tensor in labels.values():
+        assert len(tensor.shape) == 1
+
+
+def test_get_raw_features_and_labels_correct_dtype() -> None:
+    """Tests that get_raw_features_and_labels returns tensors of the expected
+    dtype."""
+    processor = PokemonClassificationDataProcessor()
+    features, labels = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in features.values():
+        assert tensor.dtype == np.uint8
+    for tensor in labels.values():
+        assert np.issubdtype(tensor.dtype, np.unicode_)
+
+
+def test_get_raw_features_and_labels_correct_value_range() -> None:
+    """Tests that get_raw_features_and_labels returns tensors of the expected
+    value range."""
+    processor = PokemonClassificationDataProcessor()
+    features, labels = processor.get_raw_features_and_labels(
+        DEFAULT_DATASET_TRAINVALTEST_PATH)
+    for tensor in features.values():
+        assert tensor.min() >= PIXEL_MIN
+        assert tensor.max() <= PIXEL_MAX
+    for tensor in labels.values():
+        assert np.issubdtype(tensor.dtype, np.unicode_)
+
+
+def test_get_raw_features_correct_shape() -> None:
+    """Tests that get_raw_features returns tensors with the expected shapes."""
+    processor = PokemonClassificationDataProcessor()
+    raw = processor.get_raw_features(DEFAULT_DATASET_PRED_PATH)
     for tensor in raw.values():
         assert tensor.shape[1:] == (HEIGHT, WIDTH, CHANNELS)
 
@@ -59,7 +125,7 @@ def test_get_raw_features_correct_tensor_shapes() -> None:
 def test_get_raw_features_correct_dtype() -> None:
     """Tests that get_raw_features returns tensors with dtype uint8."""
     processor = PokemonClassificationDataProcessor()
-    raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
+    raw = processor.get_raw_features(DEFAULT_DATASET_PRED_PATH)
     for tensor in raw.values():
         assert tensor.dtype == np.uint8
 
@@ -90,12 +156,14 @@ def test_get_raw_features_have_multiple_pixel_values() -> None:
         assert len(np.unique(tensor)) > 1
 
 
-def test_get_raw_labels_trainvaltest_returns_expected_keys() -> None:
-    """Tests that get_raw_labels returns the expected keys {'y_train', 'y_val',
-    'y_test'} when called on the train/val/test directory."""
+def test_get_raw_labels_trainvaltest_raises_error() -> None:
+    """Tests that get_raw_labels raises
+    TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError when called on the
+    train/val/test directory."""
     processor = PokemonClassificationDataProcessor()
-    raw = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
-    assert set(raw.keys()) == {'y_train', 'y_val', 'y_test'}
+    with pytest.raises(
+            TrainValTestFeaturesAndLabelsNotLoadedSimultaneouslyError):
+        _ = processor.get_raw_labels(DEFAULT_DATASET_TRAINVALTEST_PATH)
 
 
 def test_get_raw_labels_pred_returns_empty_dict() -> None:
