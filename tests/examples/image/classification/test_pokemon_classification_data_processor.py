@@ -6,8 +6,7 @@ from mlops.examples.image.classification.pokemon_classifcation_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
     HEIGHT, WIDTH, CHANNELS, CLASSES
-from mlops.examples.image.classification.errors import \
-    AttemptedToLoadPredictionLabelsError
+from mlops.examples.image.classification.errors import LabelsNotFoundError
 
 EXPECTED_NUM_TRAINVALTEST = 10
 EXPECTED_NUM_TRAIN = 7
@@ -15,10 +14,10 @@ EXPECTED_NUM_VAL = 2
 EXPECTED_NUM_PRED = 3
 PIXEL_MIN = 0
 PIXEL_MAX = 255
-BULBASAUR_IMG_MEAN = 16.415393518518517
-BULBASAUR_LABEL = 'Grass,Poison'
-CHARIZARD_IMG_MEAN = 43.64101851851852
-CHARIZARD_LABEL = 'Fire,Flying'
+BULBASAUR_IMG_MEAN = 0.06437409
+BULBASAUR_LABEL = {'Grass', 'Poison'}
+CHARIZARD_IMG_MEAN = 0.17114125
+CHARIZARD_LABEL = {'Fire', 'Flying'}
 
 
 def test_get_raw_features_and_labels_returns_expected_keys() -> None:
@@ -32,11 +31,10 @@ def test_get_raw_features_and_labels_returns_expected_keys() -> None:
 
 
 def test_get_raw_features_and_labels_pred_raises_error() -> None:
-    """Tests that get_raw_features_and_labels raises
-    AttemptedToLoadPredictionLabelsError when called on the prediction
-    directory."""
+    """Tests that get_raw_features_and_labels raises LabelsNotFoundError when
+    called on the prediction directory."""
     processor = PokemonClassificationDataProcessor()
-    with pytest.raises(AttemptedToLoadPredictionLabelsError):
+    with pytest.raises(LabelsNotFoundError):
         _ = processor.get_raw_features_and_labels(DEFAULT_DATASET_PRED_PATH)
 
 
@@ -103,11 +101,11 @@ def test_get_raw_features_correct_shape() -> None:
 
 
 def test_get_raw_features_correct_dtype() -> None:
-    """Tests that get_raw_features returns tensors with dtype uint8."""
+    """Tests that get_raw_features returns tensors with dtype float32."""
     processor = PokemonClassificationDataProcessor()
     raw = processor.get_raw_features(DEFAULT_DATASET_PRED_PATH)
     for tensor in raw.values():
-        assert tensor.dtype == np.uint8
+        assert tensor.dtype == np.float32
 
 
 def test_get_raw_features_correct_value_range() -> None:
@@ -115,8 +113,8 @@ def test_get_raw_features_correct_value_range() -> None:
     processor = PokemonClassificationDataProcessor()
     raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
     for tensor in raw.values():
-        assert tensor.min() >= PIXEL_MIN
-        assert tensor.max() <= PIXEL_MAX
+        assert tensor.min() >= 0
+        assert tensor.max() <= 1
 
 
 def test_get_raw_features_no_na() -> None:
@@ -153,7 +151,7 @@ def test_get_raw_labels_correct_tensor_shapes() -> None:
     _, raw = processor.get_raw_features_and_labels(
         DEFAULT_DATASET_TRAINVALTEST_PATH)
     for tensor in raw.values():
-        assert len(tensor.shape) == 1
+        assert tensor.shape[1:] == (2,)
 
 
 def test_get_raw_labels_correct_dtype() -> None:
@@ -162,18 +160,7 @@ def test_get_raw_labels_correct_dtype() -> None:
     _, raw = processor.get_raw_features_and_labels(
         DEFAULT_DATASET_TRAINVALTEST_PATH)
     for tensor in raw.values():
-        assert np.issubdtype(tensor.dtype, np.unicode_)
-
-
-def test_get_raw_labels_min_one_max_two_classes() -> None:
-    """Tests that all raw labels have at a minimum one and a maximum two
-    classes."""
-    processor = PokemonClassificationDataProcessor()
-    _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    for tensor in raw.values():
-        for row in tensor:
-            assert row.count(',') in {0, 1}
+        assert tensor.dtype == np.object
 
 
 def test_get_raw_labels_valid_classes() -> None:
@@ -183,18 +170,8 @@ def test_get_raw_labels_valid_classes() -> None:
         DEFAULT_DATASET_TRAINVALTEST_PATH)
     for tensor in raw.values():
         for row in tensor:
-            labels = row.split(',')
-            for label in labels:
-                assert label in CLASSES
-
-
-def test_get_raw_labels_no_na() -> None:
-    """Tests that there are no missing values in the raw labels."""
-    processor = PokemonClassificationDataProcessor()
-    _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    for tensor in raw.values():
-        assert not np.isnan(tensor).any()
+            assert row[0] in CLASSES
+            assert row[1] is None or row[1] in CLASSES
 
 
 def test_preprocessed_features_same_shape_as_raw() -> None:
@@ -284,7 +261,7 @@ def test_preprocess_labels_min_one_max_two_classes() -> None:
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         row_sums = preprocessed.sum(axis=1)
-        assert set(np.unique(row_sums)) == {1, 2}
+        assert set(np.unique(row_sums)).union({1, 2}) == {1, 2}
 
 
 def test_unpreprocess_features_inverts_transformation() -> None:
@@ -328,10 +305,10 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
         if np.isclose(X_all[idx].mean(), BULBASAUR_IMG_MEAN):
             bulbasaur_idx = idx
     assert bulbasaur_idx is not None
-    assert y_all[bulbasaur_idx] == BULBASAUR_LABEL
+    assert set(y_all[bulbasaur_idx]) == BULBASAUR_LABEL
     charizard_idx = None
     for idx in range(len(X_all)):
         if np.isclose(X_all[idx].mean(), CHARIZARD_IMG_MEAN):
             charizard_idx = idx
     assert charizard_idx is not None
-    assert y_all[charizard_idx] == CHARIZARD_LABEL
+    assert set(y_all[charizard_idx]) == CHARIZARD_LABEL
