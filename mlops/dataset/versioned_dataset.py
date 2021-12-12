@@ -35,12 +35,12 @@ class VersionedDataset:
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            setattr(self, 'md5', metadata['hash'])
+            self.md5 = metadata['hash']
             # Get data processor.
             with fs.open(os.path.join(path, 'data_processor.pkl'),
                          'rb') as infile:
                 processor = pickle.loads(infile.read())
-            setattr(self, 'data_processor', processor)
+            self.data_processor = processor
         else:
             # Get tensors.
             tensor_filenames = {tensor_filename
@@ -56,11 +56,11 @@ class VersionedDataset:
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            setattr(self, 'md5', metadata['hash'])
+            self.md5 = metadata['hash']
             # Get data processor.
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
                 processor = pickle.loads(infile.read())
-            setattr(self, 'data_processor', processor)
+            self.data_processor = processor
 
     def __eq__(self, other: 'VersionedDataset') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,
