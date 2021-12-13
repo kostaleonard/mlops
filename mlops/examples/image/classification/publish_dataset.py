@@ -12,12 +12,13 @@ PUBLICATION_PATH_LOCAL = os.path.join('datasets', 'pokemon')
 PUBLICATION_PATH_S3 = 's3://kosta-mlops/datasets/pokemon'
 TAGS = ['image', 'classification']
 
-# TODO test script
-
 
 def publish_dataset(publication_path: str) -> None:
-    """Builds and publishes the dataset."""
-    # TODO update docstring
+    """Builds and publishes the dataset.
+
+    :param publication_path: The path on the local or remote filesystem to which
+        to publish the dataset.
+    """
     processor = PokemonClassificationDataProcessor()
     builder = VersionedDatasetBuilder(DEFAULT_DATASET_TRAINVALTEST_PATH,
                                       processor)
@@ -31,4 +32,3 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
-
