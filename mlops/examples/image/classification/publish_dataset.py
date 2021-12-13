@@ -7,9 +7,9 @@ from mlops.examples.image.classification.pokemon_classifcation_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH
 
-VERSION = 'v1'
-PUBLICATION_PATH_LOCAL = os.path.join('datasets', 'pokemon')
-PUBLICATION_PATH_S3 = 's3://kosta-mlops/datasets/pokemon'
+DATASET_VERSION = 'v1'
+DATASET_PUBLICATION_PATH_LOCAL = os.path.join('datasets', 'pokemon')
+DATASET_PUBLICATION_PATH_S3 = 's3://kosta-mlops/datasets/pokemon'
 TAGS = ['image', 'classification']
 
 
@@ -22,12 +22,12 @@ def publish_dataset(publication_path: str) -> None:
     processor = PokemonClassificationDataProcessor()
     builder = VersionedDatasetBuilder(DEFAULT_DATASET_TRAINVALTEST_PATH,
                                       processor)
-    builder.publish(publication_path, VERSION, tags=TAGS)
+    builder.publish(publication_path, DATASET_VERSION, tags=TAGS)
 
 
 def main() -> None:
     """Runs the program."""
-    publish_dataset(PUBLICATION_PATH_LOCAL)
+    publish_dataset(DATASET_PUBLICATION_PATH_LOCAL)
 
 
 if __name__ == '__main__':
