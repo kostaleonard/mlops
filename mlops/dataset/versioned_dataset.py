@@ -9,7 +9,6 @@ from s3fs import S3FileSystem
 
 class VersionedDataset:
     """Represents a versioned dataset."""
-    # TODO add key attributes to docstring.
 
     def __init__(self, path: str) -> None:
         """Instantiates the object.

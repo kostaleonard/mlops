@@ -4,8 +4,6 @@ from typing import Any
 from dataclasses import dataclass
 from tensorflow.keras.callbacks import History
 
-# TODO test script
-
 
 @dataclass
 class TrainingConfig:
