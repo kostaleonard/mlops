@@ -1,19 +1,19 @@
 """Trains a new model on the Pokemon classification task."""
 
 import os
-from typing import Optional
+from typing import Optional, Any
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import History
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
+from mlops.model.training_config import TrainingConfig
 from mlops.examples.image.classification.publish_dataset import \
     DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
-from mlops.examples.image.classification.pokemon_classifcation_data_processor \
-    import DEFAULT_DATASET_PRED_PATH
 
 MODEL_PUBLICATION_PATH_LOCAL = os.path.join('models', 'pokemon')
 MODEL_PUBLICATION_PATH_S3 = 's3://kosta-mlops/models/pokemon'
 
+TAGS = ['baseline']
 # TODO test script
 
 
@@ -32,24 +32,27 @@ def get_baseline_model(dataset: VersionedDataset) -> Model:
 def train_model(model: Model,
                 dataset: VersionedDataset,
                 use_wandb: bool = False,
-                **fit_kwargs) -> History:
-    """Trains the model on the dataset and returns the training history object.
+                **fit_kwargs) -> TrainingConfig:
+    """Trains the model on the dataset and returns the training configuration
+    object.
 
     :param model: The Keras Model to be trained.
     :param dataset: The input dataset.
     :param use_wandb: If True, sync the run with wandb.
     :param fit_kwargs: Keyword arguments to be passed to model.fit().
+    :return: The training configuration.
     """
-    # TODO how does this capture training config? Maybe it should be JSON of all hyperparams, and the History should be just a part of the JSON
+    # TODO
 
 
 def publish_model(model: Model,
                   dataset: VersionedDataset,
-                  history: History,
+                  training_config: TrainingConfig,
                   publication_path: str,
                   tags: Optional[list[str]] = None) -> None:
     """Publishes the model to the path on the local or remote filesystem."""
-    builder = VersionedModelBuilder(dataset, model, history)
+    # TODO docstring
+    builder = VersionedModelBuilder(dataset, model, training_config)
     builder.publish(publication_path, tags=tags)
 
 
@@ -57,11 +60,13 @@ def main() -> None:
     """Runs the program."""
     dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
-    print(len(dataset.X_train))
-    print(dataset.y_train)
-    print(dataset.data_processor.unpreprocess_labels(dataset.y_train))
-    print(dataset.data_processor.get_raw_features(
-        DEFAULT_DATASET_PRED_PATH)['X_pred'].shape)
+    model = get_baseline_model(dataset)
+    training_config = train_model(model, dataset, epochs=5, batch_size=4)
+    publish_model(model,
+                  dataset,
+                  training_config,
+                  MODEL_PUBLICATION_PATH_LOCAL,
+                  tags=TAGS)
 
 
 if __name__ == '__main__':

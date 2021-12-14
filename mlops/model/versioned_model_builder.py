@@ -3,8 +3,8 @@
 
 from typing import Optional
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import History
 from mlops.dataset.versioned_dataset import VersionedDataset
+from mlops.model.training_config import TrainingConfig
 
 
 class VersionedModelBuilder:
@@ -14,14 +14,14 @@ class VersionedModelBuilder:
     def __init__(self,
                  versioned_dataset: VersionedDataset,
                  model: Model,
-                 history: History) -> None:
+                 training_config: TrainingConfig) -> None:
         """Instantiates the object.
 
         :param versioned_dataset: The versioned dataset object with which the
             model was trained/validated/tested. Used to preprocess new data at
             prediction time.
         :param model: The trained Keras model.
-        :param history: The model's training history.
+        :param training_config: The model's training configuration.
         """
         # TODO
 
@@ -36,13 +36,15 @@ class VersionedModelBuilder:
         The following files will be created:
             path/version/ (the publication path and version)
                 model.h5 (the saved model)
-                dataset.txt (a file containing a link to the dataset used)
                 meta.json (metadata)
 
         The contents of meta.json will be:
             {
                 version: (model version)
                 hash: (MD5 hash of all objects apart from meta.json)
+                dataset: (the link to the dataset used during training)
+                history: (the training history dictionary)
+                train_args: (the training arguments dictionary)
                 created_at: (timestamp)
                 tags: (optional list of tags)
             }
