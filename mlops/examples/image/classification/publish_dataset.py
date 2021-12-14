@@ -3,7 +3,7 @@ be run any time the data processor changes."""
 
 import os
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
-from mlops.examples.image.classification.pokemon_classifcation_data_processor \
+from mlops.examples.image.classification.pokemon_classification_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH
 

@@ -2,7 +2,7 @@
 
 import pytest
 import numpy as np
-from mlops.examples.image.classification.pokemon_classifcation_data_processor \
+from mlops.examples.image.classification.pokemon_classification_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
     HEIGHT, WIDTH, CHANNELS, CLASSES
@@ -312,3 +312,64 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
             charizard_idx = idx
     assert charizard_idx is not None
     assert set(y_all[charizard_idx]) == CHARIZARD_LABEL
+
+
+def test_get_valid_prediction_correct_shape() -> None:
+    """Tests that the output of get_valid_prediction is of the same shape as
+    the input."""
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
+                         [0.3, 0.4, 0.1, 0.1]])
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
+    assert pred_arr.shape == valid.shape
+
+
+def test_get_valid_prediction_output_is_binary() -> None:
+    """Tests that the output of get_valid_prediction on arbitrary input is
+    binary."""
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
+                         [0.3, 0.4, 0.1, 0.1],
+                         [-1, 5, 2, 0.5]])
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
+    assert set(np.unique(valid)) == {0, 1}
+
+
+def test_get_valid_prediction_chooses_highest() -> None:
+    """Tests that get_valid_prediction chooses the highest scores as output."""
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
+                         [0.3, 0.4, 0.1, 0.1],
+                         [0.9, 0.9, 0.8, 0.8]])
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
+    assert valid.tolist() == [[1, 0, 0, 1],
+                              [0, 1, 0, 0],
+                              [1, 1, 0, 0]]
+
+
+def test_get_valid_prediction_one_or_two_classes() -> None:
+    """Tests that get_valid_prediction returns predictions with one or two
+    classes."""
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
+                         [0.3, 0.4, 0.1, 0.1],
+                         [0.9, 0.9, 0.9, 0.9],
+                         [0.1, 0.1, 0.1, 0.1],
+                         [2.0, 2.0, 2.0, 2.0]])
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
+    row_sums = valid.sum(axis=1)
+    assert set(row_sums) == {1, 2}
+
+
+def test_get_valid_prediction_threshold_only_affects_second_highest() -> None:
+    """Tests that the decision threshold only affects the second highest
+    prediction value."""
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
+                         [0.3, 0.4, 0.1, 0.1],
+                         [0.9, 0.8, 0.7, 0.7]])
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(
+        pred_arr, threshold=0.6)
+    assert valid.tolist() == [[1, 0, 0, 1],
+                              [0, 1, 0, 0],
+                              [1, 1, 0, 0]]
+    valid = PokemonClassificationDataProcessor.get_valid_prediction(
+        pred_arr, threshold=0.99)
+    assert valid.tolist() == [[1, 0, 0, 0],
+                              [0, 1, 0, 0],
+                              [1, 0, 0, 0]]

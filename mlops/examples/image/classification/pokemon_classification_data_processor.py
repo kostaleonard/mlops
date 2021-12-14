@@ -21,13 +21,13 @@ CLASSES = ['Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting',
 HEIGHT = 120
 WIDTH = 120
 CHANNELS = 3
+THRESHOLD = 0.5
 
 
 class PokemonClassificationDataProcessor(InvertibleDataProcessor):
     """Transforms the pokemon dataset at sample_data/pokemon into features and
     labels for classification."""
     # TODO add support for loading dataset from S3
-    # TODO add name as a feature to train better model
 
     def get_raw_features_and_labels(self, dataset_path: str) -> \
             (dict[str, np.ndarray], dict[str, np.ndarray]):
@@ -215,3 +215,31 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         if len(type_strs) == 1:
             type_strs.append(None)
         return np.array(type_strs)
+
+    @staticmethod
+    def get_valid_prediction(pred_arr: np.ndarray,
+                             threshold: float = THRESHOLD) -> np.ndarray:
+        """Returns a valid binary prediction from the raw prediction tensor. A
+        valid prediction has one or two 1s, and all other entries are 0. The
+        highest value in the prediction array is automatically converted to a 1,
+        and the second-highest is converted to a 1 if the value is higher than
+        the given decision threshold.
+
+        :param pred_arr: The raw model predictions; a tensor of shape m x k,
+            where m is the number of examples and k is the number of classes.
+            All entries are in the range [0, 1].
+        :param threshold: The decision threshold, in the range [0, 1]. If the
+            second-highest value in pred_arr is greater than this threshold, it
+            will be converted to a 1. The highest value is automatically
+            converted to a 1 (Pokemon have at least 1 type).
+        :return: The valid binary predictions; a tensor of shape m x k, where m
+            is the number of example and k is the number of classes. All entries
+            are in the set {0, 1}, and in each example there are 1 or 2 ones.
+        """
+        valid_arr = np.zeros_like(pred_arr)
+        top_indices = pred_arr.argsort(axis=1)[:, ::-1]
+        for idx in range(len(pred_arr)):
+            valid_arr[idx, top_indices[idx, 0]] = 1
+            if pred_arr[idx, top_indices[idx, 1]] >= threshold:
+                valid_arr[idx, top_indices[idx, 1]] = 1
+        return valid_arr
