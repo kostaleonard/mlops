@@ -17,7 +17,6 @@ MODEL_PUBLICATION_PATH_S3 = 's3://kosta-mlops/models/pokemon'
 MODEL_CHECKPOINT_FILENAME = os.path.join('models', 'pokemon', 'checkpoints',
                                          'model_best.h5')
 TAGS = ['baseline']
-# TODO test script
 
 
 def get_baseline_model(dataset: VersionedDataset) -> Model:
@@ -87,7 +86,6 @@ def train_model(model: Model,
                         validation_data=(dataset.X_val, dataset.y_val),
                         callbacks=callbacks,
                         **fit_kwargs)
-    # TODO if you want the best model, you could load the weights or implement a custom callback that keeps the best weights in memory
     return TrainingConfig(history, fit_kwargs)
 
 
@@ -96,8 +94,16 @@ def publish_model(model: Model,
                   training_config: TrainingConfig,
                   publication_path: str,
                   tags: Optional[list[str]] = None) -> None:
-    """Publishes the model to the path on the local or remote filesystem."""
-    # TODO docstring
+    """Publishes the model to the path on the local or remote filesystem.
+
+    :param model: The model to be published, with the exact weights desired for
+        publication (the user needs to set the weights to the best found during
+        training if that is what they desire).
+    :param dataset: The input dataset.
+    :param training_config: The training configuration.
+    :param publication_path: The path to which the model will be published.
+    :param tags: Optional tags for the published model.
+    """
     builder = VersionedModelBuilder(dataset, model, training_config)
     builder.publish(publication_path, tags=tags)
 
