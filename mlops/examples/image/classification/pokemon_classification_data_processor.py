@@ -132,6 +132,8 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         :return: The preprocessed feature tensor. This tensor is ready for
             downstream model consumption.
         """
+        # TODO remove
+        #raise ValueError
         # PNG images, when loaded by imread, are already scaled into [0, 1].
         return raw_feature_tensor.copy()
 

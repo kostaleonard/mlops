@@ -400,7 +400,7 @@ class VersionedDatasetBuilder:
         :param processor_path: The path to which to write the data processor.
         """
         with open(processor_path, 'wb') as outfile:
-            outfile.write(pickle.dumps(self.data_processor))
+            outfile.write(self._serialize_data_processor())
 
     def _write_data_processor_s3(self,
                                  processor_path: str,
@@ -411,7 +411,25 @@ class VersionedDatasetBuilder:
         :param fs: The S3 filesystem object to interface with S3.
         """
         with fs.open(processor_path, 'wb') as outfile:
-            outfile.write(pickle.dumps(self.data_processor))
+            outfile.write(self._serialize_data_processor())
+
+    def _serialize_data_processor(self) -> bytes:
+        """Returns the serialized representation of the data processor object.
+
+        :return: The serialized representation of the data processor object.
+        """
+        # See below dill issue on by-value serialization of classes not in
+        # __main__:
+        # https://github.com/uqfoundation/dill/issues/424
+        # The current workaround is provided here:
+        # https://github.com/pulumi/pulumi/pull/7755
+        obj_type = type(self.data_processor)
+        obj_module = obj_type.__module__
+        try:
+            obj_type.__module__ = '__main__'
+            return pickle.dumps(self.data_processor, recurse=True)
+        finally:
+            obj_type.__module__ = obj_module
 
     @staticmethod
     def _get_hash_local(files_to_hash: Collection[str]) -> str:
