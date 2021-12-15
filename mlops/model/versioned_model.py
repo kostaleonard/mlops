@@ -2,9 +2,6 @@
 # pylint: disable=no-name-in-module
 
 from typing import Callable, Any
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import History
-from mlops.dataset.versioned_dataset import VersionedDataset
 
 
 class VersionedModel:

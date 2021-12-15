@@ -69,4 +69,4 @@ class VersionedModelBuilder:
         """
         # TODO
 
-    # TODO mirror VersionedDatasetBuilder interface
+    # TODO mirror VersionedDatasetBuilder interface, inc. __eq__ and __hash__
