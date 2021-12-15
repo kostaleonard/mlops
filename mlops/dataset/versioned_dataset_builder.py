@@ -99,6 +99,7 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
+        # TODO data processor object needs to be saved as script, which could hopefully then be imported and instantiated.
         # TODO we should also save the contents of the data processor script as a reference, because we might want to look at the code to see exactly what transformation were applied to the data
         # TODO to cut down on repeated code, we might want to have functions that extract the data we want to save in some intermediate format (bytes? temporary files?) from local/S3, then have separate functions to publish those intermediate representations to local/S3.
         timestamp = datetime.now().isoformat()

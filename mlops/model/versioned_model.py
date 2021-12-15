@@ -17,7 +17,7 @@ class VersionedModel:
             store such as S3, from which the model should be loaded. An S3 path
             should be a URL of the form "s3://bucket-name/path/to/dir".
         """
-        # TODO Model, History, and VersionedDataset
+        # TODO get model, dataset path
 
     @staticmethod
     def get_best(paths: list[str],

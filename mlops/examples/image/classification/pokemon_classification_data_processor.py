@@ -27,7 +27,6 @@ THRESHOLD = 0.5
 class PokemonClassificationDataProcessor(InvertibleDataProcessor):
     """Transforms the pokemon dataset at sample_data/pokemon into features and
     labels for classification."""
-    # TODO add support for loading dataset from S3
 
     def get_raw_features_and_labels(self, dataset_path: str) -> \
             (dict[str, np.ndarray], dict[str, np.ndarray]):

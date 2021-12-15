@@ -5,6 +5,7 @@ from typing import Optional, Any
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, \
     Dropout
+from tensorflow.keras.callbacks import ModelCheckpoint
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
 from mlops.model.training_config import TrainingConfig
@@ -13,7 +14,8 @@ from mlops.examples.image.classification.publish_dataset import \
 
 MODEL_PUBLICATION_PATH_LOCAL = os.path.join('models', 'pokemon')
 MODEL_PUBLICATION_PATH_S3 = 's3://kosta-mlops/models/pokemon'
-
+MODEL_CHECKPOINT_FILENAME = os.path.join('models', 'pokemon', 'checkpoints',
+                                         'model_best.h5')
 TAGS = ['baseline']
 # TODO test script
 
@@ -62,7 +64,6 @@ def get_baseline_model(dataset: VersionedDataset) -> Model:
 
 def train_model(model: Model,
                 dataset: VersionedDataset,
-                use_wandb: bool = False,
                 model_checkpoint_filename: Optional[str] = None,
                 **fit_kwargs: Any) -> TrainingConfig:
     """Trains the model on the dataset and returns the training configuration
@@ -70,17 +71,23 @@ def train_model(model: Model,
 
     :param model: The Keras Model to be trained.
     :param dataset: The input dataset.
-    :param use_wandb: If True, sync the run with wandb.
     :param model_checkpoint_filename: If supplied, saves model checkpoints to
         the specified path.
     :param fit_kwargs: Keyword arguments to be passed to model.fit().
     :return: The training configuration.
     """
-    # TODO wandb and model checkpoint callbacks
+    callbacks = []
+    if model_checkpoint_filename:
+        checkpoint_callback = ModelCheckpoint(
+            model_checkpoint_filename,
+            save_best_only=True)
+        callbacks.append(checkpoint_callback)
     history = model.fit(x=dataset.X_train,
                         y=dataset.y_train,
                         validation_data=(dataset.X_val, dataset.y_val),
+                        callbacks=callbacks,
                         **fit_kwargs)
+    # TODO if you want the best model, you could load the weights or implement a custom callback that keeps the best weights in memory
     return TrainingConfig(history, fit_kwargs)
 
 
@@ -100,12 +107,18 @@ def main() -> None:
     dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
     model = get_baseline_model(dataset)
-    training_config = train_model(model, dataset, epochs=5, batch_size=4)
-    publish_model(model,
-                  dataset,
-                  training_config,
-                  MODEL_PUBLICATION_PATH_LOCAL,
-                  tags=TAGS)
+    training_config = train_model(
+        model,
+        dataset,
+        model_checkpoint_filename=MODEL_CHECKPOINT_FILENAME,
+        epochs=5,
+        batch_size=4)
+    publish_model(
+        model,
+        dataset,
+        training_config,
+        MODEL_PUBLICATION_PATH_LOCAL,
+        tags=TAGS)
 
 
 if __name__ == '__main__':
