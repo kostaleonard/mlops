@@ -1,10 +1,10 @@
 """Contains the DataProcessor class."""
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import numpy as np
 
 
-class DataProcessor(ABC):
+class DataProcessor:
     """Transforms a raw dataset into features and labels for downstream model
     training, prediction, etc."""
 

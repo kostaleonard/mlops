@@ -61,8 +61,8 @@ def _redefine_class() -> None:
     global DataProcessorThatWillChange
 
     class DataProcessorThatWillChange(DataProcessor):
-        """A DataProcessor subclass that will change, simulating a user redefining
-        how data should enter the model pipeline."""
+        """A DataProcessor subclass that will change, simulating a user
+        redefining how data should enter the model pipeline."""
 
         def get_raw_features_and_labels(self, dataset_path: str) -> \
                 (dict[str, np.ndarray], dict[str, np.ndarray]):
@@ -79,13 +79,14 @@ def _redefine_class() -> None:
 
             :param dataset_path: Unused.
             :return: A dictionary whose values are feature tensors and whose
-                corresponding keys are the names by which those tensors should be
-                referenced. For example, the training features (value) may be called
-                'X_train' (key).
+                corresponding keys are the names by which those tensors should
+                be referenced. For example, the training features (value) may be
+                called 'X_train' (key).
             """
             raise ValueError('The new implementation is different.')
 
-        def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+        def preprocess_features(self, raw_feature_tensor: np.ndarray) -> \
+                np.ndarray:
             """Returns features multiplied by 2.
 
             :param raw_feature_tensor: The raw features to be preprocessed.
