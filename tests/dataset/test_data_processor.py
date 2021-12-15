@@ -6,8 +6,12 @@ from mlops.dataset.data_processor import DataProcessor
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
 
+@pytest.mark.xfail
 def test_data_processor_is_abstract() -> None:
     """Tests that the DataProcessor object is abstract."""
+    # This test currently fails because we needed to make DataProcessor concrete
+    # as a serialization workaround. See:
+    # https://github.com/kostaleonard/mlops/issues/12
     with pytest.raises(TypeError):
         _ = DataProcessor()
 

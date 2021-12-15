@@ -160,7 +160,7 @@ def test_get_raw_labels_correct_dtype() -> None:
     _, raw = processor.get_raw_features_and_labels(
         DEFAULT_DATASET_TRAINVALTEST_PATH)
     for tensor in raw.values():
-        assert tensor.dtype == np.object
+        assert tensor.dtype == object
 
 
 def test_get_raw_labels_valid_classes() -> None:

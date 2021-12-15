@@ -6,8 +6,12 @@ from mlops.dataset import invertible_data_processor as idp
 from tests.dataset.preset_data_processor import PresetDataProcessor
 
 
+@pytest.mark.xfail
 def test_invertible_data_processor_is_abstract() -> None:
     """Tests that the InvertibleDataProcessor object is abstract."""
+    # This test currently fails because we needed to make
+    # InvertibleDataProcessor concrete as a serialization workaround. See:
+    # https://github.com/kostaleonard/mlops/issues/12
     with pytest.raises(TypeError):
         _ = idp.InvertibleDataProcessor()
 

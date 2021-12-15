@@ -494,7 +494,6 @@ def test_published_data_processor_reproduces_dataset() -> None:
                                       'data_processor.pkl')
     with open(processor_filename, 'rb') as infile:
         processor_loaded = pickle.load(infile)
-    assert isinstance(processor_loaded, PresetDataProcessor)
     original_features = processor.get_preprocessed_features(
         TEST_DATASET_PATH_LOCAL)
     loaded_features = processor_loaded.get_preprocessed_features(
