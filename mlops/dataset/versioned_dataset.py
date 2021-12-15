@@ -2,7 +2,7 @@
 
 import os
 import json
-import pickle
+import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
 
@@ -38,7 +38,7 @@ class VersionedDataset:
             # Get data processor.
             with fs.open(os.path.join(path, 'data_processor.pkl'),
                          'rb') as infile:
-                processor = pickle.loads(infile.read())
+                processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
         else:
             # Get tensors.
@@ -58,7 +58,7 @@ class VersionedDataset:
             self.md5 = metadata['hash']
             # Get data processor.
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
-                processor = pickle.loads(infile.read())
+                processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
 
     def __eq__(self, other: 'VersionedDataset') -> bool:

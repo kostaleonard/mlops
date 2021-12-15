@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryFile
 from typing import Optional, Collection
-import pickle
+import dill as pickle
 import hashlib
 from functools import partial
 from datetime import datetime
