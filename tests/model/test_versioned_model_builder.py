@@ -7,6 +7,7 @@ from s3fs import S3FileSystem
 from tensorflow.keras.models import Model
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
+from mlops.model.training_config import TrainingConfig
 from tests.dataset.test_versioned_dataset import _publish_test_dataset_local, \
     TEST_PUBLICATION_PATH_LOCAL as TEST_DATASET_PUBLICATION_PATH_LOCAL
 
@@ -33,12 +34,34 @@ def _remove_test_directories_s3() -> None:
 
 
 @pytest.fixture
-def test_model() -> Model:
-    """Returns the trained model fixture for testing.
+def dataset() -> VersionedDataset:
+    """Returns the versioned dataset fixture for testing.
 
-    :return: The trained model fixture.
+    :return: The versioned dataset fixture.
     """
-    # TODO train model--make sure it only runs once
+    # TODO
+
+
+@pytest.fixture
+def model(dataset: VersionedDataset) -> Model:
+    """Returns the model fixture for testing.
+
+    :param dataset: The versioned dataset.
+    :return: The model fixture.
+    """
+    # TODO
+
+
+@pytest.fixture
+def training_config(dataset: VersionedDataset,
+                    model: Model) -> TrainingConfig:
+    """Returns the training configuration fixture for testing.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :return: The training configuration fixture.
+    """
+    # TODO train model--run once
 
 
 def test_publish_appends_explicit_version() -> None:
