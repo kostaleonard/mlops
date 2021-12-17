@@ -1,10 +1,54 @@
 """Tests versioned_model_builder.py."""
 
+import os
+import shutil
 import pytest
+from s3fs import S3FileSystem
+from tensorflow.keras.models import Model
+from mlops.dataset.versioned_dataset import VersionedDataset
+from mlops.model.versioned_model_builder import VersionedModelBuilder
+from tests.dataset.test_versioned_dataset import _publish_test_dataset_local, \
+    TEST_PUBLICATION_PATH_LOCAL as TEST_DATASET_PUBLICATION_PATH_LOCAL
+
+TEST_MODEL_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_model_builder/model'
+TEST_MODEL_PUBLICATION_PATH_S3 = ('s3://kosta-mlops/'
+                                  'test_versioned_model_builder/model')
+
+
+def _remove_test_directories_local() -> None:
+    """Removes the local test directories."""
+    try:
+        shutil.rmtree(TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    except FileNotFoundError:
+        pass
+
+
+def _remove_test_directories_s3() -> None:
+    """Removes the S3 test directories."""
+    fs = S3FileSystem()
+    try:
+        fs.rm(TEST_MODEL_PUBLICATION_PATH_S3, recursive=True)
+    except FileNotFoundError:
+        pass
+
+
+@pytest.fixture
+def test_model() -> Model:
+    """Returns the trained model fixture for testing.
+
+    :return: The trained model fixture.
+    """
+    # TODO train model--make sure it only runs once
 
 
 def test_publish_appends_explicit_version() -> None:
     """Tests that publish appends the version string to the path."""
+    _remove_test_directories_local()
+    _publish_test_dataset_local()
+    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
+                                            'v1'))
+    # TODO model fixture?
+    builder = VersionedModelBuilder(dataset)
     # TODO
     assert False
 

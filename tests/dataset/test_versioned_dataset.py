@@ -72,5 +72,4 @@ def test_hashcode_is_hash_of_md5_digest() -> None:
     MD5 digest."""
     _publish_test_dataset_local()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1'))
-    print(dir(dataset))
     assert hash(dataset) == hash(dataset.md5)
