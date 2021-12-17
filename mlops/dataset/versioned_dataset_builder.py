@@ -99,7 +99,6 @@ class VersionedDatasetBuilder:
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         """
-        # TODO data processor object needs to be saved as script, which could hopefully then be imported and instantiated.
         # TODO we should also save the contents of the data processor script as a reference, because we might want to look at the code to see exactly what transformation were applied to the data
         # TODO to cut down on repeated code, we might want to have functions that extract the data we want to save in some intermediate format (bytes? temporary files?) from local/S3, then have separate functions to publish those intermediate representations to local/S3.
         timestamp = datetime.now().isoformat()
@@ -442,6 +441,7 @@ class VersionedDatasetBuilder:
         :return: The MD5 hex digest string from hashing the content of all the
             given files.
         """
+        # TODO versioned_model_builder is going to use this, so put this in its own module
         hash_md5 = hashlib.md5()
         for filename in sorted(files_to_hash):
             with open(filename, 'rb') as infile:
@@ -462,6 +462,7 @@ class VersionedDatasetBuilder:
         :return: The MD5 hex digest string from hashing the content of all the
             given files.
         """
+        # TODO versioned_model_builder is going to use this, so put this in its own module
         hash_md5 = hashlib.md5()
         for filename in sorted(files_to_hash):
             with fs.open(filename, 'rb') as infile:

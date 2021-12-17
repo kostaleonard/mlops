@@ -68,5 +68,3 @@ class VersionedModelBuilder:
             metadata.
         """
         # TODO
-
-    # TODO mirror VersionedDatasetBuilder interface, inc. __eq__ and __hash__

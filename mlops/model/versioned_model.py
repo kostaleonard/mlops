@@ -37,4 +37,4 @@ class VersionedModel:
         """
         # TODO
 
-    # TODO mirror VersionedDataset interface
+    # TODO mirror VersionedDataset interface, inc. __eq__ and __hash__
