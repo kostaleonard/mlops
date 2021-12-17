@@ -4,7 +4,8 @@ import os
 import shutil
 import pytest
 from s3fs import S3FileSystem
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
 from mlops.model.training_config import TrainingConfig
@@ -39,7 +40,9 @@ def dataset() -> VersionedDataset:
 
     :return: The versioned dataset fixture.
     """
-    # TODO
+    _publish_test_dataset_local()
+    return VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
+                                         'v1'))
 
 
 @pytest.fixture
@@ -49,7 +52,8 @@ def model(dataset: VersionedDataset) -> Model:
     :param dataset: The versioned dataset.
     :return: The model fixture.
     """
-    # TODO
+    return Sequential([Dense(dataset.y_train.shape[1],
+                             input_shape=dataset.X_train.shape[1:])])
 
 
 @pytest.fixture
@@ -64,14 +68,14 @@ def training_config(dataset: VersionedDataset,
     # TODO train model--run once
 
 
-def test_publish_appends_explicit_version() -> None:
+def test_publish_appends_explicit_version(
+        dataset: VersionedDataset,
+        model: Model) -> None:
     """Tests that publish appends the version string to the path."""
     _remove_test_directories_local()
-    _publish_test_dataset_local()
-    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
-                                            'v1'))
+    print(model.summary())
+    print(model.predict(dataset.X_train))
     # TODO model fixture?
-    builder = VersionedModelBuilder(dataset)
     # TODO
     assert False
 
