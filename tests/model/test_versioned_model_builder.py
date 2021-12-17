@@ -52,8 +52,10 @@ def model(dataset: VersionedDataset) -> Model:
     :param dataset: The versioned dataset.
     :return: The model fixture.
     """
-    return Sequential([Dense(dataset.y_train.shape[1],
-                             input_shape=dataset.X_train.shape[1:])])
+    mod = Sequential([Dense(dataset.y_train.shape[1],
+                            input_shape=dataset.X_train.shape[1:])])
+    mod.compile('adam', loss='mse')
+    return mod
 
 
 @pytest.fixture
@@ -65,19 +67,31 @@ def training_config(dataset: VersionedDataset,
     :param model: The model.
     :return: The training configuration fixture.
     """
-    # TODO train model--run once
+    train_kwargs = {'epochs': 5,
+                    'batch_size': 8}
+    history = model.fit(x=dataset.X_train,
+                        y=dataset.y_train,
+                        **train_kwargs)
+    return TrainingConfig(history, train_kwargs)
 
 
 def test_publish_appends_explicit_version(
         dataset: VersionedDataset,
-        model: Model) -> None:
-    """Tests that publish appends the version string to the path."""
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that publish appends the version string to the path.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
     _remove_test_directories_local()
-    print(model.summary())
-    print(model.predict(dataset.X_train))
-    # TODO model fixture?
-    # TODO
-    assert False
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
 
 
 def test_publish_appends_version_timestamp() -> None:
