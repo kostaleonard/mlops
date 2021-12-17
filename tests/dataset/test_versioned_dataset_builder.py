@@ -432,23 +432,6 @@ def test_publish_local_and_s3_create_same_dataset() -> None:
     assert contents1['hash'] == contents2['hash']
 
 
-def test_hash_is_reproducible() -> None:
-    """Tests that hashing of files is reproducible."""
-    _remove_test_directories_local()
-    _create_test_dataset_local()
-    files_to_hash_forward = [os.path.join(TEST_DATASET_PATH_LOCAL, filename)
-                             for filename in TEST_DATASET_FILENAMES]
-    files_to_hash_reverse = [os.path.join(TEST_DATASET_PATH_LOCAL, filename)
-                             for filename in TEST_DATASET_FILENAMES[::-1]]
-    hash_forward = VersionedDatasetBuilder._get_hash_local(
-        files_to_hash_forward)
-    hash_reverse = VersionedDatasetBuilder._get_hash_local(
-        files_to_hash_reverse)
-    assert hash_forward
-    assert hash_reverse
-    assert hash_forward == hash_reverse
-
-
 def test_publish_local_with_trailing_slash() -> None:
     """Tests that publishing to a local path with a trailing slash works
     properly."""
