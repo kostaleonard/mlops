@@ -2,6 +2,7 @@
 
 import os
 import shutil
+from datetime import datetime
 import pytest
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model, Sequential
@@ -9,6 +10,7 @@ from tensorflow.keras.layers import Dense
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
 from mlops.model.training_config import TrainingConfig
+from mlops.errors import PublicationPathAlreadyExistsError
 from tests.dataset.test_versioned_dataset import _publish_test_dataset_local, \
     TEST_PUBLICATION_PATH_LOCAL as TEST_DATASET_PUBLICATION_PATH_LOCAL
 
@@ -94,41 +96,111 @@ def test_publish_appends_explicit_version(
     assert os.path.isdir(expected_filename)
 
 
-def test_publish_appends_version_timestamp() -> None:
+def test_publish_appends_version_timestamp(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish appends the timestamp to the path when no version is
-    given."""
-    # TODO
-    assert False
+    given.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    start = datetime.now()
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    end = datetime.now()
+    assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1
+    dirname = os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)[0]
+    publication_time = datetime.fromisoformat(dirname)
+    assert start < publication_time < end
 
 
-def test_publish_local_path_creates_expected_files() -> None:
+def test_publish_local_path_creates_expected_files(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish on a local path creates the expected
-    files/directories on the local filesystem."""
-    # TODO
-    assert False
+    files/directories on the local filesystem.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
+    assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1
+    assert os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)[0] == version
+    publication_dir = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    assert set(os.listdir(publication_dir)) == {'model.h5', 'meta.json'}
 
 
 @pytest.mark.awstest
-def test_publish_s3_path_creates_expected_files() -> None:
+def test_publish_s3_path_creates_expected_files(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish on an S3 path creates the expected files/directories
-    on S3."""
-    # TODO
-    assert False
+    on S3.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_s3()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version=version)
+    fs = S3FileSystem()
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, version)
+    # Remove 's3://' from latter paths.
+    assert set(fs.ls(expected_filename)) == {
+        os.path.join(expected_filename, 'model.h5')[5:],
+        os.path.join(expected_filename, 'meta.json')[5:]}
+    assert fs.isdir(expected_filename)
 
 
-def test_publish_local_path_raises_path_already_exists_error() -> None:
+def test_publish_local_path_raises_path_already_exists_error(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish on a local path that already exists raises a
-    PublicationPathAlreadyExistsError."""
-    # TODO
-    assert False
+    PublicationPathAlreadyExistsError.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
+    with pytest.raises(PublicationPathAlreadyExistsError):
+        builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
 
 
 @pytest.mark.awstest
-def test_publish_s3_path_raises_path_already_exists_error() -> None:
+def test_publish_s3_path_raises_path_already_exists_error(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish on an S3 path that already exists raises a
-    PublicationPathAlreadyExistsError."""
-    # TODO
-    assert False
+    PublicationPathAlreadyExistsError.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_s3()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version=version)
+    with pytest.raises(PublicationPathAlreadyExistsError):
+        builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version=version)
 
 
 def test_publish_includes_expected_metadata() -> None:
