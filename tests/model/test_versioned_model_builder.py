@@ -4,6 +4,7 @@ import os
 import shutil
 from datetime import datetime
 import pytest
+import json
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense
@@ -203,26 +204,85 @@ def test_publish_s3_path_raises_path_already_exists_error(
         builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version=version)
 
 
-def test_publish_includes_expected_metadata() -> None:
+def test_publish_includes_expected_metadata(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish creates a file meta.json with the expected
-    metadata."""
-    # TODO
-    assert False
+    metadata.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version,
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    assert set(contents.keys()) == {
+        'version',
+        'hash',
+        'dataset',
+        'history',
+        'train_args',
+        'created_at',
+        'tags'}
 
 
-def test_publish_timestamps_match() -> None:
+def test_publish_timestamps_match(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that all 3 timestamps match if no version string is supplied:
     metadata.json's version and created_at fields, and the final directory
-    of the published path."""
-    # TODO
-    assert False
+    of the published path.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1
+    dirname = os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)[0]
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, dirname,
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    version_time = contents['version']
+    created_at_time = contents['created_at']
+    assert dirname == version_time == created_at_time
 
 
-def test_publish_accepts_path_with_trailing_slash() -> None:
+def test_publish_accepts_path_with_trailing_slash(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publish accepts a path with (potentially many) trailing
-    slashes and creates the files as if the trailing slashes were absent."""
-    # TODO
-    assert False
+    slashes and creates the files as if the trailing slashes were absent.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    # One trailing slash.
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '/', version)
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
+    _remove_test_directories_local()
+    # Many trailing slashes.
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '///', version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
 
 
 def test_publish_local_with_trailing_slash() -> None:
