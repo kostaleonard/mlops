@@ -259,12 +259,12 @@ def test_publish_timestamps_match(
     assert dirname == version_time == created_at_time
 
 
-def test_publish_accepts_path_with_trailing_slash(
+def test_publish_local_with_trailing_slash(
         dataset: VersionedDataset,
         model: Model,
         training_config: TrainingConfig) -> None:
-    """Tests that publish accepts a path with (potentially many) trailing
-    slashes and creates the files as if the trailing slashes were absent.
+    """Tests that publishing to a local path with a trailing slash works
+    properly.
 
     :param dataset: The versioned dataset.
     :param model: The model.
@@ -285,19 +285,34 @@ def test_publish_accepts_path_with_trailing_slash(
     assert os.path.isdir(expected_filename)
 
 
-def test_publish_local_with_trailing_slash() -> None:
-    """Tests that publishing to a local path with a trailing slash works
-    properly."""
-    # TODO
-    assert False
-
-
 @pytest.mark.awstest
-def test_publish_s3_with_trailing_slash() -> None:
+def test_publish_s3_with_trailing_slash(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publishing to an S3 path with a trailing slash works
-    properly."""
-    # TODO
-    assert False
+    properly.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_s3()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    version = 'v2'
+    # One trailing slash.
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3 + '/', version=version)
+    fs = S3FileSystem()
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, version)
+    assert fs.exists(expected_filename)
+    assert fs.isdir(expected_filename)
+    _remove_test_directories_s3()
+    # Many trailing slashes.
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3 + '///', version=version)
+    fs = S3FileSystem()
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, version)
+    assert fs.exists(expected_filename)
+    assert fs.isdir(expected_filename)
 
 
 def test_same_models_have_same_hashes() -> None:
