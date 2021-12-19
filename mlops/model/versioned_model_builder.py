@@ -1,10 +1,17 @@
 """Contains the VersionedModelBuilder class."""
 # pylint: disable=no-name-in-module
 
+import os
+import json
+from tempfile import TemporaryFile
 from typing import Optional
+from datetime import datetime
+from s3fs import S3FileSystem
 from tensorflow.keras.models import Model
+from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.training_config import TrainingConfig
+from mlops.hashing.hashing import get_hash_local, get_hash_s3
 
 
 class VersionedModelBuilder:
@@ -28,7 +35,9 @@ class VersionedModelBuilder:
             the best weights in memory).
         :param training_config: The model's training configuration.
         """
-        # TODO
+        self.versioned_dataset = versioned_dataset
+        self.model = model
+        self.training_config = training_config
 
     def publish(self,
                 path: str,
@@ -67,4 +76,86 @@ class VersionedModelBuilder:
         :param tags: An optional list of string tags to add to the model
             metadata.
         """
-        # TODO
+        timestamp = datetime.now().isoformat()
+        if not version:
+            version = timestamp
+        if not tags:
+            tags = []
+        publication_path = os.path.join(path, version)
+        model_path = os.path.join(publication_path, 'model.h5')
+        metadata_path = os.path.join(publication_path, 'meta.json')
+        metadata = {
+            'version': version,
+            'hash': 'TDB',
+            'dataset': self.versioned_dataset.path,
+            'history': self.training_config.history.history,
+            'train_args': self.training_config.train_args,
+            'created_at': timestamp,
+            'tags': tags}
+        if path.startswith('s3://'):
+            self._publish_s3(publication_path,
+                             model_path,
+                             metadata_path,
+                             metadata)
+        else:
+            self._publish_local(publication_path,
+                                model_path,
+                                metadata_path,
+                                metadata)
+
+    def _publish_local(self,
+                       publication_path: str,
+                       model_path: str,
+                       metadata_path: str,
+                       metadata: dict) -> None:
+        """Saves the versioned model files to the given local path. See
+        publish() for more detailed information.
+
+        :param publication_path: The local path to which to publish the model.
+        :param model_path: The path to which the model is saved.
+        :param metadata_path: The path to which the metadata is saved.
+        :param metadata: Model metadata.
+        """
+        files_to_hash = set()
+        # Create publication path.
+        # TODO this should be in an IO module maybe
+        VersionedDatasetBuilder._make_publication_path_local(publication_path)
+        # Save model.
+        self.model.save(model_path)
+        files_to_hash.add(model_path)
+        # Save metadata.
+        hash_digest = get_hash_local(files_to_hash)
+        metadata['hash'] = hash_digest
+        with open(metadata_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(metadata))
+
+    def _publish_s3(self,
+                    publication_path: str,
+                    model_path: str,
+                    metadata_path: str,
+                    metadata: dict) -> None:
+        """Saves the versioned model files to the given S3 path. See publish()
+        for more detailed information.
+
+        :param publication_path: The S3 path to which to publish the model.
+        :param model_path: The path to which the model is saved.
+        :param metadata_path: The path to which the metadata is saved.
+        :param metadata: Model metadata.
+        """
+        fs = S3FileSystem()
+        files_to_hash = set()
+        # Create publication path.
+        # TODO this should be in an IO module maybe
+        VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
+        # Save model.
+        with TemporaryFile() as tmp_file:
+            self.model.save(tmp_file.name)
+            tmp_file.seek(0)
+            with fs.open(model_path, 'wb') as outfile:
+                outfile.write(tmp_file.read())
+        files_to_hash.add(model_path)
+        # Save metadata.
+        hash_digest = get_hash_s3(files_to_hash)
+        metadata['hash'] = hash_digest
+        with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
+            outfile.write(json.dumps(metadata))
