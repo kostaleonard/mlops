@@ -21,7 +21,7 @@ class VersionedModel:
         if path.startswith('s3://'):
             fs = S3FileSystem()
             # Get model.
-            # TODO
+            # TODO load model from S3
             # Get hash.
             with fs.open(os.path.join(path, 'meta.json'),
                          'r',

@@ -12,7 +12,7 @@ from mlops.model.training_config import TrainingConfig
 from mlops.examples.image.classification.publish_dataset import \
     DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
 
-MODEL_PUBLICATION_PATH_LOCAL = os.path.join('models', 'pokemon')
+MODEL_PUBLICATION_PATH_LOCAL = os.path.join('models', 'pokemon', 'versioned')
 MODEL_PUBLICATION_PATH_S3 = 's3://kosta-mlops/models/pokemon'
 MODEL_CHECKPOINT_FILENAME = os.path.join('models', 'pokemon', 'checkpoints',
                                          'model_best.h5')
