@@ -37,10 +37,12 @@ def get_best_model() -> VersionedModel:
     :return: The versioned model with the best performance on the validation
         dataset.
     """
-    # TODO
+    # TODO raise error if no models found
+    # TODO get actual best model
     model_filenames = os.listdir(MODEL_PUBLICATION_PATH_LOCAL)
     first_model_path = os.path.join(MODEL_PUBLICATION_PATH_LOCAL,
                                     model_filenames[0])
+    # TODO remove print
     print(f'Using model: {first_model_path}')
     return VersionedModel(first_model_path)
 
