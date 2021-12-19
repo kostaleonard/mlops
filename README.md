@@ -1,7 +1,17 @@
 # MLOps
 
-mlops is a package for conducting MLOps, including versioning of datasets and
-models
+mlops is a package that enables software engineering within an MLOps framework by
+providing:
+
+* Seamless dataset and model versioning
+* Publication of versioned datasets and models to local and Cloud filesystems
+* Serialization and reproducibility of the data processing pipeline for each
+versioned dataset, so that new prediction or training data can be pre- and
+post-processed according to the arbitrary transformations that produced the
+original dataset
+* Capturing of dataset and model metadata, including the linking of models to the
+datasets on which they were trained/validated/tested
+* A common framework for data processing and model prototyping
 
 ## Installation
 
