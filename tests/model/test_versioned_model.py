@@ -113,3 +113,24 @@ def test_hashcode_is_hash_of_md5_digest(
     model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
     versioned_model = VersionedModel(model_path)
     assert hash(versioned_model) == hash(versioned_model.md5)
+
+
+def test_get_best_model_gets_min_val_loss() -> None:
+    """Tests that get_best returns the versioned model with the minimum
+    validation loss."""
+    # TODO
+    assert False
+
+
+def test_get_best_model_custom_comparator() -> None:
+    """Tests that get_best returns the versioned model with the maximum
+    validation loss when max is supplied as the custom comparator."""
+    # TODO
+    assert False
+
+
+def test_get_best_model_custom_metric() -> None:
+    """Tests that get_best returns the versioned model with the minimum
+    performance on the custom metric when one is supplied."""
+    # TODO
+    assert False
