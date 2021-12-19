@@ -3,10 +3,12 @@
 import os
 import shutil
 from datetime import datetime
+
+import numpy as np
 import pytest
 import json
 from s3fs import S3FileSystem
-from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.layers import Dense
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
@@ -415,34 +417,111 @@ def test_publish_local_and_s3_create_same_model(
     assert contents1['hash'] == contents2['hash']
 
 
-def test_metadata_includes_training_history() -> None:
+def test_metadata_includes_training_history(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that the metadata includes the training history dictionary, and
-    that it is consistent with the training results."""
-    # TODO
-    assert False
+    that it is consistent with the training results.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    meta_history = contents['history']
+    assert meta_history == training_config.history.history
 
 
-def test_metadata_includes_training_args() -> None:
+def test_metadata_includes_training_args(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that the metadata includes any kwargs supplied to the training
-    function."""
-    # TODO
-    assert False
+    function.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    meta_args = contents['train_args']
+    assert meta_args == training_config.train_args
 
 
-def test_metadata_includes_dataset_link() -> None:
-    """Tests that the metadata includes a link to the dataset."""
-    # TODO
-    assert False
+def test_metadata_includes_dataset_link(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that the metadata includes a link to the dataset.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    link = contents['dataset']
+    assert link == dataset.path
 
 
-def test_metadata_includes_expected_tags() -> None:
-    """Tests that the metadata includes the expected tags."""
-    # TODO
-    assert False
+def test_metadata_includes_expected_tags(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that the metadata includes the expected tags.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    tags = ['hello', 'world']
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1', tags=tags)
+    meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
+                             'meta.json')
+    with open(meta_path, 'r', encoding='utf-8') as infile:
+        contents = json.loads(infile.read())
+    meta_tags = contents['tags']
+    assert meta_tags == tags
 
 
-def test_published_model_performance_matches_trained_model() -> None:
+def test_published_model_performance_matches_trained_model(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that the published model has the same performance as the model
-    supplied during object instantiation."""
-    # TODO
-    assert False
+    supplied during object instantiation.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    saved_model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                                    'v1',
+                                    'model.h5')
+    loaded_model = load_model(saved_model_path)
+    val_err = model.evaluate(x=dataset.X_val, y=dataset.y_val)
+    loaded_val_err = loaded_model.evaluate(x=dataset.X_val, y=dataset.y_val)
+    assert np.isclose(val_err, loaded_val_err)
