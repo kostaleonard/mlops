@@ -1,7 +1,10 @@
 """Contains the VersionedModel class."""
 # pylint: disable=no-name-in-module
 
-from typing import Callable, Any
+import os
+import json
+from s3fs import S3FileSystem
+from tensorflow.keras.models import load_model
 
 
 class VersionedModel:
@@ -14,6 +17,39 @@ class VersionedModel:
             store such as S3, from which the model should be loaded. An S3 path
             should be a URL of the form "s3://bucket-name/path/to/dir".
         """
-        # TODO get model, dataset path
+        self.path = path
+        if path.startswith('s3://'):
+            fs = S3FileSystem()
+            # Get model.
+            # TODO
+            # Get hash.
+            with fs.open(os.path.join(path, 'meta.json'),
+                         'r',
+                         encoding='utf-8') as infile:
+                metadata = json.loads(infile.read())
+            self.md5 = metadata['hash']
+        else:
+            # Get model.
+            self.model = load_model(os.path.join(path, 'model.h5'))
+            # Get hash.
+            with open(os.path.join(path, 'meta.json'),
+                      'r',
+                      encoding='utf-8') as infile:
+                metadata = json.loads(infile.read())
+            self.md5 = metadata['hash']
 
-    # TODO mirror VersionedDataset interface, inc. __eq__ and __hash__
+    def __eq__(self, other: 'VersionedModel') -> bool:
+        """Returns True if the two objects have the same loaded MD5 hash code,
+        False otherwise.
+
+        :param other: The model with which to compare this object.
+        :return: True if the object MD5 hashes match.
+        """
+        return self.md5 == other.md5
+
+    def __hash__(self) -> int:
+        """Returns this object's hashcode based on the loaded MD5 hashcode.
+
+        :return: The object's hashcode based on the loaded MD5 hashcode.
+        """
+        return hash(self.md5)
