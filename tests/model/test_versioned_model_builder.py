@@ -315,26 +315,104 @@ def test_publish_s3_with_trailing_slash(
     assert fs.isdir(expected_filename)
 
 
-def test_same_models_have_same_hashes() -> None:
+def test_same_models_have_same_hashes(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that the hash values from two models that have identical files are
-    the same."""
-    # TODO
-    assert False
+    the same.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
 
 
-def test_different_models_have_different_hashes() -> None:
+def test_different_models_have_different_hashes(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that the hash values from two models that have different files are
-    different."""
-    # TODO
-    assert False
+    different.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder1 = VersionedModelBuilder(dataset, model, training_config)
+    builder1.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    # model2 has an extra layer.
+    model2 = Sequential([Dense(5, input_shape=dataset.X_train.shape[1:]),
+                         Dense(dataset.y_train.shape[1])])
+    model2.compile('adam', loss='mse')
+    train_args = {'epochs': 1, 'batch_size': 2}
+    history = model2.fit(x=dataset.X_train,
+                         y=dataset.y_train,
+                         **train_args)
+    training_config2 = TrainingConfig(history, train_args)
+    builder2 = VersionedModelBuilder(dataset, model2, training_config2)
+    builder2.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] != contents2['hash']
 
 
 @pytest.mark.awstest
-def test_publish_local_and_s3_create_same_model() -> None:
+def test_publish_local_and_s3_create_same_model(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
     """Tests that publishing locally or remotely on S3 produces the same model.
-    Verifies identity by comparing model hashes."""
-    # TODO
-    assert False
+    Verifies identity by comparing model hashes.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, 'v1')
+    meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3,
+                              'v1',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    fs = S3FileSystem()
+    with fs.open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
 
 
 def test_metadata_includes_training_history() -> None:
