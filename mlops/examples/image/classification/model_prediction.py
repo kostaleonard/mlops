@@ -13,8 +13,13 @@ from mlops.examples.image.classification.train_model import \
 
 
 def model_evaluate(dataset: VersionedDataset,
-                   model: VersionedModel) -> np.ndarray:
-    """TODO"""
+                   model: VersionedModel) -> float:
+    """Returns the model's loss on the test dataset.
+
+    :param dataset: The dataset.
+    :param model: The model.
+    :return: The model's loss on the test dataset.
+    """
     return model.model.evaluate(x=dataset.X_test,
                                 y=dataset.y_test)
 
@@ -22,7 +27,17 @@ def model_evaluate(dataset: VersionedDataset,
 def model_predict(path: str,
                   dataset: VersionedDataset,
                   model: VersionedModel) -> np.ndarray:
-    """TODO"""
+    """Returns the model's unpreprocessed predictions on the data located at the
+    given path.
+
+    :param path: The path to the data on which to run prediction. The format of
+        the data files must be consistent with what the dataset's data processor
+        expects.
+    :param dataset: The dataset.
+    :param model: The model.
+    :return: The model's unpreprocessed predictions on the data located at the
+        given path.
+    """
     features = dataset.data_processor.get_preprocessed_features(path)
     raw_predictions = model.model.predict(features['X_pred'])
     valid_predictions = \
