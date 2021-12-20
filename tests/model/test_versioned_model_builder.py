@@ -3,7 +3,6 @@
 import os
 import shutil
 from datetime import datetime
-
 import numpy as np
 import pytest
 import json
