@@ -1,6 +1,7 @@
 """Loads a VersionedModel and uses it to run prediction on unseen data."""
 
 import os
+from typing import Collection
 import numpy as np
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model import VersionedModel
@@ -30,9 +31,7 @@ def model_predict(features: np.ndarray,
     """Returns the model's unpreprocessed predictions on the data located at the
     given path.
 
-    :param path: The path to the data on which to run prediction. The format of
-        the data files must be consistent with what the dataset's data processor
-        expects.
+    :param features: The preprocessed features on which to run prediction.
     :param dataset: The dataset.
     :param model: The model.
     :return: The model's unpreprocessed predictions on the data located at the
@@ -44,18 +43,17 @@ def model_predict(features: np.ndarray,
     return dataset.data_processor.unpreprocess_labels(valid_predictions)
 
 
-def get_best_model() -> VersionedModel:
+def get_best_model(model_paths: Collection[str]) -> VersionedModel:
     """Returns the versioned model with the best performance on the validation
     dataset.
 
+    :param model_paths: The paths to the versioned models to load.
     :return: The versioned model with the best performance on the validation
         dataset.
     """
     # TODO raise error if no models found
     # TODO get actual best model
-    model_filenames = os.listdir(MODEL_PUBLICATION_PATH_LOCAL)
-    first_model_path = os.path.join(MODEL_PUBLICATION_PATH_LOCAL,
-                                    model_filenames[0])
+    first_model_path = model_paths[0]
     # TODO remove print
     print(f'Using model: {first_model_path}')
     return VersionedModel(first_model_path)
@@ -65,10 +63,15 @@ def main() -> None:
     """Runs the program."""
     dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
-    model = get_best_model()
+    model_filenames = os.listdir(MODEL_PUBLICATION_PATH_LOCAL)
+    model_paths = [os.path.join(MODEL_PUBLICATION_PATH_LOCAL, filename)
+                   for filename in model_filenames]
+    model = get_best_model(model_paths)
     test_err = model_evaluate(dataset, model)
     print(f'Best model\'s test error: {test_err:.3f}')
-    predictions = model_predict(DEFAULT_DATASET_PRED_PATH, dataset, model)
+    features = dataset.data_processor.get_preprocessed_features(
+        DEFAULT_DATASET_PRED_PATH)['X_pred']
+    predictions = model_predict(features, dataset, model)
     print(f'Predictions:\n{predictions}')
 
 
