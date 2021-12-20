@@ -13,16 +13,17 @@ DATASET_PUBLICATION_PATH_S3 = 's3://kosta-mlops/datasets/pokemon'
 TAGS = ['image', 'classification']
 
 
-def publish_dataset(publication_path: str) -> None:
+def publish_dataset(publication_path: str) -> str:
     """Builds and publishes the dataset.
 
     :param publication_path: The path on the local or remote filesystem to which
         to publish the dataset.
+    :return: The versioned dataset's publication path.
     """
     processor = PokemonClassificationDataProcessor()
     builder = VersionedDatasetBuilder(DEFAULT_DATASET_TRAINVALTEST_PATH,
                                       processor)
-    builder.publish(publication_path, DATASET_VERSION, tags=TAGS)
+    return builder.publish(publication_path, DATASET_VERSION, tags=TAGS)
 
 
 def main() -> None:

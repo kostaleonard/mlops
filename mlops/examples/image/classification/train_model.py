@@ -93,7 +93,7 @@ def publish_model(model: Model,
                   dataset: VersionedDataset,
                   training_config: TrainingConfig,
                   publication_path: str,
-                  tags: Optional[list[str]] = None) -> None:
+                  tags: Optional[list[str]] = None) -> str:
     """Publishes the model to the path on the local or remote filesystem.
 
     :param model: The model to be published, with the exact weights desired for
@@ -103,9 +103,10 @@ def publish_model(model: Model,
     :param training_config: The training configuration.
     :param publication_path: The path to which the model will be published.
     :param tags: Optional tags for the published model.
+    :return: The versioned model's publication path.
     """
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(publication_path, tags=tags)
+    return builder.publish(publication_path, tags=tags)
 
 
 def main() -> None:

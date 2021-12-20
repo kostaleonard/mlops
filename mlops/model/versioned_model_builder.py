@@ -42,7 +42,7 @@ class VersionedModelBuilder:
     def publish(self,
                 path: str,
                 version: Optional[str] = None,
-                tags: Optional[list[str]] = None) -> None:
+                tags: Optional[list[str]] = None) -> str:
         """Saves the versioned model files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -75,6 +75,7 @@ class VersionedModelBuilder:
             will be used as the version.
         :param tags: An optional list of string tags to add to the model
             metadata.
+        :return: The versioned model's publication path.
         """
         timestamp = datetime.now().isoformat()
         if not version:
@@ -93,21 +94,21 @@ class VersionedModelBuilder:
             'created_at': timestamp,
             'tags': tags}
         if path.startswith('s3://'):
-            self._publish_s3(publication_path,
-                             model_path,
-                             metadata_path,
-                             metadata)
+            return self._publish_s3(publication_path,
+                                    model_path,
+                                    metadata_path,
+                                    metadata)
         else:
-            self._publish_local(publication_path,
-                                model_path,
-                                metadata_path,
-                                metadata)
+            return self._publish_local(publication_path,
+                                       model_path,
+                                       metadata_path,
+                                       metadata)
 
     def _publish_local(self,
                        publication_path: str,
                        model_path: str,
                        metadata_path: str,
-                       metadata: dict) -> None:
+                       metadata: dict) -> str:
         """Saves the versioned model files to the given local path. See
         publish() for more detailed information.
 
@@ -115,6 +116,7 @@ class VersionedModelBuilder:
         :param model_path: The path to which the model is saved.
         :param metadata_path: The path to which the metadata is saved.
         :param metadata: Model metadata.
+        :return: The versioned model's publication path.
         """
         files_to_hash = set()
         # Create publication path.
@@ -128,12 +130,13 @@ class VersionedModelBuilder:
         metadata['hash'] = hash_digest
         with open(metadata_path, 'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(metadata))
+        return publication_path
 
     def _publish_s3(self,
                     publication_path: str,
                     model_path: str,
                     metadata_path: str,
-                    metadata: dict) -> None:
+                    metadata: dict) -> str:
         """Saves the versioned model files to the given S3 path. See publish()
         for more detailed information.
 
@@ -141,6 +144,7 @@ class VersionedModelBuilder:
         :param model_path: The path to which the model is saved.
         :param metadata_path: The path to which the metadata is saved.
         :param metadata: Model metadata.
+        :return: The versioned model's publication path.
         """
         fs = S3FileSystem()
         files_to_hash = set()
@@ -159,3 +163,4 @@ class VersionedModelBuilder:
         metadata['hash'] = hash_digest
         with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
             outfile.write(json.dumps(metadata))
+        return publication_path

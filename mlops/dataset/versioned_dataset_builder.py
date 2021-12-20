@@ -52,7 +52,7 @@ class VersionedDatasetBuilder:
                 path: str,
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY,
-                tags: Optional[list[str]] = None) -> None:
+                tags: Optional[list[str]] = None) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -96,6 +96,7 @@ class VersionedDatasetBuilder:
             duplicate.
         :param tags: An optional list of string tags to add to the dataset
             metadata.
+        :return: The versioned dataset's publication path.
         """
         # TODO we should also save the contents of the data processor script as a reference, because we might want to look at the code to see exactly what transformation were applied to the data
         # TODO to cut down on repeated code, we might want to have functions that extract the data we want to save in some intermediate format (bytes? temporary files?) from local/S3, then have separate functions to publish those intermediate representations to local/S3.
@@ -117,21 +118,21 @@ class VersionedDatasetBuilder:
             'created_at': timestamp,
             'tags': tags}
         if path.startswith('s3://'):
-            self._publish_s3(publication_path,
-                             copy_path,
-                             link_path,
-                             metadata_path,
-                             processor_path,
-                             dataset_copy_strategy,
-                             metadata)
+            return self._publish_s3(publication_path,
+                                    copy_path,
+                                    link_path,
+                                    metadata_path,
+                                    processor_path,
+                                    dataset_copy_strategy,
+                                    metadata)
         else:
-            self._publish_local(publication_path,
-                                copy_path,
-                                link_path,
-                                metadata_path,
-                                processor_path,
-                                dataset_copy_strategy,
-                                metadata)
+            return self._publish_local(publication_path,
+                                       copy_path,
+                                       link_path,
+                                       metadata_path,
+                                       processor_path,
+                                       dataset_copy_strategy,
+                                       metadata)
 
     def _publish_local(self,
                        publication_path: str,
@@ -140,7 +141,7 @@ class VersionedDatasetBuilder:
                        metadata_path: str,
                        processor_path: str,
                        dataset_copy_strategy: str,
-                       metadata: dict) -> None:
+                       metadata: dict) -> str:
         """Saves the versioned dataset files to the given local path. See
         publish() for more detailed information.
 
@@ -152,6 +153,7 @@ class VersionedDatasetBuilder:
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
+        :return: The versioned dataset's publication path.
         """
         # pylint: disable=too-many-arguments
         files_to_hash = set()
@@ -172,6 +174,7 @@ class VersionedDatasetBuilder:
         VersionedDatasetBuilder._write_metadata_local(metadata, metadata_path)
         # Save data processor object.
         self._write_data_processor_local(processor_path)
+        return publication_path
 
     def _publish_s3(self,
                     publication_path: str,
@@ -180,7 +183,7 @@ class VersionedDatasetBuilder:
                     metadata_path: str,
                     processor_path: str,
                     dataset_copy_strategy: str,
-                    metadata: dict) -> None:
+                    metadata: dict) -> str:
         """Saves the versioned dataset files to the given S3 path. See publish()
         for more detailed information.
 
@@ -192,6 +195,7 @@ class VersionedDatasetBuilder:
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path.
         :param metadata: Dataset metadata.
+        :return: The versioned dataset's publication path.
         """
         # pylint: disable=too-many-arguments
         fs = S3FileSystem()
@@ -213,6 +217,7 @@ class VersionedDatasetBuilder:
         VersionedDatasetBuilder._write_metadata_s3(metadata, metadata_path, fs)
         # Save data processor object.
         self._write_data_processor_s3(processor_path, fs)
+        return publication_path
 
     @staticmethod
     def _make_publication_path_local(publication_path: str) -> None:

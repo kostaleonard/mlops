@@ -24,7 +24,7 @@ def model_evaluate(dataset: VersionedDataset,
                                 y=dataset.y_test)
 
 
-def model_predict(path: str,
+def model_predict(features: np.ndarray,
                   dataset: VersionedDataset,
                   model: VersionedModel) -> np.ndarray:
     """Returns the model's unpreprocessed predictions on the data located at the
@@ -38,8 +38,7 @@ def model_predict(path: str,
     :return: The model's unpreprocessed predictions on the data located at the
         given path.
     """
-    features = dataset.data_processor.get_preprocessed_features(path)
-    raw_predictions = model.model.predict(features['X_pred'])
+    raw_predictions = model.model.predict(features)
     valid_predictions = \
         PokemonClassificationDataProcessor.get_valid_prediction(raw_predictions)
     return dataset.data_processor.unpreprocess_labels(valid_predictions)
@@ -68,7 +67,7 @@ def main() -> None:
                                             DATASET_VERSION))
     model = get_best_model()
     test_err = model_evaluate(dataset, model)
-    print(f'Test error: {test_err:.3f}')
+    print(f'Best model\'s test error: {test_err:.3f}')
     predictions = model_predict(DEFAULT_DATASET_PRED_PATH, dataset, model)
     print(f'Predictions:\n{predictions}')
 
