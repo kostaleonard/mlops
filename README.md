@@ -19,7 +19,11 @@ the datasets on which they were trained/validated/tested
 pip install mlops
 ```
 
-## Usage
+## Examples
+
+See the [project examples directory](mlops/examples) for worked and tested examples.
+
+## Quickstart
 
 ### Extend class `DataProcessor`
 
