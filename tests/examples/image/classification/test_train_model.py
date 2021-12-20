@@ -59,11 +59,48 @@ def test_train_model_creates_checkpoints() -> None:
 def test_train_model_returns_correct_training_config() -> None:
     """Tests that train_model returns a TrainingConfig object with the correct
     information."""
-    # TODO
-    assert False
+    _create_dataset()
+    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+                                            DATASET_VERSION))
+    model = Sequential([
+        Flatten(input_shape=dataset.X_train.shape[1:]),
+        Dense(dataset.y_train.shape[1])])
+    model.compile('adam', loss='mse')
+    train_kwargs = {'epochs': 3, 'batch_size': 8}
+    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
+    training_config = train_model.train_model(
+        model,
+        dataset,
+        model_checkpoint_filename=model_checkpoint_filename,
+        **train_kwargs)
+    assert training_config.history == model.history
+    assert training_config.train_args == train_kwargs
 
 
 def test_publish_model_creates_files() -> None:
     """Tests that publish_model creates the published model files."""
-    # TODO
-    assert False
+    _create_dataset()
+    try:
+        shutil.rmtree(TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    except FileNotFoundError:
+        pass
+    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+                                            DATASET_VERSION))
+    model = Sequential([
+        Flatten(input_shape=dataset.X_train.shape[1:]),
+        Dense(dataset.y_train.shape[1])])
+    model.compile('adam', loss='mse')
+    train_kwargs = {'epochs': 3, 'batch_size': 8}
+    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
+    training_config = train_model.train_model(
+        model,
+        dataset,
+        model_checkpoint_filename=model_checkpoint_filename,
+        **train_kwargs)
+    train_model.publish_model(
+        model,
+        dataset,
+        training_config,
+        TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    assert os.path.exists(TEST_MODEL_PUBLICATION_PATH_LOCAL)
+    assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1
