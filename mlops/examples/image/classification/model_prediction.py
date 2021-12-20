@@ -2,6 +2,7 @@
 
 import os
 from typing import Collection
+import json
 import numpy as np
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model import VersionedModel
@@ -11,6 +12,7 @@ from mlops.examples.image.classification.publish_dataset import \
     DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
 from mlops.examples.image.classification.train_model import \
     MODEL_PUBLICATION_PATH_LOCAL
+from mlops.examples.image.classification.errors import NoModelPathsSuppliedError
 
 
 def model_evaluate(dataset: VersionedDataset,
@@ -51,12 +53,19 @@ def get_best_model(model_paths: Collection[str]) -> VersionedModel:
     :return: The versioned model with the best performance on the validation
         dataset.
     """
-    # TODO raise error if no models found
-    # TODO get actual best model
-    first_model_path = model_paths[0]
-    # TODO remove print
-    print(f'Using model: {first_model_path}')
-    return VersionedModel(first_model_path)
+    if not model_paths:
+        raise NoModelPathsSuppliedError
+    best_model_path = None
+    best_model_val_loss = 0
+    for model_path in model_paths:
+        meta_path = os.path.join(model_path, 'meta.json')
+        with open(meta_path, 'r', encoding='utf-8') as infile:
+            contents = json.loads(infile.read())
+        model_val_loss = contents['history']['val_loss'][-1]
+        if not best_model_path or model_val_loss < best_model_val_loss:
+            best_model_path = model_path
+            best_model_val_loss = model_val_loss
+    return VersionedModel(best_model_path)
 
 
 def main() -> None:
