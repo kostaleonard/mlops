@@ -21,6 +21,21 @@ TODO update package name
 pip install mlops
 ```
 
+## Why does MLOps matter?
+
+MLOps as a software engineering methodology for ML, and by extension this package that aims to enable MLOps, is
+designed to improve the quality and decrease the time to market of ML systems. One key component that this package
+automates, dataset and model versioning, supports arbitrary rollback to previous dataset and model combinations so that
+any results the ML team has achieved can be effortlessly reproduced.
+
+Consider the following motivating scenario. Your team creates a dataset and trains an initial ML model to 98% accuracy.
+You hypothesize that you can improve the accuracy, so you experiment with many datasets and models. Over several months, your
+next-best dataset/model achieve only 95% accuracy. You might have your old model saved, but you've changed the dataset
+so many times that you can't reproduce the original input to your ML model. You have no idea how to put the model into
+production, because no new data can be processed according to the transformations (of which you have no record) that
+produced your original dataset. There may be a way to piece together the original dataset from your VCS history, but it
+will be painful and costly. With dataset and model versioning, you could have avoided this situation.
+
 ## Versioned dataset artifacts
 
 When you call `VersionedDatasetBuilder`'s `publish()`, the following files will be generated:

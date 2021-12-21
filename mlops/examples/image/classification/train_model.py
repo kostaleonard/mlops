@@ -7,11 +7,12 @@ from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, \
     Dropout
 from tensorflow.keras.callbacks import ModelCheckpoint
+from mlops.errors import PublicationPathAlreadyExistsError
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model_builder import VersionedModelBuilder
 from mlops.model.training_config import TrainingConfig
 from mlops.examples.image.classification.publish_dataset import \
-    DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
+    publish_dataset, DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
 
 MODEL_PUBLICATION_PATH_LOCAL = os.path.join('models', 'pokemon', 'versioned')
 MODEL_PUBLICATION_PATH_S3 = 's3://kosta-mlops/models/pokemon'
@@ -112,8 +113,12 @@ def publish_model(model: Model,
 
 def main() -> None:
     """Runs the program."""
-    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
-                                            DATASET_VERSION))
+    try:
+        dataset_path = publish_dataset(DATASET_PUBLICATION_PATH_LOCAL)
+    except PublicationPathAlreadyExistsError:
+        dataset_path = os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+                                    DATASET_VERSION)
+    dataset = VersionedDataset(dataset_path)
     model = get_baseline_model(dataset)
     training_config = train_model(
         model,
