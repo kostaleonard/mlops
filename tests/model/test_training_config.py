@@ -1,4 +1,5 @@
 """Tests training_config.py."""
+# pylint: disable=no-name-in-module
 
 from tensorflow.keras.callbacks import History
 from mlops.model.training_config import TrainingConfig

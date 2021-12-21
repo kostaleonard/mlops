@@ -67,6 +67,7 @@ def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
 def test_get_raw_features_match() -> None:
     """Tests that the features produced by get_raw_features_and_labels and
     get_raw_features are the same features."""
+    # pylint: disable=invalid-name
     processor = PokemonClassificationDataProcessor()
     features, _ = processor.get_raw_features_and_labels(
         DEFAULT_DATASET_TRAINVALTEST_PATH)
@@ -291,6 +292,7 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
     """Tests that the raw features and raw labels have examples in the same
     order. For example, say X_train[0] is the raw Bulbasaur image; then
     y_train[0] must be the labels for Bulbasaur."""
+    # pylint: disable=invalid-name
     processor = PokemonClassificationDataProcessor()
     features, labels = processor.get_raw_features_and_labels(
         DEFAULT_DATASET_TRAINVALTEST_PATH)
@@ -301,14 +303,14 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
                             labels['y_val'],
                             labels['y_test']))
     bulbasaur_idx = None
-    for idx in range(len(X_all)):
-        if np.isclose(X_all[idx].mean(), BULBASAUR_IMG_MEAN):
+    for idx, arr in enumerate(X_all):
+        if np.isclose(arr.mean(), BULBASAUR_IMG_MEAN):
             bulbasaur_idx = idx
     assert bulbasaur_idx is not None
     assert set(y_all[bulbasaur_idx]) == BULBASAUR_LABEL
     charizard_idx = None
-    for idx in range(len(X_all)):
-        if np.isclose(X_all[idx].mean(), CHARIZARD_IMG_MEAN):
+    for idx, arr in enumerate(X_all):
+        if np.isclose(arr.mean(), CHARIZARD_IMG_MEAN):
             charizard_idx = idx
     assert charizard_idx is not None
     assert set(y_all[charizard_idx]) == CHARIZARD_LABEL

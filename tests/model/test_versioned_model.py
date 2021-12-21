@@ -1,4 +1,5 @@
 """Tests versioned_model.py."""
+# pylint: disable=redefined-outer-name,no-name-in-module,unused-import
 
 import os
 import pytest

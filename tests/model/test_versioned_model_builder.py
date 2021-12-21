@@ -1,11 +1,12 @@
 """Tests versioned_model_builder.py."""
+# pylint: disable=redefined-outer-name,no-name-in-module
 
 import os
 import shutil
 from datetime import datetime
+import json
 import numpy as np
 import pytest
-import json
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.layers import Dense

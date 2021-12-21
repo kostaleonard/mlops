@@ -394,7 +394,6 @@ good-names=i,
            X_val,
            X_test,
            X_pred,
-           X_*,
            y,
            df,
            s3

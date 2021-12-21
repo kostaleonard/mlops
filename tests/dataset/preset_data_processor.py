@@ -1,4 +1,5 @@
 """Contains the PresetDataProcessor class."""
+# pylint:disable=no-name-in-module
 
 import numpy as np
 from tensorflow.keras.utils import to_categorical

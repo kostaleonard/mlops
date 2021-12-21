@@ -1,4 +1,5 @@
 """Tests train_model.py."""
+# pylint: disable=no-name-in-module,no-member
 
 import os
 import shutil

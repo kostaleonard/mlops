@@ -1,8 +1,9 @@
 """Tests model_prediction.py."""
+# pylint: disable=no-name-in-module,no-member
 
 import os
-import pytest
 import json
+import pytest
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
 from mlops.dataset.versioned_dataset import VersionedDataset
@@ -12,10 +13,10 @@ from mlops.examples.image.classification.publish_dataset import \
 from mlops.examples.image.classification.train_model import train_model, \
     publish_model
 from mlops.examples.image.classification import model_prediction
-from tests.examples.image.classification.test_train_model import _create_dataset
 from mlops.examples.image.classification.pokemon_classification_data_processor \
     import DEFAULT_DATASET_PRED_PATH
 from mlops.examples.image.classification.errors import NoModelPathsSuppliedError
+from tests.examples.image.classification.test_train_model import _create_dataset
 
 TEST_MODEL_PUBLICATION_PATH_LOCAL = ('/tmp/test_model_prediction/models/'
                                      'versioned')
@@ -83,13 +84,13 @@ def test_get_best_model_gets_lowest_val_error() -> None:
     error."""
     _create_dataset()
     publication_paths = []
-    for model_idx in range(len(FAKE_TRAIN_HISTORIES)):
+    for fake_train_history in FAKE_TRAIN_HISTORIES:
         publication_path = _create_model()
         publication_paths.append(publication_path)
         with open(os.path.join(publication_path, 'meta.json'), 'r',
                   encoding='utf-8') as infile:
             contents = json.loads(infile.read())
-        contents['history'] = FAKE_TRAIN_HISTORIES[model_idx]
+        contents['history'] = fake_train_history
         with open(os.path.join(publication_path, 'meta.json'), 'w',
                   encoding='utf-8') as outfile:
             outfile.write(json.dumps(contents))
