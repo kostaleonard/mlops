@@ -7,7 +7,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.examples.image.classification.publish_dataset import \
-    publish_dataset, DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
+    publish_dataset, DATASET_VERSION
 from mlops.examples.image.classification import train_model
 
 TEST_DATASET_PUBLICATION_PATH_LOCAL = '/tmp/test_train_model/datasets'
@@ -27,7 +27,7 @@ def _create_dataset() -> None:
 def test_get_baseline_model_correct_shapes() -> None:
     """Tests that the baseline model has the correct input and output shapes."""
     _create_dataset()
-    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
     model = train_model.get_baseline_model(dataset)
     assert model.input_shape[1:] == dataset.X_train.shape[1:]
@@ -41,7 +41,7 @@ def test_train_model_creates_checkpoints() -> None:
         shutil.rmtree(TEST_CHECKPOINT_PATH)
     except FileNotFoundError:
         pass
-    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
     model = Sequential([
         Flatten(input_shape=dataset.X_train.shape[1:]),
@@ -61,7 +61,7 @@ def test_train_model_returns_correct_training_config() -> None:
     """Tests that train_model returns a TrainingConfig object with the correct
     information."""
     _create_dataset()
-    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
     model = Sequential([
         Flatten(input_shape=dataset.X_train.shape[1:]),
@@ -85,7 +85,7 @@ def test_publish_model_creates_files() -> None:
         shutil.rmtree(TEST_MODEL_PUBLICATION_PATH_LOCAL)
     except FileNotFoundError:
         pass
-    dataset = VersionedDataset(os.path.join(DATASET_PUBLICATION_PATH_LOCAL,
+    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
                                             DATASET_VERSION))
     model = Sequential([
         Flatten(input_shape=dataset.X_train.shape[1:]),
