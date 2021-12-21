@@ -30,7 +30,11 @@ documentation:
 	# TODO see adjutant
 
 package_prod:
-	# TODO see adjutant
+	rm -rf dist
+	python3 -m build
+	python3 -m twine upload dist/*
 
 package_test:
-	# TODO see adjutant
+	rm -rf dist
+	python3 -m build
+	python3 -m twine upload --repository testpypi dist/*

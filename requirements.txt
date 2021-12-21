@@ -11,3 +11,7 @@ matplotlib
 notebook
 ipywidgets
 dill
+sphinx
+sphinx_rtd_theme
+build
+twine
