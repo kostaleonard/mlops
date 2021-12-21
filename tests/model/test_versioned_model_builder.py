@@ -307,8 +307,8 @@ def test_publish_s3_with_trailing_slash(
     expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, version)
     assert fs.exists(expected_filename)
     assert fs.isdir(expected_filename)
-    _remove_test_directories_s3()
     # Many trailing slashes.
+    _remove_test_directories_s3()
     builder.publish(TEST_MODEL_PUBLICATION_PATH_S3 + '///', version=version)
     fs = S3FileSystem()
     expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, version)

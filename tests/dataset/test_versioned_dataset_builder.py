@@ -456,7 +456,15 @@ def test_publish_s3_with_trailing_slash() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3 + '/', processor)
     version = 'v1'
+    # One trailing slash.
     builder.publish(TEST_PUBLICATION_PATH_S3 + '/', version)
+    fs = S3FileSystem()
+    expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)
+    assert fs.ls(expected_filename)
+    assert fs.isdir(expected_filename)
+    # Many trailing slashes.
+    _remove_test_directories_s3()
+    builder.publish(TEST_PUBLICATION_PATH_S3 + '///', version)
     fs = S3FileSystem()
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)
     assert fs.ls(expected_filename)

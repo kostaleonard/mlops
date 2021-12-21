@@ -3,6 +3,7 @@
 
 import os
 import json
+from tempfile import NamedTemporaryFile
 from s3fs import S3FileSystem
 from tensorflow.keras.models import load_model
 
@@ -21,7 +22,11 @@ class VersionedModel:
         if path.startswith('s3://'):
             fs = S3FileSystem()
             # Get model.
-            # TODO load model from S3
+            with NamedTemporaryFile() as tmp_file:
+                with fs.open(os.path.join(path, 'model.h5'), 'rb') as infile:
+                    tmp_file.write(infile.read())
+                tmp_file.seek(0)
+                self.model = load_model(tmp_file.name)
             # Get hash.
             with fs.open(os.path.join(path, 'meta.json'),
                          'r',

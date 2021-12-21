@@ -107,7 +107,7 @@ class VersionedDatasetBuilder:
             tags = []
         if dataset_copy_strategy not in {STRATEGY_COPY, STRATEGY_LINK}:
             raise InvalidDatasetCopyStrategyError
-        publication_path = os.path.join(path, version)
+        publication_path = os.path.join(path.rstrip('/'), version)
         copy_path = os.path.join(publication_path, 'raw')
         link_path = os.path.join(copy_path, 'link.txt')
         metadata_path = os.path.join(publication_path, 'meta.json')

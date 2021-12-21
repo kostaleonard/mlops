@@ -3,7 +3,7 @@
 
 import os
 import json
-from tempfile import TemporaryFile
+from tempfile import TemporaryDirectory
 from typing import Optional
 from datetime import datetime
 from s3fs import S3FileSystem
@@ -82,7 +82,7 @@ class VersionedModelBuilder:
             version = timestamp
         if not tags:
             tags = []
-        publication_path = os.path.join(path, version)
+        publication_path = os.path.join(path.rstrip('/'), version)
         model_path = os.path.join(publication_path, 'model.h5')
         metadata_path = os.path.join(publication_path, 'meta.json')
         metadata = {
@@ -152,11 +152,9 @@ class VersionedModelBuilder:
         # TODO this should be in an IO module maybe
         VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
         # Save model.
-        with TemporaryFile() as tmp_file:
-            self.model.save(tmp_file.name)
-            tmp_file.seek(0)
-            with fs.open(model_path, 'wb') as outfile:
-                outfile.write(tmp_file.read())
+        with TemporaryDirectory() as tmp_dir:
+            self.model.save(f'{tmp_dir}/model.h5')
+            fs.put(f'{tmp_dir}/model.h5', model_path)
         files_to_hash.add(model_path)
         # Save metadata.
         hash_digest = get_hash_s3(files_to_hash)
