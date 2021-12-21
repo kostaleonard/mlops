@@ -15,10 +15,8 @@ the datasets on which they were trained/validated/tested
 
 ## Installation
 
-TODO update package name
-
 ```bash
-pip install mlops
+pip install mloperations
 ```
 
 ## Why does MLOps matter?
