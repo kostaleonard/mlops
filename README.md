@@ -19,6 +19,71 @@ the datasets on which they were trained/validated/tested
 pip install mlops
 ```
 
+## Versioned dataset artifacts
+
+When you call `VersionedDatasetBuilder`'s `publish()`, the following files will be generated:
+
+* `*.npy`: Tensors for training, validation, testing, and/or prediction (as defined by the user)
+* `data_processor.pkl`: The serialized data processor object
+* `meta.json`: Metadata, including creation time, dataset hash, tags
+* `raw`: The raw dataset, either directly copied or linked (as defined by the user)
+
+Consider the [image classification example](mlops/examples/image/classification), in which Pokemon images are classified
+by type. The following is the result of calling `publish('datasets/pokemon', version='v1')`:
+
+```
+datasets/pokemon/
+└── v1
+    ├── X_test.npy
+    ├── X_train.npy
+    ├── X_val.npy
+    ├── data_processor.pkl
+    ├── meta.json
+    ├── raw
+    │   ├── images
+    │   │   ├── blastoise.png
+    │   │   ├── bulbasaur.png
+    │   │   ├── charizard.png
+    │   │   ├── charmander.png
+    │   │   ├── charmeleon.png
+    │   │   ├── ivysaur.png
+    │   │   ├── squirtle.png
+    │   │   ├── venusaur.png
+    │   │   ├── wartortle.png
+    │   │   └── zapdos.png
+    │   └── pokemon.csv
+    ├── y_test.npy
+    ├── y_train.npy
+    └── y_val.npy
+```
+
+The dataset can be published to a Cloud store such as S3 by specifying a URL instead of a local path. For example, the
+following is the result of calling `publish('s3://kosta-mlops/datasets/pokemon', version='v1')`:
+
+[Publication of a dataset to S3](media/versioned_dataset_pokemon_s3.png)
+
+## Versioned model artifacts
+
+`VersionedModelBuidler`'s `publish()` creates the following files:
+
+* `model.h5`: The saved model (the user decides whether the model is saved at the last epoch, best epoch, etc.)
+* `meta.json`: Metadata, including creation time, model hash, tags, training history, hyperparameters, and a link to
+the versioned dataset on which the model was trained.
+
+Again in the [image classification example](mlops/examples/image/classification), the following is the result of
+`publish('models/pokemon/versioned')`. If no explicit version is supplied, the timestamp is used as the version.
+
+```
+models/pokemon/versioned/
+├── 2021-12-19T06:59:00.451852
+│   ├── meta.json
+│   └── model.h5
+```
+
+Publish to a Cloud store with `publish('s3://kosta-mlops/models/pokemon/versioned')`:
+
+[Publication of a model to S3](media/versioned_model_pokemon_s3.png)
+
 ## Examples
 
 See the [project examples directory](mlops/examples) for worked and tested examples.
@@ -147,12 +212,10 @@ builder = VersionedDatasetBuilder('path/to/my/dataset', processor)
 builder.publish('s3://my-bucket/datasets', 'v1', tags=['image', 'classification'])
 ```
 
-TODO show a screenshot of the published dataset files here.
-
 ### Publish a model
 
 Now train and publish a model using the versioned dataset. The `VersionedDataset`
-is important because it standardizes the training/validation/test datasets,
+is important to model development because it standardizes the training/validation/test datasets,
 providing a common point of comparison between models. It also captures the
 transformations required to feed data into models using the `data_processor`
 property. Every prototype model should be published so that any results achieved
@@ -181,8 +244,6 @@ training_config = TrainingConfig(history, train_kwargs)
 builder = VersionedModelBuilder(versioned_dataset, model, training_config)
 builder.publish('s3://my-bucket/models', tags=['prototype'])
 ```
-
-TODO show a screenshot of the published model files here.
 
 ### Predict using VersionedDataset and VersionedModel
 
