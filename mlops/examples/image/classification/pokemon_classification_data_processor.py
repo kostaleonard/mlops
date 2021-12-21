@@ -49,6 +49,7 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
+        # pylint: disable=too-many-locals
         try:
             df = pd.read_csv(os.path.join(dataset_path, LABELS_FILENAME))
         except FileNotFoundError as exc:

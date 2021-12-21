@@ -1,4 +1,5 @@
 """Trains a new model on the Pokemon classification task."""
+# pylint: disable=no-name-in-module
 
 import os
 from typing import Optional, Any

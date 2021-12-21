@@ -1,4 +1,5 @@
 """Contains the TrainingConfig class."""
+# pylint: disable = no-name-in-module
 
 from typing import Any
 from dataclasses import dataclass

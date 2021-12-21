@@ -5,9 +5,9 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryFile
 from typing import Optional
-import dill as pickle
 from datetime import datetime
 import json
+import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
 from mlops.dataset.data_processor import DataProcessor
@@ -98,8 +98,6 @@ class VersionedDatasetBuilder:
             metadata.
         :return: The versioned dataset's publication path.
         """
-        # TODO we should also save the contents of the data processor script as a reference, because we might want to look at the code to see exactly what transformation were applied to the data
-        # TODO to cut down on repeated code, we might want to have functions that extract the data we want to save in some intermediate format (bytes? temporary files?) from local/S3, then have separate functions to publish those intermediate representations to local/S3.
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
@@ -125,14 +123,13 @@ class VersionedDatasetBuilder:
                                     processor_path,
                                     dataset_copy_strategy,
                                     metadata)
-        else:
-            return self._publish_local(publication_path,
-                                       copy_path,
-                                       link_path,
-                                       metadata_path,
-                                       processor_path,
-                                       dataset_copy_strategy,
-                                       metadata)
+        return self._publish_local(publication_path,
+                                   copy_path,
+                                   link_path,
+                                   metadata_path,
+                                   processor_path,
+                                   dataset_copy_strategy,
+                                   metadata)
 
     def _publish_local(self,
                        publication_path: str,

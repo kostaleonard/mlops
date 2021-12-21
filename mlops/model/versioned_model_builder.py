@@ -17,6 +17,7 @@ from mlops.hashing.hashing import get_hash_local, get_hash_s3
 class VersionedModelBuilder:
     """An object containing all of the components that form a versioned
     model."""
+    # pylint: disable=too-few-public-methods
 
     def __init__(self,
                  versioned_dataset: VersionedDataset,
@@ -98,11 +99,10 @@ class VersionedModelBuilder:
                                     model_path,
                                     metadata_path,
                                     metadata)
-        else:
-            return self._publish_local(publication_path,
-                                       model_path,
-                                       metadata_path,
-                                       metadata)
+        return self._publish_local(publication_path,
+                                   model_path,
+                                   metadata_path,
+                                   metadata)
 
     def _publish_local(self,
                        publication_path: str,
@@ -120,7 +120,7 @@ class VersionedModelBuilder:
         """
         files_to_hash = set()
         # Create publication path.
-        # TODO this should be in an IO module maybe
+        # pylint: disable=protected-access
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
         # Save model.
         self.model.save(model_path)
@@ -149,7 +149,7 @@ class VersionedModelBuilder:
         fs = S3FileSystem()
         files_to_hash = set()
         # Create publication path.
-        # TODO this should be in an IO module maybe
+        # pylint: disable=protected-access
         VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
         # Save model.
         with TemporaryDirectory() as tmp_dir:
