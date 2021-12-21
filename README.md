@@ -15,6 +15,8 @@ the datasets on which they were trained/validated/tested
 
 ## Installation
 
+TODO update package name
+
 ```bash
 pip install mlops
 ```
@@ -25,7 +27,7 @@ When you call `VersionedDatasetBuilder`'s `publish()`, the following files will 
 
 * `*.npy`: Tensors for training, validation, testing, and/or prediction (as defined by the user)
 * `data_processor.pkl`: The serialized data processor object
-* `meta.json`: Metadata, including creation time, dataset hash, tags
+* `meta.json`: Metadata, including creation time, dataset hash, and tags
 * `raw`: The raw dataset, either directly copied or linked (as defined by the user)
 
 Consider the [image classification example](mlops/examples/image/classification), in which Pokemon images are classified
@@ -60,7 +62,7 @@ datasets/pokemon/
 The dataset can be published to a Cloud store such as S3 by specifying a URL instead of a local path. For example, the
 following is the result of calling `publish('s3://kosta-mlops/datasets/pokemon', version='v1')`:
 
-[Publication of a dataset to S3](media/versioned_dataset_pokemon_s3.png)
+![Publication of a dataset to S3](media/versioned_dataset_pokemon_s3.png)
 
 ## Versioned model artifacts
 
@@ -82,7 +84,7 @@ models/pokemon/versioned/
 
 Publish to a Cloud store with `publish('s3://kosta-mlops/models/pokemon/versioned')`:
 
-[Publication of a model to S3](media/versioned_model_pokemon_s3.png)
+![Publication of a model to S3](media/versioned_model_pokemon_s3.png)
 
 ## Examples
 
@@ -194,7 +196,11 @@ This relationship ensures that every instantiated `VersionedDataset` object is i
 the dataset repository (i.e., you can't create an "unversioned"
 `VersionedDataset`).
 
-During publication, the `VersionedDatasetBuilder` serializes the data processor
+The `VersionedDataset`
+is important to model development because it standardizes the training/validation/test datasets,
+providing a common point of comparison between models. It also captures the
+transformations required to feed data into models using the `data_processor`
+property. During publication, the `VersionedDatasetBuilder` serializes the data processor
 and adds it to the dataset repository as an artifact. The serialized data
 processor captures the data pre- and post-processing instructions at the time of
 dataset creation, which may not be tied to any commit in the project VCS (saving
@@ -214,11 +220,7 @@ builder.publish('s3://my-bucket/datasets', 'v1', tags=['image', 'classification'
 
 ### Publish a model
 
-Now train and publish a model using the versioned dataset. The `VersionedDataset`
-is important to model development because it standardizes the training/validation/test datasets,
-providing a common point of comparison between models. It also captures the
-transformations required to feed data into models using the `data_processor`
-property. Every prototype model should be published so that any results achieved
+Now train and publish a model using the versioned dataset and a `VersionedModelBuilder`. Every prototype model should be published so that any results achieved
 can be reproduced.
 
 The `TrainingConfig` object saves the training history and hyperparameters for
