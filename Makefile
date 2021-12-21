@@ -27,7 +27,10 @@ pytest_full:
 	coverage xml
 
 documentation:
-	# TODO see adjutant
+	cd docs && make clean
+	rm -rf docs/_apidoc
+	cd docs && sphinx-apidoc -o _apidoc ../mlops
+	cd docs && make html
 
 package_prod:
 	rm -rf dist

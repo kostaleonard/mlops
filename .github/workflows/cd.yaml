@@ -1,0 +1,44 @@
+name: Generate documentation and deploy to PyPI
+on:
+  release:
+    types: [published]
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install
+      - name: Generate documentation
+        run: make documentation
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs
+          path: docs/_build/html
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make install
+      - name: Build the package
+        run: |
+          rm -rf dist
+          python3 -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
