@@ -1,7 +1,7 @@
 """mlops is a package for conducting MLOps, including versioning of datasets and
 models."""
 
-__version__ = '0.0.15'
+__version__ = '0.1.0'
 
 __all__ = [
     '__version__',
