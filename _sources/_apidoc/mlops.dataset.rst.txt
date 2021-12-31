@@ -1,0 +1,45 @@
+mlops.dataset package
+=====================
+
+Submodules
+----------
+
+mlops.dataset.data\_processor module
+------------------------------------
+
+.. automodule:: mlops.dataset.data_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.dataset.invertible\_data\_processor module
+------------------------------------------------
+
+.. automodule:: mlops.dataset.invertible_data_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.dataset.versioned\_dataset module
+---------------------------------------
+
+.. automodule:: mlops.dataset.versioned_dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.dataset.versioned\_dataset\_builder module
+------------------------------------------------
+
+.. automodule:: mlops.dataset.versioned_dataset_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mlops.dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:

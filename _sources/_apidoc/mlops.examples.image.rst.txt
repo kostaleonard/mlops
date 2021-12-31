@@ -1,0 +1,18 @@
+mlops.examples.image package
+============================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mlops.examples.image.classification
+
+Module contents
+---------------
+
+.. automodule:: mlops.examples.image
+   :members:
+   :undoc-members:
+   :show-inheritance:

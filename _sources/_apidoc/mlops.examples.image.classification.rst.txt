@@ -1,0 +1,53 @@
+mlops.examples.image.classification package
+===========================================
+
+Submodules
+----------
+
+mlops.examples.image.classification.errors module
+-------------------------------------------------
+
+.. automodule:: mlops.examples.image.classification.errors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.examples.image.classification.model\_prediction module
+------------------------------------------------------------
+
+.. automodule:: mlops.examples.image.classification.model_prediction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.examples.image.classification.pokemon\_classification\_data\_processor module
+-----------------------------------------------------------------------------------
+
+.. automodule:: mlops.examples.image.classification.pokemon_classification_data_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.examples.image.classification.publish\_dataset module
+-----------------------------------------------------------
+
+.. automodule:: mlops.examples.image.classification.publish_dataset
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.examples.image.classification.train\_model module
+-------------------------------------------------------
+
+.. automodule:: mlops.examples.image.classification.train_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mlops.examples.image.classification
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mlops.model package &mdash; mlops v0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> mlops
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mlops.model package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-mlops.model.training_config">mlops.model.training_config module</a></li>
+<li><a class="reference internal" href="#module-mlops.model.versioned_model">mlops.model.versioned_model module</a></li>
+<li><a class="reference internal" href="#module-mlops.model.versioned_model_builder">mlops.model.versioned_model_builder module</a></li>
+<li><a class="reference internal" href="#module-mlops.model">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mlops</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>mlops.model package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_apidoc/mlops.model.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mlops-model-package">
+<h1>mlops.model package<a class="headerlink" href="#mlops-model-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-mlops.model.training_config">
+<span id="mlops-model-training-config-module"></span><h2>mlops.model.training_config module<a class="headerlink" href="#module-mlops.model.training_config" title="Permalink to this headline"></a></h2>
+<p>Contains the TrainingConfig class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.model.training_config.TrainingConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.model.training_config.</span></span><span class="sig-name descname"><span class="pre">TrainingConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">keras.callbacks.History</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">typing.Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.model.training_config.TrainingConfig" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains training configuration and results.</p>
+<p>history: The model’s training history.
+train_args: The training arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mlops.model.training_config.TrainingConfig.history">
+<span class="sig-name descname"><span class="pre">history</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">keras.callbacks.History</span></em><a class="headerlink" href="#mlops.model.training_config.TrainingConfig.history" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mlops.model.training_config.TrainingConfig.train_args">
+<span class="sig-name descname"><span class="pre">train_args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">typing.Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mlops.model.training_config.TrainingConfig.train_args" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.model.versioned_model">
+<span id="mlops-model-versioned-model-module"></span><h2>mlops.model.versioned_model module<a class="headerlink" href="#module-mlops.model.versioned_model" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedModel class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.model.versioned_model.</span></span><span class="sig-name descname"><span class="pre">VersionedModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a versioned model.</p>
+</dd></dl>
+
+</section>
+<section id="module-mlops.model.versioned_model_builder">
+<span id="mlops-model-versioned-model-builder-module"></span><h2>mlops.model.versioned_model_builder module<a class="headerlink" href="#module-mlops.model.versioned_model_builder" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedModelBuilder class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.model.versioned_model_builder.VersionedModelBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.model.versioned_model_builder.</span></span><span class="sig-name descname"><span class="pre">VersionedModelBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">versioned_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">keras.engine.training.Model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mlops.model.training_config.TrainingConfig" title="mlops.model.training_config.TrainingConfig"><span class="pre">mlops.model.training_config.TrainingConfig</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.model.versioned_model_builder.VersionedModelBuilder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An object containing all of the components that form a versioned
+model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.model.versioned_model_builder.VersionedModelBuilder.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.model.versioned_model_builder.VersionedModelBuilder.publish" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the versioned model files to the given path. If the path and
+appended version already exists, this operation will raise a
+PublicationPathAlreadyExistsError.</p>
+<dl>
+<dt>The following files will be created:</dt><dd><dl class="simple">
+<dt>path/version/ (the publication path and version)</dt><dd><p>model.h5 (the saved model)
+meta.json (metadata)</p>
+</dd>
+</dl>
+</dd>
+<dt>The contents of meta.json will be:</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>version: (model version)
+hash: (MD5 hash of all objects apart from meta.json)
+dataset: (the link to the dataset used during training)
+history: (the training history dictionary)
+train_args: (the training arguments dictionary)
+created_at: (timestamp)
+tags: (optional list of tags)</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – The path, either on the local filesystem or in a cloud
+store such as S3, to which the model should be saved. The version
+will be appended to this path as a subdirectory. An S3 path
+should be a URL of the form “s3://bucket-name/path/to/dir”. It is
+recommended to use this same path to publish all models, since it
+will prevent the user from creating two different models with the
+same version.</p></li>
+<li><p><strong>version</strong> – A string indicating the model version. The version
+should be unique to this model. If None, the publication timestamp
+will be used as the version.</p></li>
+<li><p><strong>tags</strong> – An optional list of string tags to add to the model
+metadata.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned model’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mlops.model" title="Permalink to this headline"></a></h2>
+<p>Contains model modules.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Leo Kosta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

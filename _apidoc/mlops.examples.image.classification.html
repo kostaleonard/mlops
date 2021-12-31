@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mlops.examples.image.classification package &mdash; mlops v0.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> mlops
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mlops.examples.image.classification package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification.errors">mlops.examples.image.classification.errors module</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification.model_prediction">mlops.examples.image.classification.model_prediction module</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification.pokemon_classification_data_processor">mlops.examples.image.classification.pokemon_classification_data_processor module</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification.publish_dataset">mlops.examples.image.classification.publish_dataset module</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification.train_model">mlops.examples.image.classification.train_model module</a></li>
+<li><a class="reference internal" href="#module-mlops.examples.image.classification">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mlops</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>mlops.examples.image.classification package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_apidoc/mlops.examples.image.classification.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mlops-examples-image-classification-package">
+<h1>mlops.examples.image.classification package<a class="headerlink" href="#mlops-examples-image-classification-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-mlops.examples.image.classification.errors">
+<span id="mlops-examples-image-classification-errors-module"></span><h2>mlops.examples.image.classification.errors module<a class="headerlink" href="#module-mlops.examples.image.classification.errors" title="Permalink to this headline"></a></h2>
+<p>Contains custom errors for the Pokemon classification example.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.errors.LabelsNotFoundError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.errors.</span></span><span class="sig-name descname"><span class="pre">LabelsNotFoundError</span></span><a class="headerlink" href="#mlops.examples.image.classification.errors.LabelsNotFoundError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></p>
+<p>Raised when a PokemonClassificationDataProcessor attempts to load labels
+for prediction data, an unlabeled data source.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.errors.NoModelPathsSuppliedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.errors.</span></span><span class="sig-name descname"><span class="pre">NoModelPathsSuppliedError</span></span><a class="headerlink" href="#mlops.examples.image.classification.errors.NoModelPathsSuppliedError" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></p>
+<p>Raised when a non-empty collection of strings representing paths to
+models is expected, but an empty collection is passed instead.</p>
+</dd></dl>
+
+</section>
+<section id="module-mlops.examples.image.classification.model_prediction">
+<span id="mlops-examples-image-classification-model-prediction-module"></span><h2>mlops.examples.image.classification.model_prediction module<a class="headerlink" href="#module-mlops.examples.image.classification.model_prediction" title="Permalink to this headline"></a></h2>
+<p>Loads a VersionedModel and uses it to run prediction on unseen data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.model_prediction.get_best_model">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.model_prediction.</span></span><span class="sig-name descname"><span class="pre">get_best_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mlops.model.html#mlops.model.versioned_model.VersionedModel" title="mlops.model.versioned_model.VersionedModel"><span class="pre">mlops.model.versioned_model.VersionedModel</span></a></span></span><a class="headerlink" href="#mlops.examples.image.classification.model_prediction.get_best_model" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the versioned model with the best performance on the validation
+dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model_paths</strong> – The paths to the versioned models to load.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned model with the best performance on the validation
+dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.model_prediction.main">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.model_prediction.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.model_prediction.main" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the program.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.model_prediction.model_evaluate">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.model_prediction.</span></span><span class="sig-name descname"><span class="pre">model_evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.model.html#mlops.model.versioned_model.VersionedModel" title="mlops.model.versioned_model.VersionedModel"><span class="pre">mlops.model.versioned_model.VersionedModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.model_prediction.model_evaluate" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the model’s loss on the test dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – The dataset.</p></li>
+<li><p><strong>model</strong> – The model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The model’s loss on the test dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.model_prediction.model_predict">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.model_prediction.</span></span><span class="sig-name descname"><span class="pre">model_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.model.html#mlops.model.versioned_model.VersionedModel" title="mlops.model.versioned_model.VersionedModel"><span class="pre">mlops.model.versioned_model.VersionedModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.model_prediction.model_predict" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the model’s unpreprocessed predictions on the data located at the
+given path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> – The preprocessed features on which to run prediction.</p></li>
+<li><p><strong>dataset</strong> – The dataset.</p></li>
+<li><p><strong>model</strong> – The model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The model’s unpreprocessed predictions on the data located at the
+given path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mlops.examples.image.classification.pokemon_classification_data_processor">
+<span id="mlops-examples-image-classification-pokemon-classification-data-processor-module"></span><h2>mlops.examples.image.classification.pokemon_classification_data_processor module<a class="headerlink" href="#module-mlops.examples.image.classification.pokemon_classification_data_processor" title="Permalink to this headline"></a></h2>
+<p>Contains the PokemonClassificationDataProcessor class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.pokemon_classification_data_processor.</span></span><span class="sig-name descname"><span class="pre">PokemonClassificationDataProcessor</span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="mlops.dataset.html#mlops.dataset.invertible_data_processor.InvertibleDataProcessor" title="mlops.dataset.invertible_data_processor.InvertibleDataProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlops.dataset.invertible_data_processor.InvertibleDataProcessor</span></code></a></p>
+<p>Transforms the pokemon dataset at sample_data/pokemon into features and
+labels for classification.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features">
+<span class="sig-name descname"><span class="pre">get_raw_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the raw feature tensors from the prediction dataset path. Raw
+features are tensors of shape m x h x w x c, where m is the number of
+images, h is the image height, w is the image width, and c is the number
+of channels (3 for RGB), with all values in the interval [0, 1]. The
+features are already scaled because PNG images load into float32 instead
+of uint8.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset_path</strong> – The path to the file or directory on the local or
+remote filesystem containing the dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary whose values are feature tensors and whose
+corresponding keys are the names by which those tensors should be
+referenced. The returned keys will be {‘X_train’, ‘X_val’, ‘X_test’}
+if the directory indicated by dataset_path ends with ‘trainvaltest’,
+and {‘X_pred’} otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features_and_labels">
+<span class="sig-name descname"><span class="pre">get_raw_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features_and_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the raw feature and label tensors from the dataset path. This
+method is specifically used for the train/val/test sets and not input
+data for prediction, because in some cases the features and labels need
+to be read simultaneously to ensure proper ordering of features and
+labels.</p>
+<p>Raw features are tensors of shape m x h x w x c, where m is the number
+of images, h is the image height, w is the image width, and c is the
+number of channels (3 for RGB), with all values in the interval
+[0, 1]. Raw labels are tensors of shape m x 2, where m is the number of
+examples. All entries are strings from CLASSES indicating 1 or 2 (if
+multi-typed) types belonging to the sample. Types are not ordered.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset_path</strong> – The path to the file or directory on the local or
+remote filesystem containing the dataset, specifically
+train/val/test and not prediction data.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 2-tuple of the features dictionary and labels dictionary,
+with matching keys and ordered tensors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_valid_prediction">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_valid_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_valid_prediction" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a valid binary prediction from the raw prediction tensor. A
+valid prediction has one or two 1s, and all other entries are 0. The
+highest value in the prediction array is automatically converted to a 1,
+and the second-highest is converted to a 1 if the value is higher than
+the given decision threshold.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pred_arr</strong> – The raw model predictions; a tensor of shape m x k,
+where m is the number of examples and k is the number of classes.
+All entries are in the range [0, 1].</p></li>
+<li><p><strong>threshold</strong> – The decision threshold, in the range [0, 1]. If the
+second-highest value in pred_arr is greater than this threshold, it
+will be converted to a 1. The highest value is automatically
+converted to a 1 (Pokemon have at least 1 type).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The valid binary predictions; a tensor of shape m x k, where m
+is the number of example and k is the number of classes. All entries
+are in the set {0, 1}, and in each example there are 1 or 2 ones.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.preprocess_features">
+<span class="sig-name descname"><span class="pre">preprocess_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_feature_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.preprocess_features" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the preprocessed feature tensor from the raw tensor. The
+preprocessed features are how training/validation/test as well as
+prediction data are fed into downstream models. The preprocessed tensors
+are of shape m x h x w x c, where m is the number of images, h is the
+image height, w is the image width, and c is the number of channels
+(3 for RGB), with all values in the interval [0, 1].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_feature_tensor</strong> – The raw features to be preprocessed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The preprocessed feature tensor. This tensor is ready for
+downstream model consumption.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.preprocess_labels">
+<span class="sig-name descname"><span class="pre">preprocess_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_label_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.preprocess_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the preprocessed label tensor from the raw tensor. The
+preprocessed labels are how training/validation/test as well as
+prediction data are fed into downstream models. Preprocessed labels are
+tensors of shape m x k, where m is the number of examples, and k is the
+number of classes, where each of the k-length vectors are binary,
+multi-label encoded for a minimum of 1 and a maximum of 2 entries per
+vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_label_tensor</strong> – The raw labels to be preprocessed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The preprocessed label tensor. This tensor is ready for
+downstream model consumption.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.unpreprocess_features">
+<span class="sig-name descname"><span class="pre">unpreprocess_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.unpreprocess_features" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the raw feature tensor from the preprocessed tensor; inverts
+preprocessing. Improves model interpretability by enabling users to
+transform model inputs into real-world values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>feature_tensor</strong> – The preprocessed features to be inverted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The raw feature tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.unpreprocess_labels">
+<span class="sig-name descname"><span class="pre">unpreprocess_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.unpreprocess_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the raw label tensor from the preprocessed tensor; inverts
+preprocessing. Improves model interpretability by enabling users to
+transform model outputs into real-world values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>label_tensor</strong> – The preprocessed labels to be inverted.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The raw label tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.examples.image.classification.publish_dataset">
+<span id="mlops-examples-image-classification-publish-dataset-module"></span><h2>mlops.examples.image.classification.publish_dataset module<a class="headerlink" href="#module-mlops.examples.image.classification.publish_dataset" title="Permalink to this headline"></a></h2>
+<p>Publishes a new dataset to the local or remote filesystem. This script should
+be run any time the data processor changes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.publish_dataset.main">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.publish_dataset.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.publish_dataset.main" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the program.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.publish_dataset.publish_dataset">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.publish_dataset.</span></span><span class="sig-name descname"><span class="pre">publish_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">publication_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.publish_dataset.publish_dataset" title="Permalink to this definition"></a></dt>
+<dd><p>Builds and publishes the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>publication_path</strong> – The path on the local or remote filesystem to which
+to publish the dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned dataset’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mlops.examples.image.classification.train_model">
+<span id="mlops-examples-image-classification-train-model-module"></span><h2>mlops.examples.image.classification.train_model module<a class="headerlink" href="#module-mlops.examples.image.classification.train_model" title="Permalink to this headline"></a></h2>
+<p>Trains a new model on the Pokemon classification task.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.train_model.get_baseline_model">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.train_model.</span></span><span class="sig-name descname"><span class="pre">get_baseline_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">keras.engine.training.Model</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.train_model.get_baseline_model" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a new Keras Model for use on the dataset. This model is only a
+baseline; developers should also experiment with custom models in notebook
+environments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> – The input dataset. Used to determine model input and output
+shapes.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new Keras Model for use on the dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.train_model.main">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.train_model.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.train_model.main" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the program.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.train_model.publish_model">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.train_model.</span></span><span class="sig-name descname"><span class="pre">publish_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">keras.engine.training.Model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.model.html#mlops.model.training_config.TrainingConfig" title="mlops.model.training_config.TrainingConfig"><span class="pre">mlops.model.training_config.TrainingConfig</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">publication_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.train_model.publish_model" title="Permalink to this definition"></a></dt>
+<dd><p>Publishes the model to the path on the local or remote filesystem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – The model to be published, with the exact weights desired for
+publication (the user needs to set the weights to the best found during
+training if that is what they desire).</p></li>
+<li><p><strong>dataset</strong> – The input dataset.</p></li>
+<li><p><strong>training_config</strong> – The training configuration.</p></li>
+<li><p><strong>publication_path</strong> – The path to which the model will be published.</p></li>
+<li><p><strong>tags</strong> – Optional tags for the published model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned model’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mlops.examples.image.classification.train_model.train_model">
+<span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.train_model.</span></span><span class="sig-name descname"><span class="pre">train_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">keras.engine.training.Model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_checkpoint_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">fit_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="mlops.model.html#mlops.model.training_config.TrainingConfig" title="mlops.model.training_config.TrainingConfig"><span class="pre">mlops.model.training_config.TrainingConfig</span></a></span></span><a class="headerlink" href="#mlops.examples.image.classification.train_model.train_model" title="Permalink to this definition"></a></dt>
+<dd><p>Trains the model on the dataset and returns the training configuration
+object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> – The Keras Model to be trained.</p></li>
+<li><p><strong>dataset</strong> – The input dataset.</p></li>
+<li><p><strong>model_checkpoint_filename</strong> – If supplied, saves model checkpoints to
+the specified path.</p></li>
+<li><p><strong>fit_kwargs</strong> – Keyword arguments to be passed to model.fit().</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The training configuration.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-mlops.examples.image.classification">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mlops.examples.image.classification" title="Permalink to this headline"></a></h2>
+<p>Contains an example on an image classification task.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Leo Kosta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

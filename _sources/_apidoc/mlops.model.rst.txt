@@ -1,0 +1,37 @@
+mlops.model package
+===================
+
+Submodules
+----------
+
+mlops.model.training\_config module
+-----------------------------------
+
+.. automodule:: mlops.model.training_config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.model.versioned\_model module
+-----------------------------------
+
+.. automodule:: mlops.model.versioned_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.model.versioned\_model\_builder module
+--------------------------------------------
+
+.. automodule:: mlops.model.versioned_model_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mlops.model
+   :members:
+   :undoc-members:
+   :show-inheritance:

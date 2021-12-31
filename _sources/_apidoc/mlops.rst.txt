@@ -1,0 +1,22 @@
+mlops package
+=============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   mlops.dataset
+   mlops.errors
+   mlops.examples
+   mlops.hashing
+   mlops.model
+
+Module contents
+---------------
+
+.. automodule:: mlops
+   :members:
+   :undoc-members:
+   :show-inheritance:
