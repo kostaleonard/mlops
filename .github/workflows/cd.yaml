@@ -22,6 +22,11 @@ jobs:
         with:
           name: docs
           path: docs/_build/html
+      - name: Update GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html
   deploy:
     runs-on: ubuntu-latest
     steps:

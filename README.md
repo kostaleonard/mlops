@@ -19,6 +19,10 @@ the datasets on which they were trained/validated/tested
 pip install mloperations
 ```
 
+## API reference
+
+For the Sphinx API docs, please see the [project's GitHub Pages](https://kostaleonard.github.io/mlops/index.html).
+
 ## Why does MLOps matter?
 
 MLOps as a software engineering methodology for ML, and by extension this package that aims to enable MLOps, is
