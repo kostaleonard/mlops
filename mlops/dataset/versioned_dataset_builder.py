@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import shutil
 from tempfile import TemporaryFile
-from typing import Optional
+from typing import Optional, List, Set
 from datetime import datetime
 import json
 import dill as pickle
@@ -52,7 +52,7 @@ class VersionedDatasetBuilder:
                 path: str,
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY,
-                tags: Optional[list[str]] = None) -> str:
+                tags: Optional[List[str]] = None) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -241,7 +241,7 @@ class VersionedDatasetBuilder:
             raise PublicationPathAlreadyExistsError
         fs.mkdirs(publication_path)
 
-    def _write_tensors_local(self, publication_path: str) -> set[str]:
+    def _write_tensors_local(self, publication_path: str) -> Set[str]:
         """Writes the feature and label tensors to the publication path
         directory and returns the paths to the created files for hashing.
 
@@ -257,7 +257,7 @@ class VersionedDatasetBuilder:
 
     def _write_tensors_s3(self,
                           publication_path: str,
-                          fs: S3FileSystem) -> set[str]:
+                          fs: S3FileSystem) -> Set[str]:
         """Writes the feature and label tensors to the publication path
         directory and returns the paths to the created files for hashing.
 
@@ -297,7 +297,7 @@ class VersionedDatasetBuilder:
             with fs.open(path, 'wb') as outfile:
                 outfile.write(tmp_file.read())
 
-    def _copy_raw_dataset_local(self, copy_path: str) -> set[str]:
+    def _copy_raw_dataset_local(self, copy_path: str) -> Set[str]:
         """Copies the raw dataset to the given path, and returns the paths to
         all created files for hashing.
 
@@ -319,7 +319,7 @@ class VersionedDatasetBuilder:
 
     def _copy_raw_dataset_s3(self,
                              copy_path: str,
-                             fs: S3FileSystem) -> set[str]:
+                             fs: S3FileSystem) -> Set[str]:
         """Copies the raw dataset to the given path, and returns the paths to
         all created files for hashing.
 

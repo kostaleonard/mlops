@@ -45,7 +45,7 @@ def model_predict(features: np.ndarray,
     return dataset.data_processor.unpreprocess_labels(valid_predictions)
 
 
-def get_best_model(model_paths: Collection[str]) -> VersionedModel:
+def get_best_model(model_paths: Collection) -> VersionedModel:
     """Returns the versioned model with the best performance on the validation
     dataset.
 

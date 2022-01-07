@@ -1,6 +1,7 @@
 """Contains the DataProcessor class."""
 
 from abc import abstractmethod
+from typing import Dict
 import numpy as np
 
 
@@ -9,7 +10,7 @@ class DataProcessor:
     training, prediction, etc."""
 
     def get_preprocessed_features_and_labels(self, dataset_path: str) -> \
-            (dict[str, np.ndarray], dict[str, np.ndarray]):
+            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
         """Returns the preprocessed feature and label tensors from the dataset
         path. This method is specifically used for the train/val/test sets and
         not input data for prediction, because in some cases the features and
@@ -31,7 +32,7 @@ class DataProcessor:
         return features, labels
 
     def get_preprocessed_features(self, dataset_path: str) -> \
-            dict[str, np.ndarray]:
+            Dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
         that can be used by downstream models. The data in the directory may be
         the training/validation/test data, or it may be a batch of user data
@@ -52,7 +53,7 @@ class DataProcessor:
 
     @abstractmethod
     def get_raw_features_and_labels(self, dataset_path: str) -> \
-            (dict[str, np.ndarray], dict[str, np.ndarray]):
+            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
         """Returns the raw feature and label tensors from the dataset path. This
         method is specifically used for the train/val/test sets and not input
         data for prediction, because in some cases the features and labels need
@@ -74,7 +75,7 @@ class DataProcessor:
         """
 
     @abstractmethod
-    def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
         """Returns the raw feature tensors from the dataset path. The raw
         features are how training/validation/test as well as prediction data
         enter the data pipeline. For example, when handling image data, the raw

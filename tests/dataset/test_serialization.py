@@ -2,6 +2,7 @@
 
 import os
 import shutil
+from typing import Dict
 import numpy as np
 from mlops.dataset.data_processor import DataProcessor
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
@@ -16,7 +17,7 @@ class DataProcessorThatWillChange(DataProcessor):
     how data should enter the model pipeline."""
 
     def get_raw_features_and_labels(self, dataset_path: str) -> \
-            (dict[str, np.ndarray], dict[str, np.ndarray]):
+            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
         """Returns dummy features and labels
 
         :param dataset_path: Unused.
@@ -26,7 +27,7 @@ class DataProcessorThatWillChange(DataProcessor):
         return ({'X': np.array([1, 2, 3])},
                 {'y': np.array([1, 2, 3])})
 
-    def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:
+    def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
         """Returns dummy features.
 
         :param dataset_path: Unused.
@@ -59,7 +60,7 @@ class DataProcessorThatWillChange(DataProcessor):
 def _redefine_class() -> None:
     """Redefines DataProcessorThatWillChange."""
     # pylint: disable=redefined-outer-name
-    # pylint: disable=global-variable-not-assigned
+    # pylint: disable=global-variable-undefined
     # pylint: disable=invalid-name
     # pylint: disable=unused-variable
     global DataProcessorThatWillChange
@@ -69,7 +70,7 @@ def _redefine_class() -> None:
         redefining how data should enter the model pipeline."""
 
         def get_raw_features_and_labels(self, dataset_path: str) -> \
-                (dict[str, np.ndarray], dict[str, np.ndarray]):
+                (Dict[str, np.ndarray], Dict[str, np.ndarray]):
             """Returns dummy features and labels
 
             :param dataset_path: Unused.
@@ -78,7 +79,7 @@ def _redefine_class() -> None:
             """
             raise ValueError('The new implementation is different.')
 
-        def get_raw_features(self, dataset_path: str) -> dict[str, np.ndarray]:
+        def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
             """Returns dummy features.
 
             :param dataset_path: Unused.

@@ -2,7 +2,7 @@
 # pylint: disable=no-name-in-module
 
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, \
     Dropout
@@ -83,6 +83,8 @@ def train_model(model: Model,
             model_checkpoint_filename,
             save_best_only=True)
         callbacks.append(checkpoint_callback)
+        model_dir = os.path.dirname(model_checkpoint_filename)
+        os.makedirs(model_dir, exist_ok=True)
     history = model.fit(x=dataset.X_train,
                         y=dataset.y_train,
                         validation_data=(dataset.X_val, dataset.y_val),
@@ -95,7 +97,7 @@ def publish_model(model: Model,
                   dataset: VersionedDataset,
                   training_config: TrainingConfig,
                   publication_path: str,
-                  tags: Optional[list[str]] = None) -> str:
+                  tags: Optional[List[str]] = None) -> str:
     """Publishes the model to the path on the local or remote filesystem.
 
     :param model: The model to be published, with the exact weights desired for
