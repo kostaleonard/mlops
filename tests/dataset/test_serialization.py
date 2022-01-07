@@ -60,7 +60,7 @@ class DataProcessorThatWillChange(DataProcessor):
 def _redefine_class() -> None:
     """Redefines DataProcessorThatWillChange."""
     # pylint: disable=redefined-outer-name
-    # pylint: disable=global-variable-not-assigned
+    # pylint: disable=global-variable-undefined
     # pylint: disable=invalid-name
     # pylint: disable=unused-variable
     global DataProcessorThatWillChange

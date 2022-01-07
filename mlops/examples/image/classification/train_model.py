@@ -83,6 +83,8 @@ def train_model(model: Model,
             model_checkpoint_filename,
             save_best_only=True)
         callbacks.append(checkpoint_callback)
+        model_dir = os.path.dirname(model_checkpoint_filename)
+        os.makedirs(model_dir, exist_ok=True)
     history = model.fit(x=dataset.X_train,
                         y=dataset.y_train,
                         validation_data=(dataset.X_val, dataset.y_val),

@@ -49,7 +49,6 @@ def test_train_model_creates_checkpoints() -> None:
     model.compile('adam', loss='mse')
     train_kwargs = {'epochs': 3, 'batch_size': 8}
     model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
-    os.mkdir(TEST_CHECKPOINT_PATH)
     _ = train_model.train_model(
         model,
         dataset,
