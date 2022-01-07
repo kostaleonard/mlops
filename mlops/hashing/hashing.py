@@ -8,7 +8,7 @@ from s3fs import S3FileSystem
 CHUNK_SIZE = 2 ** 20
 
 
-def get_hash_local(files_to_hash: Collection[str]) -> str:
+def get_hash_local(files_to_hash: Collection) -> str:
     """Returns the MD5 hex digest string from hashing the content of all the
     given files on the local filesystem. The files are sorted before hashing
     so that the process is reproducible.
@@ -26,7 +26,7 @@ def get_hash_local(files_to_hash: Collection[str]) -> str:
     return hash_md5.hexdigest()
 
 
-def get_hash_s3(files_to_hash: Collection[str]) -> str:
+def get_hash_s3(files_to_hash: Collection) -> str:
     """Returns the MD5 hex digest string from hashing the content of all the
     given files in S3. The files are sorted before hashing so that the
     process is reproducible.

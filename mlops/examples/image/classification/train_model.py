@@ -2,7 +2,7 @@
 # pylint: disable=no-name-in-module
 
 import os
-from typing import Optional, Any
+from typing import Optional, Any, List
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, \
     Dropout
@@ -95,7 +95,7 @@ def publish_model(model: Model,
                   dataset: VersionedDataset,
                   training_config: TrainingConfig,
                   publication_path: str,
-                  tags: Optional[list[str]] = None) -> str:
+                  tags: Optional[List[str]] = None) -> str:
     """Publishes the model to the path on the local or remote filesystem.
 
     :param model: The model to be published, with the exact weights desired for

@@ -1,7 +1,7 @@
 """Contains the TrainingConfig class."""
 # pylint: disable = no-name-in-module
 
-from typing import Any
+from typing import Any, Dict
 from dataclasses import dataclass
 from tensorflow.keras.callbacks import History
 
@@ -14,4 +14,4 @@ class TrainingConfig:
     train_args: The training arguments.
     """
     history: History
-    train_args: dict[str, Any]
+    train_args: Dict[str, Any]

@@ -5,6 +5,7 @@ import os
 import shutil
 from datetime import datetime
 import json
+import dateutil
 import numpy as np
 import pytest
 from s3fs import S3FileSystem
@@ -117,7 +118,7 @@ def test_publish_appends_version_timestamp(
     end = datetime.now()
     assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1
     dirname = os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)[0]
-    publication_time = datetime.fromisoformat(dirname)
+    publication_time = dateutil.parser.parse(dirname)
     assert start < publication_time < end
 
 

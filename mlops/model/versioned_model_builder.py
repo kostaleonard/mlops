@@ -4,7 +4,7 @@
 import os
 import json
 from tempfile import TemporaryDirectory
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model
@@ -43,7 +43,7 @@ class VersionedModelBuilder:
     def publish(self,
                 path: str,
                 version: Optional[str] = None,
-                tags: Optional[list[str]] = None) -> str:
+                tags: Optional[List[str]] = None) -> str:
         """Saves the versioned model files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
