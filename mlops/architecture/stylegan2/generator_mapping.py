@@ -103,7 +103,7 @@ class GeneratorMapping(Layer):
                 layer_size = self.d_latent_size
             else:
                 layer_size = self.mapping_layers
-            self.mapping.append(Dense(layer_size))
+            self.mapping.append(Dense(layer_size, dtype=self.dtype))
             self.mapping.append(self._get_activation_layer())
 
     def call(self, inputs, **kwargs):

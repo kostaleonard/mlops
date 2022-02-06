@@ -20,10 +20,14 @@ def test_no_conditioning_correct_input_shape() -> None:
     conditioning is used."""
     # TODO
     z_latent_size = 4
-    gen_mapping = GeneratorMapping(z_latent_size=z_latent_size - 1, label_size=1)
+    gen_mapping = GeneratorMapping(z_latent_size=z_latent_size - 1,
+                                   label_size=1,
+                                   dtype='float64')
     arr = np.random.normal(size=(2, z_latent_size))
     print(gen_mapping(arr))
     print(gen_mapping(arr).shape)
+    print(gen_mapping(arr).dtype)
+    print(gen_mapping.mapping[1].dtype)
 
 # TODO test trainable variables
 
