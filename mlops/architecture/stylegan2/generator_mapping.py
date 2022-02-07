@@ -19,11 +19,7 @@ class GeneratorMapping(Layer):
     input latent code z into a disentangled latent code w. The input latent
     code z is drawn at random, e.g., from a multivariate Gaussian distribution.
     The disentangled latent code w contains style information that is learned
-    during training.
-
-    # TODO remove this note
-    The size of the latent code z is inferred based on the
-    first input to the layer (set lazily during build())."""
+    during training."""
 
     def __init__(self,
                  name: str = 'generator_mapping',
@@ -77,6 +73,7 @@ class GeneratorMapping(Layer):
 
     def build(self, input_shape):
         # TODO types and docstring
+        super().build(input_shape)
         if len(input_shape) != 2:
             # TODO custom error
             raise ValueError('Too many dimensions for generator mapping input')
@@ -108,6 +105,7 @@ class GeneratorMapping(Layer):
 
     def call(self, inputs, **kwargs):
         """TODO types and docstring"""
+        super().call(inputs **kwargs)
         x = inputs
         if self.conditioning_weights is not None:
             z, y = tf.split(
