@@ -1,6 +1,6 @@
 """Contains the GeneratorMapping class."""
 
-from typing import Optional, Any
+from typing import Tuple, Optional, Any
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer, Dense, LeakyReLU, ReLU
@@ -71,8 +71,12 @@ class GeneratorMapping(Layer):
         self.conditioning_weights = None
         self.mapping = None
 
-    def build(self, input_shape):
-        # TODO types and docstring
+    def build(self, input_shape: Tuple[Optional[int], ...]) -> None:
+        """Sets input shape-dependent layer properties, such as weights.
+
+        :param input_shape: The shape of the input tensors to this layer. The
+            first dimension, batch size, is ignored and may be None.
+        """
         super().build(input_shape)
         if len(input_shape) != 2:
             # TODO custom error
@@ -99,13 +103,13 @@ class GeneratorMapping(Layer):
             if layer_idx == self.mapping_layers - 1:
                 layer_size = self.d_latent_size
             else:
-                layer_size = self.mapping_layers
+                layer_size = self.mapping_fmaps
             self.mapping.append(Dense(layer_size, dtype=self.dtype))
             self.mapping.append(self._get_activation_layer())
 
     def call(self, inputs, **kwargs):
         """TODO types and docstring"""
-        super().call(inputs **kwargs)
+        super().call(inputs, **kwargs)
         x = inputs
         if self.conditioning_weights is not None:
             z, y = tf.split(
