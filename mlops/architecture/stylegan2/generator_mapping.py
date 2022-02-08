@@ -109,7 +109,6 @@ class GeneratorMapping(Layer):
 
     def call(self, inputs, **kwargs):
         """TODO types and docstring"""
-        super().call(inputs, **kwargs)
         x = inputs
         if self.conditioning_weights is not None:
             z, y = tf.split(
@@ -120,14 +119,20 @@ class GeneratorMapping(Layer):
             conditions = tf.matmul(y, self.conditioning_weights)
             x = tf.concat([z, conditions], axis=1)
         if self.normalize_latents:
-            # Add epsilon for numerical stability in reciprocal sqrt.
-            x *= tf.math.rsqrt(
-                tf.reduce_mean(tf.square(x), axis=1, keepdims=True) + EPSILON)
+            x = GeneratorMapping._normalize(x)
         for layer in self.mapping:
             x = layer(x)
         if self.d_latent_broadcast:
             x = tf.tile(x[:, np.newaxis], [1, self.d_latent_broadcast, 1])
         return x
+
+    @staticmethod
+    @tf.function
+    def _normalize(x):
+        """TODO types and docstring."""
+        # Add epsilon for numerical stability in reciprocal sqrt.
+        return x * tf.math.rsqrt(
+            tf.reduce_mean(tf.square(x), axis=1, keepdims=True) + EPSILON)
 
     def _get_activation_layer(self) -> Layer:
         if self.mapping_nonlinearity == 'lrelu':

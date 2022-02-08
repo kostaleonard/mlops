@@ -3,7 +3,7 @@
 import pytest
 import numpy as np
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, Dense
+from tensorflow.keras.layers import Input, Dense, ReLU, LeakyReLU
 from mlops.architecture.stylegan2.generator_mapping import GeneratorMapping
 
 
@@ -120,7 +120,7 @@ def test_correct_number_of_mapping_layers() -> None:
             z_latent_size=z_latent_size,
             mapping_layers=mapping_layers)
         # Need to build the layer to have its weights set.
-        gen_mapping.build((None, z_latent_size,))
+        gen_mapping.build((None, z_latent_size))
         num_dense = len([sublayer for sublayer in gen_mapping.mapping
                          if isinstance(sublayer, Dense)])
         assert num_dense == mapping_layers
@@ -135,13 +135,52 @@ def test_correct_number_of_mapping_feature_maps() -> None:
             z_latent_size=z_latent_size,
             mapping_fmaps=mapping_fmaps)
         # Need to build the layer to have its weights set.
-        gen_mapping.build((None, z_latent_size,))
+        gen_mapping.build((None, z_latent_size))
         dense_sublayers = [sublayer for sublayer in gen_mapping.mapping
                            if isinstance(sublayer, Dense)]
         # Ignore the output dense sublayer, which has d_latent_size units.
         for sublayer in dense_sublayers[:-1]:
             if isinstance(sublayer, Dense):
                 assert sublayer.units == mapping_fmaps
+
+
+def test_correct_nonlinearity() -> None:
+    """Tests that the layer uses the correct nonlinearity."""
+    z_latent_size = 4
+    for nonlinearity in ['relu', 'lrelu']:
+        gen_mapping = GeneratorMapping(
+            z_latent_size=z_latent_size,
+            mapping_nonlinearity=nonlinearity)
+        # Need to build the layer to have its weights set.
+        gen_mapping.build((None, z_latent_size))
+        if nonlinearity == 'relu':
+            assert any([isinstance(sublayer, ReLU)
+                        for sublayer in gen_mapping.mapping])
+        else:
+            assert any([isinstance(sublayer, LeakyReLU)
+                        for sublayer in gen_mapping.mapping])
+
+
+def test_invalid_nonlinearity_raises_error():
+    """Tests that instantiating the layer with an invalid nonlinearity raises
+    an error."""
+    # TODO custom error
+    z_latent_size = 4
+    gen_mapping = GeneratorMapping(z_latent_size=z_latent_size,
+                                   mapping_nonlinearity='dne')
+    with pytest.raises(ValueError):
+        gen_mapping.build((None, z_latent_size))
+
+
+def test_normalize_reduces_input():
+    """Tests that _normalize returns a normalized version of the input."""
+    batch_size = 2
+    units = 4
+    arr = 2 * np.ones((batch_size, units))
+    print(GeneratorMapping._normalize(arr))
+    # TODO
+
+
 
 # TODO test trainable variables
 
@@ -150,7 +189,5 @@ def test_correct_number_of_mapping_feature_maps() -> None:
 # TODO test conditioning labels
 
 # TODO test normalization
-
-# TODO test nonlinearity
 
 # TODO test learning rate multiplier
