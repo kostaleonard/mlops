@@ -172,14 +172,23 @@ def test_invalid_nonlinearity_raises_error():
         gen_mapping.build((None, z_latent_size))
 
 
-def test_normalize_reduces_input():
-    """Tests that _normalize returns a normalized version of the input."""
+def test_rms_norm_normalizes_input():
+    """Tests that _rms_norm returns a normalized version of the input.
+    According to the RMS Norm paper (https://arxiv.org/pdf/1910.07467.pdf),
+    the output is not re-centered, but it is scaled to a sqrt(n) unit sphere,
+    where n is the length of the input array."""
     batch_size = 2
-    units = 4
-    arr = 2 * np.ones((batch_size, units))
-    print(GeneratorMapping._normalize(arr))
-    # TODO
-
+    units1 = 4
+    units2 = 9
+    arr1 = 2 * np.ones((batch_size, units1))
+    arr2 = np.array([[idx for idx in range(units2)],
+                     [10 * idx for idx in range(units2)]], dtype=np.float32)
+    for arr in arr1, arr2:
+        normalized = GeneratorMapping._rms_norm(arr)
+        normalized_vec_lengths = np.linalg.norm(normalized.numpy(), axis=1)
+        assert np.isclose(
+            normalized_vec_lengths,
+            np.sqrt(arr.shape[1]) * np.ones_like(normalized_vec_lengths)).all()
 
 
 # TODO test trainable variables

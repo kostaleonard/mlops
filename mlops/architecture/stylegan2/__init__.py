@@ -8,6 +8,8 @@ base, although it is TFv1.14 and we implement in TFv2. The original code base
 can be found here: https://github.com/NVlabs/stylegan2
 
 Additional sources.
-LoGANv2 (https://arxiv.org/abs/1909.09974): Discusses use of conditioning
-labels.
+    LoGANv2 (https://arxiv.org/abs/1909.09974): Discusses use of conditioning
+        labels.
+    RMS Layer Normalization (https://arxiv.org/pdf/1910.07467.pdf): Introduces
+        RMS layer normalization.
 """

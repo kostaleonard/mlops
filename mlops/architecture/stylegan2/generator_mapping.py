@@ -119,7 +119,7 @@ class GeneratorMapping(Layer):
             conditions = tf.matmul(y, self.conditioning_weights)
             x = tf.concat([z, conditions], axis=1)
         if self.normalize_latents:
-            x = GeneratorMapping._normalize(x)
+            x = GeneratorMapping._rms_norm(x)
         for layer in self.mapping:
             x = layer(x)
         if self.d_latent_broadcast:
@@ -128,7 +128,7 @@ class GeneratorMapping(Layer):
 
     @staticmethod
     @tf.function
-    def _normalize(x):
+    def _rms_norm(x):
         """TODO types and docstring."""
         # Add epsilon for numerical stability in reciprocal sqrt.
         return x * tf.math.rsqrt(
