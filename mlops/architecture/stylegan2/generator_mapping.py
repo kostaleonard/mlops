@@ -34,7 +34,12 @@ class GeneratorMapping(Layer):
                  mapping_nonlinearity: str = 'lrelu',
                  normalize_latents: bool = True,
                  **kwargs: Any) -> None:
-        """Instantiates the object.
+        """Instantiates the object. The input to the layer must be of shape
+        m x z_latent_size if no conditioning labels are used, or m x
+        (z_latent_size + label_size) if they are; m is the batch size. The
+        latent vector z is drawn from a normal distribution, and the condition
+        label is a one-hot encoded vector over the number of classes (i.e.,
+        label_size).
 
         :param name: The name of the layer.
         :param dtype: The data type to use for activations and outputs.
@@ -94,6 +99,8 @@ class GeneratorMapping(Layer):
                              f'{self.z_latent_size}, but got '
                              f'{input_shape[-1]}')
         if self.label_size:
+            # TODO are the conditioning weights supposed to be trainable? LoGANv2 paper is unclear.
+            # TODO this is the StyleGAN2 implementation, but it is not clear this is correct.
             self.conditioning_weights = self.add_weight(
                 name='conditioning_weights',
                 shape=(self.label_size, self.z_latent_size),
@@ -106,6 +113,10 @@ class GeneratorMapping(Layer):
                 layer_size = self.mapping_fmaps
             self.mapping.append(Dense(layer_size, dtype=self.dtype))
             self.mapping.append(self._get_activation_layer())
+        # Build all instantiated layers by running call().
+        # TODO this does not appear to do anything.
+        input_batch = tf.zeros((1, *input_shape[1:]))
+        _ = self.call(input_batch)
 
     def call(self, inputs, **kwargs):
         """TODO types and docstring"""
