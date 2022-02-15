@@ -113,10 +113,6 @@ class GeneratorMapping(Layer):
                 layer_size = self.mapping_fmaps
             self.mapping.append(Dense(layer_size, dtype=self.dtype))
             self.mapping.append(self._get_activation_layer())
-        # Build all instantiated layers by running call().
-        # TODO this does not appear to do anything.
-        input_batch = tf.zeros((1, *input_shape[1:]))
-        _ = self.call(input_batch)
 
     def call(self, inputs, **kwargs):
         """TODO types and docstring"""

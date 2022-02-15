@@ -202,35 +202,6 @@ def test_conditioning_weights_correct_shape() -> None:
                                                       z_latent_size)
 
 
-def test_first_sublayer_output_shape_correct_with_conditioning() -> None:
-    """Tests that the output shape of the first sublayer is correct when using
-    conditioning."""
-    z_latent_size = 4
-    label_size = 2
-    gen_mapping = GeneratorMapping(z_latent_size=z_latent_size,
-                                   label_size=label_size,
-                                   input_shape=(z_latent_size + label_size,))
-    model = Sequential([gen_mapping])
-    model.summary()
-    print(model.input_shape)
-    for layer in model.layers:
-        print(layer.output_shape)
-    model(np.zeros((1, z_latent_size + label_size), dtype=np.float32))
-    print(gen_mapping.mapping[0].output_shape)
-    #assert gen_mapping.mapping[0].output_shape == (2 * z_latent_size,)
-
-
-def test_build_also_builds_sublayers() -> None:
-    """Tests that build also calls build on sublayers, setting their shapes."""
-    z_latent_size = 4
-    gen_mapping = GeneratorMapping(z_latent_size=z_latent_size)
-    gen_mapping.build((None, z_latent_size))
-    _ = gen_mapping(np.zeros((1, z_latent_size)))
-    #print(gen_mapping.call(np.zeros((1, z_latent_size))))
-    #assert gen_mapping.mapping[0].input_shape == (None, z_latent_size)
-    print(gen_mapping.input_shape)
-
-
 # TODO test conditioning weights correct shape
 
 # TODO test trainable variables
