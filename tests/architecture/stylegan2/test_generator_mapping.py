@@ -231,14 +231,27 @@ def test_correct_num_trainable_variables_with_conditioning() -> None:
     """Tests that the layer has the correct number of trainable variables
     (identical to trainable weights) when no conditioning labels are used."""
     z_latent_size = 4
-    label_size = 2
+    label_size = 8
+    mapping_fmaps = 256
+    mapping_layers = 8
+    d_latent_size = 128
     model = Sequential([
         Input(shape=(z_latent_size + label_size,)),
         GeneratorMapping(z_latent_size=z_latent_size,
-                         label_size=label_size)])
-    model.summary()
-
-
-# TODO test trainable variables
+                         label_size=label_size,
+                         mapping_fmaps=mapping_fmaps,
+                         mapping_layers=mapping_layers,
+                         d_latent_size=d_latent_size)])
+    conditioning_weights = z_latent_size * label_size
+    first_dense_weights = (2 * z_latent_size + 1) * mapping_fmaps
+    middle_dense_weights = (mapping_fmaps + 1) * mapping_fmaps
+    last_dense_weights = (mapping_fmaps + 1) * d_latent_size
+    expected_weights = conditioning_weights + \
+        first_dense_weights + \
+        (mapping_layers - 2) * middle_dense_weights + \
+        last_dense_weights
+    trainable_variable_sum = sum(
+        count_params(variables) for variables in model.trainable_variables)
+    assert expected_weights == trainable_variable_sum
 
 # TODO test learning rate multiplier
