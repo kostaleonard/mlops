@@ -3,7 +3,10 @@
 from typing import Tuple, Optional, Any
 import numpy as np
 import tensorflow as tf
+from tensorflow import Tensor
 from tensorflow.keras.layers import Layer, Dense, LeakyReLU, ReLU
+from mlops.errors import GeneratorMappingInvalidInputShapeError, \
+    UnknownActivationFunctionError
 
 DEFAULT_Z_LATENT_SIZE = 512
 DEFAULT_D_LATENT_SIZE = 512
@@ -63,6 +66,7 @@ class GeneratorMapping(Layer):
             passing them through the mapping layers.
         :param kwargs: Layer kwargs.
         """
+        # TODO how can we change LR multiplier?
         super().__init__(name=name, dtype=dtype, **kwargs)
         self.z_latent_size = z_latent_size
         self.label_size = label_size
@@ -84,20 +88,19 @@ class GeneratorMapping(Layer):
         """
         super().build(input_shape)
         if len(input_shape) != 2:
-            # TODO custom error
-            raise ValueError('Too many dimensions for generator mapping input')
+            raise GeneratorMappingInvalidInputShapeError(
+                'Too many dimensions for generator mapping input')
         if self.label_size is not None and \
                 input_shape[-1] != self.z_latent_size + self.label_size:
-            # TODO custom error
-            raise ValueError(f'Expected input second dimension to have size '
-                             f'{self.z_latent_size} + {self.label_size} = '
-                             f'{self.z_latent_size + self.label_size}, but '
-                             f'got {input_shape[-1]}')
+            raise GeneratorMappingInvalidInputShapeError(
+                f'Expected input second dimension to have size '
+                f'{self.z_latent_size} + {self.label_size} = '
+                f'{self.z_latent_size + self.label_size}, but got '
+                f'{input_shape[-1]}')
         if self.label_size is None and input_shape[-1] != self.z_latent_size:
-            # TODO custom error
-            raise ValueError(f'Expected input second dimension to have size '
-                             f'{self.z_latent_size}, but got '
-                             f'{input_shape[-1]}')
+            raise GeneratorMappingInvalidInputShapeError(
+                f'Expected input second dimension to have size '
+                f'{self.z_latent_size}, but got {input_shape[-1]}')
         if self.label_size:
             # TODO are the conditioning weights supposed to be trainable? LoGANv2 paper is unclear.
             # TODO this is the StyleGAN2 implementation, but it is not clear this is correct.
@@ -114,8 +117,20 @@ class GeneratorMapping(Layer):
             self.mapping.append(Dense(layer_size, dtype=self.dtype))
             self.mapping.append(self._get_activation_layer())
 
-    def call(self, inputs, **kwargs):
-        """TODO types and docstring"""
+    def call(self, inputs: Tensor, **kwargs: Any) -> Tensor:
+        """Returns the output of the layer.
+
+        :param inputs: The input tensor. Must be of shape m x z_latent_size if
+            no conditioning labels are used, or m x (z_latent_size +
+            label_size) if they are; m is the batch size. The input tensor
+            represents the latent vector z, which should be drawn from a normal
+            distribution, and the condition label, an optional one-hot encoded
+            vector over the number of classes (i.e., label_size).
+        :param kwargs: call kwargs.
+        :return: The disentangled latent tensor w, of shape m x d_latent_size,
+            or m x d_latent_broadcast x d_latent_size if d_latent_broadcast is
+            specified.
+        """
         x = inputs
         if self.conditioning_weights is not None:
             z, y = tf.split(
@@ -135,21 +150,29 @@ class GeneratorMapping(Layer):
 
     @staticmethod
     @tf.function
-    def _rms_norm(x):
-        """TODO types and docstring."""
+    def _rms_norm(x: Tensor) -> Tensor:
+        """Returns the RMS norm of the input tensor. RMS norm does not center
+        the output, but does scale each input vector to a sqrt(n) unit sphere,
+        where n is the length of the input array. More information is available
+        in the RMS Layer Normalization paper.
+
+        :param x: The input tensor to normalize. Its shape must be m x n, where
+            m is the batch size and n is the length of each input vector.
+        :return: The RMS norm of the input tensor.
+        """
         # Add epsilon for numerical stability in reciprocal sqrt.
         return x * tf.math.rsqrt(
             tf.reduce_mean(tf.square(x), axis=1, keepdims=True) + EPSILON)
 
     def _get_activation_layer(self) -> Layer:
+        """Returns an instance of the activation layer to be used in the
+        mapping.
+
+        :return: An instance of the activation layer to be used in the mapping.
+        """
         if self.mapping_nonlinearity == 'lrelu':
             return LeakyReLU(alpha=LEAKY_RELU_ALPHA, dtype=self.dtype)
         if self.mapping_nonlinearity == 'relu':
             return ReLU(dtype=self.dtype)
-        # TODO custom error
-        raise ValueError(f'Unknown activation function: '
-                         f'{self.mapping_nonlinearity}')
-
-    def losses(self):
-        # TODO this is just a rough idea
-        return self.mapping_lrmul * super().losses()
+        raise UnknownActivationFunctionError(
+            f'Unknown activation function: {self.mapping_nonlinearity}')

@@ -6,6 +6,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Dense, ReLU, LeakyReLU
 from tensorflow.keras.backend import count_params
 from mlops.architecture.stylegan2.generator_mapping import GeneratorMapping
+from mlops.errors import GeneratorMappingInvalidInputShapeError, \
+    UnknownActivationFunctionError
 
 
 def test_no_conditioning_correct_input_shape() -> None:
@@ -43,16 +45,33 @@ def test_cannot_instantiate_model_with_incorrect_input_shape() -> None:
     """Tests that a TensorFlow model cannot be instantiated with a
     GeneratorMapping that has an incorrect input shape."""
     z_latent_size = 4
-    # TODO custom error.
-    with pytest.raises(ValueError):
+    label_size = 2
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
         gen_mapping = GeneratorMapping(z_latent_size=z_latent_size)
+        # Larger input than expected.
         _ = Sequential([Input(shape=(z_latent_size + 1,)), gen_mapping])
-    with pytest.raises(ValueError):
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
         gen_mapping = GeneratorMapping(z_latent_size=z_latent_size)
+        # Smaller input than expected.
         _ = Sequential([Input(shape=(z_latent_size - 1,)), gen_mapping])
-    with pytest.raises(ValueError):
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
+        gen_mapping = GeneratorMapping(z_latent_size=z_latent_size,
+                                       input_shape=(z_latent_size + 1,))
+        # Larger input than expected, provided as layer arg.
+        _ = Sequential([gen_mapping])
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
         gen_mapping = GeneratorMapping(z_latent_size=z_latent_size)
-        _ = Sequential(gen_mapping(input_shape=(z_latent_size + 1,)))
+        # Too few dimensions.
+        _ = Sequential([Input(shape=()), gen_mapping])
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
+        gen_mapping = GeneratorMapping(z_latent_size=z_latent_size)
+        # Too many dimensions.
+        _ = Sequential([Input(shape=(z_latent_size, 1)), gen_mapping])
+    with pytest.raises(GeneratorMappingInvalidInputShapeError):
+        gen_mapping = GeneratorMapping(z_latent_size=z_latent_size,
+                                       label_size=label_size)
+        # Labels missing.
+        _ = Sequential([Input(shape=(z_latent_size,)), gen_mapping])
 
 
 def test_correct_output_shape() -> None:
@@ -165,11 +184,10 @@ def test_correct_nonlinearity() -> None:
 def test_invalid_nonlinearity_raises_error() -> None:
     """Tests that instantiating the layer with an invalid nonlinearity raises
     an error."""
-    # TODO custom error
     z_latent_size = 4
     gen_mapping = GeneratorMapping(z_latent_size=z_latent_size,
                                    mapping_nonlinearity='dne')
-    with pytest.raises(ValueError):
+    with pytest.raises(UnknownActivationFunctionError):
         gen_mapping.build((None, z_latent_size))
 
 
@@ -253,5 +271,3 @@ def test_correct_num_trainable_variables_with_conditioning() -> None:
     trainable_variable_sum = sum(
         count_params(variables) for variables in model.trainable_variables)
     assert expected_weights == trainable_variable_sum
-
-# TODO test learning rate multiplier
