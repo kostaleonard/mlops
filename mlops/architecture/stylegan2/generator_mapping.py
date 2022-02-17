@@ -18,11 +18,11 @@ EPSILON = 1e-8
 
 
 class GeneratorMapping(Layer):
-    """The mapping sub-network used in the StyleGAN generator. Transforms the
-    input latent code z into a disentangled latent code w. The input latent
-    code z is drawn at random, e.g., from a multivariate Gaussian distribution.
-    The disentangled latent code w contains style information that is learned
-    during training."""
+    """The mapping sub-network used in the StyleGAN/StyleGAN2 generator.
+    Transforms the input latent code z into a disentangled latent code w. The
+    input latent code z is drawn at random, e.g., from a multivariate Gaussian
+    distribution. The disentangled latent code w contains style information
+    that is learned during training."""
 
     def __init__(self,
                  name: str = 'generator_mapping',
