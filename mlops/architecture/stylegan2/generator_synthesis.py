@@ -1,6 +1,7 @@
 """Contains the GeneratorSynthesis class."""
 
 from typing import Any, Tuple, Optional
+from tensorflow import Tensor
 from tensorflow.keras.layers import Layer
 
 NUM_CHANNELS_RGB = 3
@@ -59,6 +60,37 @@ class GeneratorSynthesis(Layer):
         :param fused_modconv: TODO
         :param kwargs: Layer kwargs.
         """
+        # TODO finish docstring
         super().__init__(name=name, dtype=dtype, **kwargs)
         # TODO we are inferring d_latent_size from the input to build
+        self.d_latent_size = None
+        self.num_channels = num_channels
         # TODO resolution must be a power of 2
+        self.resolution = resolution
+        self.fmap_base = fmap_base
+        self.fmap_decay = fmap_decay
+        self.fmap_min = fmap_min
+        self.fmap_max = fmap_max
+        self.randomize_noise = randomize_noise
+        self.nonlinearity = nonlinearity
+        self.resample_kernel = resample_kernel
+        self.fused_modconv = fused_modconv
+
+    def build(self, input_shape: Tuple[Optional[int], ...]) -> None:
+        """Sets input shape-dependent layer properties, such as weights.
+
+        :param input_shape: The shape of the input tensors to this layer. The
+            first dimension, batch size, is ignored and may be None.
+        """
+        super().build(input_shape)
+        # TODO
+
+    def call(self, inputs: Tensor, **kwargs: Any) -> Tensor:
+        """Returns the output of the layer.
+
+        :param inputs: The input tensor. TODO shapes
+        :param kwargs: call kwargs.
+        :return: The generated image tensor of shape m x resolution x
+            resolution.
+        """
+        # TODO might need to make this a Model subclass because it has multiple outputs at different resolutions.
