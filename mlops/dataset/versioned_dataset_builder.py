@@ -330,11 +330,8 @@ class VersionedDatasetBuilder:
                     outfile.add(unzipped_copy_path, arcname='raw')
         else:
             # Copy raw dataset from local filesystem to local filesystem.
-            with TemporaryDirectory() as tempdir:
-                unzipped_copy_path = os.path.join(tempdir, 'raw')
-                shutil.copytree(self.dataset_path, unzipped_copy_path)
-                with tarfile.open(copy_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+            with tarfile.open(copy_path, 'w:bz2') as outfile:
+                outfile.add(self.dataset_path, arcname='raw')
         return copy_path
 
     def _copy_zip_raw_dataset_s3(self,
@@ -359,11 +356,9 @@ class VersionedDatasetBuilder:
         else:
             # Copy raw dataset from local filesystem to S3.
             with TemporaryDirectory() as tempdir:
-                unzipped_copy_path = os.path.join(tempdir, 'raw')
                 tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
-                shutil.copytree(self.dataset_path, unzipped_copy_path)
                 with tarfile.open(tempzip_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+                    outfile.add(self.dataset_path, arcname='raw')
                 fs.put(tempzip_path, copy_path)
         return copy_path
 
