@@ -3,7 +3,7 @@ pytest
 pytest-cov
 numpy
 pandas
-tensorflow
+tensorflow==2.7
 boto3
 botocore
 s3fs
