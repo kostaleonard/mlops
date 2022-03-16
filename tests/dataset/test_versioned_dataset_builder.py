@@ -13,7 +13,7 @@ import pytest
 import boto3
 from s3fs import S3FileSystem
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
-    STRATEGY_COPY, STRATEGY_LINK
+    STRATEGY_COPY_ZIP, STRATEGY_COPY, STRATEGY_LINK
 from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
 from tests.dataset.preset_data_processor import PresetDataProcessor
@@ -119,7 +119,7 @@ def test_publish_local_path_creates_expected_files() -> None:
     expected_labels = {'y_train.npy', 'y_val.npy', 'y_test.npy'}
     assert set(os.listdir(publication_dir)) == expected_features.union(
         expected_labels).union(
-        {'data_processor.pkl', 'meta.json', 'raw'})
+        {'data_processor.pkl', 'meta.json', 'raw.tar.bz2'})
 
 
 @pytest.mark.awstest
@@ -150,8 +150,8 @@ def test_publish_s3_path_creates_expected_files() -> None:
         {'data_processor.pkl', 'meta.json'})
     expected_keys = {os.path.join(prefix, key) for key in expected_keys}
     assert expected_keys.intersection(item_keys) == expected_keys
-    # Check for raw "directory" (flat filesystem).
-    raw_directory_key = os.path.join(prefix, 'raw/')
+    # Check for raw zip file.
+    raw_directory_key = os.path.join(prefix, 'raw.tar.bz2')
     assert any(key.startswith(raw_directory_key) for key in item_keys)
 
 
@@ -165,7 +165,9 @@ def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL,
+                    version,
+                    dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
     raw_dataset_paths = set()
     for current_path, _, filenames in os.walk(raw_dataset_dir):
@@ -185,7 +187,9 @@ def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    builder.publish(TEST_PUBLICATION_PATH_S3,
+                    version,
+                    dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
     fs = S3FileSystem()
     s3_filenames = {f's3://{key}' for key in fs.find(raw_dataset_dir)}
@@ -220,6 +224,41 @@ def test_publish_s3_path_raises_path_already_exists_error() -> None:
     builder.publish(TEST_PUBLICATION_PATH_S3, version)
     with pytest.raises(PublicationPathAlreadyExistsError):
         builder.publish(TEST_PUBLICATION_PATH_S3, version)
+
+
+def test_publish_zips_raw_dataset() -> None:
+    """Tests that publish copies and zips the raw dataset when the copy
+    strategy is STRATEGY_COPY_ZIP."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL,
+                    version,
+                    dataset_copy_strategy=STRATEGY_COPY_ZIP)
+    raw_dataset_zip = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version,
+                                   'raw.tar.bz2')
+    assert os.path.exists(raw_dataset_zip)
+
+
+@pytest.mark.awstest
+def test_publish_zips_s3_to_s3() -> None:
+    """Tests that publish correctly reads the dataset path when the dataset is
+    in S3 and writes to S3."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    version = 'v1'
+    builder.publish(TEST_PUBLICATION_PATH_S3,
+                    version,
+                    dataset_copy_strategy=STRATEGY_COPY_ZIP)
+    raw_dataset_zip = os.path.join(TEST_PUBLICATION_PATH_S3, version,
+                                   'raw.tar.bz2')
+    fs = S3FileSystem()
+    assert fs.exists(raw_dataset_zip)
 
 
 def test_publish_copies_raw_dataset() -> None:
@@ -465,6 +504,7 @@ def test_publish_s3_with_trailing_slash() -> None:
     assert fs.isdir(expected_filename)
     # Many trailing slashes.
     _remove_test_directories_s3()
+    _create_test_dataset_s3()
     builder.publish(TEST_PUBLICATION_PATH_S3 + '///', version)
     fs = S3FileSystem()
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)

@@ -16,3 +16,4 @@ sphinx_rtd_theme
 build
 twine
 python-dateutil
+urllib3<1.26,>=1.25.4
