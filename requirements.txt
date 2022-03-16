@@ -3,7 +3,7 @@ pytest
 pytest-cov
 numpy
 pandas
-tensorflow==2.4.1
+tensorflow
 boto3
 botocore
 s3fs
@@ -16,4 +16,3 @@ sphinx_rtd_theme
 build
 twine
 python-dateutil
-urllib3<1.26,>=1.25.4
