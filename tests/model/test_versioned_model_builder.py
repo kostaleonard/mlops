@@ -5,6 +5,7 @@ import os
 import shutil
 from datetime import datetime
 import json
+import time
 import dateutil
 import numpy as np
 import pytest
@@ -332,6 +333,39 @@ def test_same_models_have_same_hashes(
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
     builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+
+
+@pytest.mark.slowtest
+def test_same_models_have_same_hashes_different_timestamps(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that the hash values from two models that have identical files are
+    the same even when they have different timestamps. In some libraries, e.g.,
+    h5py (older versions), timestamp data is stored at second-level
+    granularity.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model, training_config)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    time.sleep(2)
     builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
     meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                               'v1',

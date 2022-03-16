@@ -3,7 +3,8 @@
 import os
 from pathlib import Path
 import shutil
-from tempfile import TemporaryFile
+from tempfile import TemporaryFile, TemporaryDirectory
+import tarfile
 from typing import Optional, List, Set
 from datetime import datetime
 import json
@@ -15,6 +16,7 @@ from mlops.hashing.hashing import get_hash_local, get_hash_s3
 from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
 
+STRATEGY_COPY_ZIP = 'copy_zip'
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
 
@@ -51,7 +53,7 @@ class VersionedDatasetBuilder:
     def publish(self,
                 path: str,
                 version: Optional[str] = None,
-                dataset_copy_strategy: str = STRATEGY_COPY,
+                dataset_copy_strategy: str = STRATEGY_COPY_ZIP,
                 tags: Optional[List[str]] = None) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
@@ -63,8 +65,7 @@ class VersionedDatasetBuilder:
                 y_train.npy (and other label tensors by their given names)
                 data_processor.pkl (DataProcessor object)
                 meta.json (metadata)
-                raw/ (non-empty directory with the raw dataset files)
-                    ...
+                raw.tar.bz2 (bz2-zipped directory with the raw dataset files)
 
         The contents of meta.json will be:
             {
@@ -86,10 +87,11 @@ class VersionedDatasetBuilder:
             should be unique to this dataset. If None, the publication timestamp
             will be used as the version.
         :param dataset_copy_strategy: The strategy by which to copy the
-            original, raw dataset to the published path. The default is
-            STRATEGY_COPY, which recursively copies all files and directories
-            from the dataset path supplied at instantiation to the published
-            path so that the dataset can be properly versioned. STRATEGY_LINK
+            original, raw dataset to the published path. STRATEGY_COPY
+            recursively copies all files and directories from the dataset path
+            supplied at instantiation to the published path so that the dataset
+            can be properly versioned. STRATEGY_COPY_ZIP is identical in
+            behavior, but zips the directory upon completion. STRATEGY_LINK
             will instead create a file 'link.txt' containing the supplied
             dataset path; this is desirable if the raw dataset is already stored
             in a versioned repository, and copying would create an unnecessary
@@ -103,10 +105,12 @@ class VersionedDatasetBuilder:
             version = timestamp
         if not tags:
             tags = []
-        if dataset_copy_strategy not in {STRATEGY_COPY, STRATEGY_LINK}:
+        if dataset_copy_strategy not in {
+                STRATEGY_COPY_ZIP, STRATEGY_COPY, STRATEGY_LINK}:
             raise InvalidDatasetCopyStrategyError
         publication_path = os.path.join(path.rstrip('/'), version)
         copy_path = os.path.join(publication_path, 'raw')
+        copy_zip_path = os.path.join(publication_path, 'raw.tar.bz2')
         link_path = os.path.join(copy_path, 'link.txt')
         metadata_path = os.path.join(publication_path, 'meta.json')
         processor_path = os.path.join(publication_path, 'data_processor.pkl')
@@ -118,6 +122,7 @@ class VersionedDatasetBuilder:
         if path.startswith('s3://'):
             return self._publish_s3(publication_path,
                                     copy_path,
+                                    copy_zip_path,
                                     link_path,
                                     metadata_path,
                                     processor_path,
@@ -125,6 +130,7 @@ class VersionedDatasetBuilder:
                                     metadata)
         return self._publish_local(publication_path,
                                    copy_path,
+                                   copy_zip_path,
                                    link_path,
                                    metadata_path,
                                    processor_path,
@@ -134,6 +140,7 @@ class VersionedDatasetBuilder:
     def _publish_local(self,
                        publication_path: str,
                        copy_path: str,
+                       copy_zip_path: str,
                        link_path: str,
                        metadata_path: str,
                        processor_path: str,
@@ -144,6 +151,7 @@ class VersionedDatasetBuilder:
 
         :param publication_path: The local path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.
+        :param copy_zip_path: The path to the zipped raw dataset.
         :param link_path: The path to the file containing the raw dataset link.
         :param metadata_path: The path to which the metadata should be saved.
         :param processor_path: The path to which to write the data processor.
@@ -162,6 +170,9 @@ class VersionedDatasetBuilder:
         if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_local(link_path)
             files_to_hash.add(link_path)
+        elif dataset_copy_strategy == STRATEGY_COPY_ZIP:
+            self._copy_zip_raw_dataset_local(copy_zip_path)
+            files_to_hash.add(copy_zip_path)
         else:
             file_paths = self._copy_raw_dataset_local(copy_path)
             files_to_hash = files_to_hash.union(file_paths)
@@ -176,6 +187,7 @@ class VersionedDatasetBuilder:
     def _publish_s3(self,
                     publication_path: str,
                     copy_path: str,
+                    copy_zip_path: str,
                     link_path: str,
                     metadata_path: str,
                     processor_path: str,
@@ -186,6 +198,7 @@ class VersionedDatasetBuilder:
 
         :param publication_path: The path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.
+        :param copy_zip_path: The path to the zipped raw dataset.
         :param link_path: The path to the file containing the raw dataset link.
         :param metadata_path: The path to which the metadata should be saved.
         :param processor_path: The path to which to write the data processor.
@@ -205,6 +218,9 @@ class VersionedDatasetBuilder:
         if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_s3(link_path, fs)
             files_to_hash.add(link_path)
+        elif dataset_copy_strategy == STRATEGY_COPY_ZIP:
+            self._copy_zip_raw_dataset_s3(copy_zip_path, fs)
+            files_to_hash.add(copy_zip_path)
         else:
             file_paths = self._copy_raw_dataset_s3(copy_path, fs)
             files_to_hash = files_to_hash.union(file_paths)
@@ -296,6 +312,55 @@ class VersionedDatasetBuilder:
             tmp_file.seek(0)
             with fs.open(path, 'wb') as outfile:
                 outfile.write(tmp_file.read())
+
+    def _copy_zip_raw_dataset_local(self, copy_path: str) -> str:
+        """Copies the raw dataset to the given path, zips it, and returns the
+        path to the zip file for hashing.
+
+        :param copy_path: The path to which to copy the raw dataset.
+        :return: The path to the zip file.
+        """
+        if self.dataset_path.startswith('s3://'):
+            # Copy raw dataset from S3 to local filesystem.
+            fs = S3FileSystem()
+            with TemporaryDirectory() as tempdir:
+                unzipped_copy_path = os.path.join(tempdir, 'raw')
+                fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                with tarfile.open(copy_path, 'w:bz2') as outfile:
+                    outfile.add(unzipped_copy_path, arcname='raw')
+        else:
+            # Copy raw dataset from local filesystem to local filesystem.
+            with tarfile.open(copy_path, 'w:bz2') as outfile:
+                outfile.add(self.dataset_path, arcname='raw')
+        return copy_path
+
+    def _copy_zip_raw_dataset_s3(self,
+                                 copy_path: str,
+                                 fs: S3FileSystem) -> str:
+        """Copies the raw dataset to the given path, zips it, and returns the
+        path to the zip file for hashing.
+
+        :param copy_path: The path to which to copy the raw dataset.
+        :param fs: The S3 filesystem object to interface with S3.
+        :return: The paths to all created files.
+        """
+        if self.dataset_path.startswith('s3://'):
+            # Copy raw dataset from S3 to S3.
+            with TemporaryDirectory() as tempdir:
+                unzipped_copy_path = os.path.join(tempdir, 'raw')
+                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                with tarfile.open(tempzip_path, 'w:bz2') as outfile:
+                    outfile.add(unzipped_copy_path, arcname='raw')
+                fs.put(tempzip_path, copy_path)
+        else:
+            # Copy raw dataset from local filesystem to S3.
+            with TemporaryDirectory() as tempdir:
+                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                with tarfile.open(tempzip_path, 'w:bz2') as outfile:
+                    outfile.add(self.dataset_path, arcname='raw')
+                fs.put(tempzip_path, copy_path)
+        return copy_path
 
     def _copy_raw_dataset_local(self, copy_path: str) -> Set[str]:
         """Copies the raw dataset to the given path, and returns the paths to
