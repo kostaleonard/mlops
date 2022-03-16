@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mlops.dataset package &mdash; mlops v0.1.1 documentation</title>
+  <title>mlops.dataset package &mdash; mlops v0.1.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -294,20 +294,17 @@ a dataset archive (such as the local filesystem or S3), and is not meant for
 consumption by downstream models.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish">
-<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_copy_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'copy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_copy_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'copy_zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish" title="Permalink to this definition"></a></dt>
 <dd><p>Saves the versioned dataset files to the given path. If the path and
 appended version already exists, this operation will raise a
 PublicationPathAlreadyExistsError.</p>
 <dl>
-<dt>The following files will be created:</dt><dd><dl>
+<dt>The following files will be created:</dt><dd><dl class="simple">
 <dt>path/version/ (the publication path and version)</dt><dd><p>X_train.npy (and other feature tensors by their given names)
 y_train.npy (and other label tensors by their given names)
 data_processor.pkl (DataProcessor object)
 meta.json (metadata)
-raw/ (non-empty directory with the raw dataset files)</p>
-<blockquote>
-<div><p>…</p>
-</div></blockquote>
+raw.tar.bz2 (bz2-zipped directory with the raw dataset files)</p>
 </dd>
 </dl>
 </dd>
@@ -338,10 +335,11 @@ same version.</p></li>
 should be unique to this dataset. If None, the publication timestamp
 will be used as the version.</p></li>
 <li><p><strong>dataset_copy_strategy</strong> – The strategy by which to copy the
-original, raw dataset to the published path. The default is
-STRATEGY_COPY, which recursively copies all files and directories
-from the dataset path supplied at instantiation to the published
-path so that the dataset can be properly versioned. STRATEGY_LINK
+original, raw dataset to the published path. STRATEGY_COPY
+recursively copies all files and directories from the dataset path
+supplied at instantiation to the published path so that the dataset
+can be properly versioned. STRATEGY_COPY_ZIP is identical in
+behavior, but zips the directory upon completion. STRATEGY_LINK
 will instead create a file ‘link.txt’ containing the supplied
 dataset path; this is desirable if the raw dataset is already stored
 in a versioned repository, and copying would create an unnecessary
