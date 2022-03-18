@@ -8,6 +8,7 @@ from typing import Optional, List
 from datetime import datetime
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model
+from tensorflow.keras.callbacks import History
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.training_config import TrainingConfig
@@ -22,7 +23,7 @@ class VersionedModelBuilder:
     def __init__(self,
                  versioned_dataset: VersionedDataset,
                  model: Model,
-                 training_config: TrainingConfig) -> None:
+                 training_config: Optional[TrainingConfig] = None) -> None:
         """Instantiates the object.
 
         :param versioned_dataset: The versioned dataset object with which the
@@ -34,11 +35,17 @@ class VersionedModelBuilder:
             set the model's weights to those desired (this can be done easily
             using the ModelCheckpoint callback or a custom callback that stores
             the best weights in memory).
-        :param training_config: The model's training configuration.
+        :param training_config: (Optional) The model's training configuration.
         """
         self.versioned_dataset = versioned_dataset
         self.model = model
-        self.training_config = training_config
+        if training_config:
+            self.training_config = training_config
+        else:
+            empty_history = History()
+            empty_train_args = {}
+            self.training_config = TrainingConfig(empty_history,
+                                                  empty_train_args)
 
     def publish(self,
                 path: str,

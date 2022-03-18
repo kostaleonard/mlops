@@ -560,3 +560,20 @@ def test_published_model_performance_matches_trained_model(
     val_err = model.evaluate(x=dataset.X_val, y=dataset.y_val)
     loaded_val_err = loaded_model.evaluate(x=dataset.X_val, y=dataset.y_val)
     assert np.isclose(val_err, loaded_val_err)
+
+
+def test_publish_without_training_config(
+        dataset: VersionedDataset,
+        model: Model) -> None:
+    """Tests that a model can be published without a training config.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    """
+    _remove_test_directories_local()
+    builder = VersionedModelBuilder(dataset, model)
+    version = 'v2'
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
+    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    assert os.path.exists(expected_filename)
+    assert os.path.isdir(expected_filename)
