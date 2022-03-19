@@ -121,7 +121,7 @@ def test_serialized_data_processor_uses_original_methods() -> None:
         pass
     data_processor = DataProcessorThatWillChange()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH, data_processor)
-    builder.publish(TEST_PUBLICATION_PATH, 'v1')
+    builder.publish(TEST_PUBLICATION_PATH, version='v1')
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH, 'v1'))
     features, labels = dataset.data_processor.get_raw_features_and_labels('dne')
     assert np.array_equal(features['X'], [1, 2, 3])

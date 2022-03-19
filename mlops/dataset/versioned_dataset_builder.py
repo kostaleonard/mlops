@@ -52,6 +52,7 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
+                name: str = 'dataset',
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY_ZIP,
                 tags: Optional[List[str]] = None) -> str:
@@ -69,6 +70,7 @@ class VersionedDatasetBuilder:
 
         The contents of meta.json will be:
             {
+                name: (dataset name)
                 version: (dataset version)
                 hash: (MD5 hash of all objects apart from data_processor.pkl and
                     meta.json)
@@ -83,6 +85,7 @@ class VersionedDatasetBuilder:
             recommended to use this same path to publish all datasets, since it
             will prevent the user from creating two different datasets with the
             same version.
+        :param name: The name of the dataset, e.g., "mnist".
         :param version: A string indicating the dataset version. The version
             should be unique to this dataset. If None, the publication timestamp
             will be used as the version.
@@ -115,6 +118,7 @@ class VersionedDatasetBuilder:
         metadata_path = os.path.join(publication_path, 'meta.json')
         processor_path = os.path.join(publication_path, 'data_processor.pkl')
         metadata = {
+            'name': name,
             'version': version,
             'hash': 'TDB',
             'created_at': timestamp,

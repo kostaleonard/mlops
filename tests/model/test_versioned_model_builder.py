@@ -228,6 +228,7 @@ def test_publish_includes_expected_metadata(
     with open(meta_path, 'r', encoding='utf-8') as infile:
         contents = json.loads(infile.read())
     assert set(contents.keys()) == {
+        'name',
         'version',
         'hash',
         'dataset',
@@ -278,13 +279,13 @@ def test_publish_local_with_trailing_slash(
     builder = VersionedModelBuilder(dataset, model, training_config)
     version = 'v2'
     # One trailing slash.
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '/', version)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '/', version=version)
     expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
     _remove_test_directories_local()
     # Many trailing slashes.
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '///', version)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '///', version=version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
 
@@ -332,8 +333,8 @@ def test_same_models_have_same_hashes(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v2')
     meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -364,9 +365,9 @@ def test_same_models_have_same_hashes_different_timestamps(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     time.sleep(2)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v2')
     meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -394,7 +395,7 @@ def test_different_models_have_different_hashes(
     """
     _remove_test_directories_local()
     builder1 = VersionedModelBuilder(dataset, model, training_config)
-    builder1.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder1.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     # model2 has an extra layer.
     model2 = Sequential([Dense(5, input_shape=dataset.X_train.shape[1:]),
                          Dense(dataset.y_train.shape[1])])
@@ -405,7 +406,7 @@ def test_different_models_have_different_hashes(
                          **train_args)
     training_config2 = TrainingConfig(history, train_args)
     builder2 = VersionedModelBuilder(dataset, model2, training_config2)
-    builder2.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v2')
+    builder2.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v2')
     meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -435,8 +436,8 @@ def test_publish_local_and_s3_create_same_model(
     _remove_test_directories_local()
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version='v1')
     meta_path1 = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -465,7 +466,7 @@ def test_metadata_includes_training_history(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
                              'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
@@ -487,7 +488,7 @@ def test_metadata_includes_training_args(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
                              'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
@@ -508,7 +509,7 @@ def test_metadata_includes_dataset_link(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
                              'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
@@ -530,7 +531,7 @@ def test_metadata_includes_expected_tags(
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
     tags = ['hello', 'world']
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1', tags=tags)
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1', tags=tags)
     meta_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1',
                              'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
@@ -552,7 +553,7 @@ def test_published_model_performance_matches_trained_model(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
     saved_model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL,
                                     'v1',
                                     'model.h5')

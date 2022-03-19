@@ -24,7 +24,7 @@ def _publish_test_dataset_local() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
 
 
 def _publish_test_dataset_s3() -> None:
@@ -35,7 +35,7 @@ def _publish_test_dataset_s3() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version=version)
 
 
 def test_init_creates_expected_attributes_local() -> None:
