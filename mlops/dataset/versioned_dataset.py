@@ -29,11 +29,13 @@ class VersionedDataset:
                 with fs.open(tensor_path, 'rb') as infile:
                     tensor = np.load(infile)
                 setattr(self, attr_name, tensor)
-            # Get hash.
+            # Get metadata.
             with fs.open(os.path.join(path, 'meta.json'),
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
             # Get data processor.
             with fs.open(os.path.join(path, 'data_processor.pkl'),
@@ -50,11 +52,13 @@ class VersionedDataset:
                 attr_name = tensor_filename.split('.npy')[0]
                 tensor = np.load(tensor_path)
                 setattr(self, attr_name, tensor)
-            # Get hash.
+            # Get metadata.
             with open(os.path.join(path, 'meta.json'),
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
             # Get data processor.
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:

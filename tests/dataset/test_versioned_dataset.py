@@ -13,6 +13,8 @@ from tests.dataset.preset_data_processor import PresetDataProcessor
 
 EXPECTED_ATTRIBUTES = {'X_train', 'X_val', 'X_test',
                        'y_train', 'y_val', 'y_test',
+                       'name',
+                       'version',
                        'md5',
                        'data_processor'}
 

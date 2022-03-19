@@ -27,20 +27,24 @@ class VersionedModel:
                     tmp_file.write(infile.read())
                 tmp_file.seek(0)
                 self.model = load_model(tmp_file.name)
-            # Get hash.
+            # Get metadata.
             with fs.open(os.path.join(path, 'meta.json'),
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
         else:
             # Get model.
             self.model = load_model(os.path.join(path, 'model.h5'))
-            # Get hash.
+            # Get metadata.
             with open(os.path.join(path, 'meta.json'),
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
 
     def __eq__(self, other: 'VersionedModel') -> bool:
