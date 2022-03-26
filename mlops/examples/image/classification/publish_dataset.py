@@ -23,7 +23,9 @@ def publish_dataset(publication_path: str) -> str:
     processor = PokemonClassificationDataProcessor()
     builder = VersionedDatasetBuilder(DEFAULT_DATASET_TRAINVALTEST_PATH,
                                       processor)
-    return builder.publish(publication_path, DATASET_VERSION, tags=TAGS)
+    return builder.publish(publication_path,
+                           version=DATASET_VERSION,
+                           tags=TAGS)
 
 
 def main() -> None:

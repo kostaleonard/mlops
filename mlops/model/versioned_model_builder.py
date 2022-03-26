@@ -49,6 +49,7 @@ class VersionedModelBuilder:
 
     def publish(self,
                 path: str,
+                name: str = 'model',
                 version: Optional[str] = None,
                 tags: Optional[List[str]] = None) -> str:
         """Saves the versioned model files to the given path. If the path and
@@ -62,6 +63,7 @@ class VersionedModelBuilder:
 
         The contents of meta.json will be:
             {
+                name: (model name)
                 version: (model version)
                 hash: (MD5 hash of all objects apart from meta.json)
                 dataset: (the link to the dataset used during training)
@@ -78,6 +80,7 @@ class VersionedModelBuilder:
             recommended to use this same path to publish all models, since it
             will prevent the user from creating two different models with the
             same version.
+        :param name: The name of the model, e.g., "vgg16".
         :param version: A string indicating the model version. The version
             should be unique to this model. If None, the publication timestamp
             will be used as the version.
@@ -94,6 +97,7 @@ class VersionedModelBuilder:
         model_path = os.path.join(publication_path, 'model.h5')
         metadata_path = os.path.join(publication_path, 'meta.json')
         metadata = {
+            'name': name,
             'version': version,
             'hash': 'TDB',
             'dataset': self.versioned_dataset.path,

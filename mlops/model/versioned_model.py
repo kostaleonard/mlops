@@ -27,21 +27,41 @@ class VersionedModel:
                     tmp_file.write(infile.read())
                 tmp_file.seek(0)
                 self.model = load_model(tmp_file.name)
-            # Get hash.
+            # Get metadata.
             with fs.open(os.path.join(path, 'meta.json'),
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
         else:
             # Get model.
             self.model = load_model(os.path.join(path, 'model.h5'))
-            # Get hash.
+            # Get metadata.
             with open(os.path.join(path, 'meta.json'),
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
+            self.name = metadata['name']
+            self.version = metadata['version']
             self.md5 = metadata['hash']
+
+    def republish(self, path: str) -> str:
+        """Saves the versioned model files to the given path. If the path and
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
+
+        :param path: The path, either on the local filesystem or in a cloud
+            store such as S3, to which the model should be saved. The version
+            will be appended to this path as a subdirectory. An S3 path
+            should be a URL of the form "s3://bucket-name/path/to/dir". It is
+            recommended to use this same path to publish all models, since it
+            will prevent the user from creating two different models with the
+            same version.
+        :return: The versioned model's publication path.
+        """
+        raise NotImplementedError
 
     def __eq__(self, other: 'VersionedModel') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,

@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryFile, TemporaryDirectory
 import tarfile
+from tarfile import TarInfo
 from typing import Optional, List, Set
 from datetime import datetime
 import json
@@ -52,6 +53,7 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
+                name: str = 'dataset',
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY_ZIP,
                 tags: Optional[List[str]] = None) -> str:
@@ -69,6 +71,7 @@ class VersionedDatasetBuilder:
 
         The contents of meta.json will be:
             {
+                name: (dataset name)
                 version: (dataset version)
                 hash: (MD5 hash of all objects apart from data_processor.pkl and
                     meta.json)
@@ -83,6 +86,7 @@ class VersionedDatasetBuilder:
             recommended to use this same path to publish all datasets, since it
             will prevent the user from creating two different datasets with the
             same version.
+        :param name: The name of the dataset, e.g., "mnist".
         :param version: A string indicating the dataset version. The version
             should be unique to this dataset. If None, the publication timestamp
             will be used as the version.
@@ -100,6 +104,7 @@ class VersionedDatasetBuilder:
             metadata.
         :return: The versioned dataset's publication path.
         """
+        # pylint: disable=too-many-arguments
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
@@ -115,6 +120,7 @@ class VersionedDatasetBuilder:
         metadata_path = os.path.join(publication_path, 'meta.json')
         processor_path = os.path.join(publication_path, 'data_processor.pkl')
         metadata = {
+            'name': name,
             'version': version,
             'hash': 'TDB',
             'created_at': timestamp,
@@ -313,6 +319,34 @@ class VersionedDatasetBuilder:
             with fs.open(path, 'wb') as outfile:
                 outfile.write(tmp_file.read())
 
+    @staticmethod
+    def _get_raw_dataset_archive_paths(local_dataset_path: str) -> list[str]:
+        """Returns the sorted paths to all files in the raw dataset.
+
+        :param local_dataset_path: The path to the local raw dataset. If the
+            builder's raw dataset is in S3, this path may be a
+            TemporaryDirectory.
+        :return: The sorted paths to all files in the raw dataset.
+        """
+        all_files = []
+        for (curdir, _, files) in os.walk(local_dataset_path):
+            all_files += [os.path.join(curdir, filename) for filename in files]
+        all_files.sort(key=lambda file_path: (
+            os.path.dirname(file_path), os.path.basename(file_path)))
+        return all_files
+
+    @staticmethod
+    def _set_reproducible_tarinfo(tarinfo: TarInfo) -> None:
+        """Sets standardized time and uid in the TarInfo object.
+
+        :param tarinfo: The TarInfo object for a raw dataset file.
+        """
+        tarinfo.uid = 500
+        tarinfo.gid = 500
+        tarinfo.uname = 'mlops'
+        tarinfo.gname = 'mlops'
+        tarinfo.mtime = 0
+
     def _copy_zip_raw_dataset_local(self, copy_path: str) -> str:
         """Copies the raw dataset to the given path, zips it, and returns the
         path to the zip file for hashing.
@@ -326,12 +360,27 @@ class VersionedDatasetBuilder:
             with TemporaryDirectory() as tempdir:
                 unzipped_copy_path = os.path.join(tempdir, 'raw')
                 fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(unzipped_copy_path)
                 with tarfile.open(copy_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+                    for filename in all_files:
+                        arcname = filename.replace(unzipped_copy_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
         else:
             # Copy raw dataset from local filesystem to local filesystem.
+            all_files = VersionedDatasetBuilder._get_raw_dataset_archive_paths(
+                self.dataset_path)
             with tarfile.open(copy_path, 'w:bz2') as outfile:
-                outfile.add(self.dataset_path, arcname='raw')
+                for filename in all_files:
+                    arcname = filename.replace(self.dataset_path, 'raw')
+                    tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                    VersionedDatasetBuilder._set_reproducible_tarinfo(tarinfo)
+                    with open(filename, 'rb') as infile:
+                        outfile.addfile(tarinfo, infile)
         return copy_path
 
     def _copy_zip_raw_dataset_s3(self,
@@ -348,17 +397,33 @@ class VersionedDatasetBuilder:
             # Copy raw dataset from S3 to S3.
             with TemporaryDirectory() as tempdir:
                 unzipped_copy_path = os.path.join(tempdir, 'raw')
-                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
                 fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(unzipped_copy_path)
                 with tarfile.open(tempzip_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+                    for filename in all_files:
+                        arcname = filename.replace(unzipped_copy_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
                 fs.put(tempzip_path, copy_path)
         else:
             # Copy raw dataset from local filesystem to S3.
             with TemporaryDirectory() as tempdir:
                 tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(self.dataset_path)
                 with tarfile.open(tempzip_path, 'w:bz2') as outfile:
-                    outfile.add(self.dataset_path, arcname='raw')
+                    for filename in all_files:
+                        arcname = filename.replace(self.dataset_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
                 fs.put(tempzip_path, copy_path)
         return copy_path
 

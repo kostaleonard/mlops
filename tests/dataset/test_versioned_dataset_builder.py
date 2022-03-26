@@ -29,6 +29,7 @@ TEST_DATASET_FILENAMES = ['file0.txt',
                           'file2.txt',
                           'sub1/file3.txt',
                           'sub1/sub2/file4.txt']
+TEST_DATASET_HASH = '48d019842836ed2fd8721f5ee7d427c1'
 
 
 def _remove_test_directories_local() -> None:
@@ -65,7 +66,10 @@ def _create_test_dataset_local() -> None:
 
 def _create_test_dataset_s3() -> None:
     """Creates a preset raw dataset at the S3 test dataset path."""
-    _remove_test_directories_local()
+    try:
+        shutil.rmtree(TEST_DATASET_PATH_LOCAL)
+    except FileNotFoundError:
+        pass
     _create_test_dataset_local()
     fs = S3FileSystem()
     for filename in TEST_DATASET_FILENAMES:
@@ -81,7 +85,7 @@ def test_publish_appends_explicit_version() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
@@ -111,7 +115,7 @@ def test_publish_local_path_creates_expected_files() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
     assert len(os.listdir(TEST_PUBLICATION_PATH_LOCAL)) == 1
     assert os.listdir(TEST_PUBLICATION_PATH_LOCAL)[0] == version
     publication_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
@@ -132,7 +136,7 @@ def test_publish_s3_path_creates_expected_files() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version=version)
     dirname = os.path.join(TEST_PUBLICATION_PATH_S3, version)
     parse_result = urlparse(dirname)
     bucket_name = parse_result.netloc
@@ -166,7 +170,7 @@ def test_publish_from_raw_dataset_in_s3_to_local() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
     raw_dataset_paths = set()
@@ -188,7 +192,7 @@ def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_S3,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
     fs = S3FileSystem()
@@ -206,9 +210,9 @@ def test_publish_local_path_raises_path_already_exists_error() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
     with pytest.raises(PublicationPathAlreadyExistsError):
-        builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+        builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
 
 
 @pytest.mark.awstest
@@ -221,9 +225,9 @@ def test_publish_s3_path_raises_path_already_exists_error() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version=version)
     with pytest.raises(PublicationPathAlreadyExistsError):
-        builder.publish(TEST_PUBLICATION_PATH_S3, version)
+        builder.publish(TEST_PUBLICATION_PATH_S3, version=version)
 
 
 def test_publish_zips_raw_dataset() -> None:
@@ -235,7 +239,7 @@ def test_publish_zips_raw_dataset() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_COPY_ZIP)
     raw_dataset_zip = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version,
                                    'raw.tar.bz2')
@@ -253,7 +257,7 @@ def test_publish_zips_s3_to_s3() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_S3,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_COPY_ZIP)
     raw_dataset_zip = os.path.join(TEST_PUBLICATION_PATH_S3, version,
                                    'raw.tar.bz2')
@@ -270,7 +274,7 @@ def test_publish_copies_raw_dataset() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_COPY)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
     raw_dataset_paths = set()
@@ -290,7 +294,7 @@ def test_publish_includes_raw_dataset_link() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_LOCAL,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_LINK)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'raw')
     link_filename = 'link.txt'
@@ -312,7 +316,7 @@ def test_publish_includes_raw_dataset_link_s3() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     builder.publish(TEST_PUBLICATION_PATH_S3,
-                    version,
+                    version=version,
                     dataset_copy_strategy=STRATEGY_LINK)
     raw_dataset_dir = os.path.join(TEST_PUBLICATION_PATH_S3, version, 'raw')
     link_filename = 'link.txt'
@@ -336,7 +340,7 @@ def test_publish_raises_invalid_dataset_copy_strategy_error() -> None:
     version = 'v1'
     with pytest.raises(InvalidDatasetCopyStrategyError):
         builder.publish(TEST_PUBLICATION_PATH_LOCAL,
-                        version,
+                        version=version,
                         dataset_copy_strategy='dne')
 
 
@@ -348,11 +352,12 @@ def test_publish_includes_expected_metadata() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
     meta_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version, 'meta.json')
     with open(meta_path, 'r', encoding='utf-8') as infile:
         contents = json.loads(infile.read())
-    assert set(contents.keys()) == {'version', 'hash', 'created_at', 'tags'}
+    assert set(contents.keys()) == {
+        'name', 'version', 'hash', 'created_at', 'tags'}
 
 
 def test_publish_timestamps_match() -> None:
@@ -383,14 +388,14 @@ def test_publish_accepts_path_with_trailing_slash() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
     # One trailing slash.
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version=version)
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
     _remove_test_directories_local()
     _create_test_dataset_local()
     # Many trailing slashes.
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '///', version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '///', version=version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
 
@@ -402,8 +407,8 @@ def test_same_datasets_have_same_hashes() -> None:
     _create_test_dataset_local()
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v1')
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v2')
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
     meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -418,6 +423,123 @@ def test_same_datasets_have_same_hashes() -> None:
     assert contents1['hash'] == contents2['hash']
 
 
+def test_rebuilt_datasets_have_same_hashes_local_to_local() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
+    shutil.rmtree(TEST_DATASET_PATH_LOCAL)
+    _create_test_dataset_local()
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
+@pytest.mark.awstest
+def test_rebuilt_datasets_have_same_hashes_s3_to_local() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
+    fs = S3FileSystem()
+    fs.rm(TEST_DATASET_PATH_S3, recursive=True)
+    _create_test_dataset_s3()
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
+@pytest.mark.awstest
+def test_rebuilt_datasets_have_same_hashes_local_to_s3() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v1')
+    shutil.rmtree(TEST_DATASET_PATH_LOCAL)
+    _create_test_dataset_local()
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v2',
+                              'meta.json')
+    fs = S3FileSystem()
+    with fs.open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with fs.open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
+@pytest.mark.awstest
+def test_rebuilt_datasets_have_same_hashes_s3_to_s3() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v1')
+    fs = S3FileSystem()
+    fs.rm(TEST_DATASET_PATH_S3, recursive=True)
+    _create_test_dataset_s3()
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v2',
+                              'meta.json')
+    with fs.open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with fs.open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
 def test_different_datasets_have_different_hashes() -> None:
     """Tests that the hash values from two datasets that have different files
     are different."""
@@ -425,10 +547,10 @@ def test_different_datasets_have_different_hashes() -> None:
     _create_test_dataset_local()
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
     # The second dataset is missing one of the raw dataset files.
     os.remove(os.path.join(TEST_DATASET_PATH_LOCAL, TEST_DATASET_FILENAMES[0]))
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, 'v2')
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
     meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
                               'v1',
                               'meta.json')
@@ -453,8 +575,8 @@ def test_publish_local_and_s3_create_same_dataset() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
-    builder.publish(TEST_PUBLICATION_PATH_S3, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version=version)
     meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
                               version,
                               'meta.json')
@@ -480,7 +602,7 @@ def test_publish_local_with_trailing_slash() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL + '/', processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL + '/', version=version)
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
@@ -497,7 +619,7 @@ def test_publish_s3_with_trailing_slash() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3 + '/', processor)
     version = 'v1'
     # One trailing slash.
-    builder.publish(TEST_PUBLICATION_PATH_S3 + '/', version)
+    builder.publish(TEST_PUBLICATION_PATH_S3 + '/', version=version)
     fs = S3FileSystem()
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)
     assert fs.ls(expected_filename)
@@ -505,7 +627,7 @@ def test_publish_s3_with_trailing_slash() -> None:
     # Many trailing slashes.
     _remove_test_directories_s3()
     _create_test_dataset_s3()
-    builder.publish(TEST_PUBLICATION_PATH_S3 + '///', version)
+    builder.publish(TEST_PUBLICATION_PATH_S3 + '///', version=version)
     fs = S3FileSystem()
     expected_filename = os.path.join(TEST_PUBLICATION_PATH_S3, version)
     assert fs.ls(expected_filename)
@@ -520,7 +642,7 @@ def test_published_data_processor_reproduces_dataset() -> None:
     processor = PresetDataProcessor()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
     version = 'v1'
-    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
     processor_filename = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
                                       version,
                                       'data_processor.pkl')

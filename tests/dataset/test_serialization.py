@@ -60,6 +60,7 @@ class DataProcessorThatWillChange(DataProcessor):
 def _redefine_class() -> None:
     """Redefines DataProcessorThatWillChange."""
     # pylint: disable=redefined-outer-name
+    # pylint: disable=global-statement
     # pylint: disable=global-variable-undefined
     # pylint: disable=global-variable-not-assigned
     # pylint: disable=invalid-name
@@ -121,7 +122,7 @@ def test_serialized_data_processor_uses_original_methods() -> None:
         pass
     data_processor = DataProcessorThatWillChange()
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH, data_processor)
-    builder.publish(TEST_PUBLICATION_PATH, 'v1')
+    builder.publish(TEST_PUBLICATION_PATH, version='v1')
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH, 'v1'))
     features, labels = dataset.data_processor.get_raw_features_and_labels('dne')
     assert np.array_equal(features['X'], [1, 2, 3])

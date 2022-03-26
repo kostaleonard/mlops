@@ -13,7 +13,7 @@ from tests.model.test_versioned_model_builder import \
     TEST_MODEL_PUBLICATION_PATH_LOCAL, TEST_MODEL_PUBLICATION_PATH_S3, \
     dataset, model, training_config
 
-EXPECTED_ATTRIBUTES = {'model', 'md5'}
+EXPECTED_ATTRIBUTES = {'path', 'name', 'version', 'model', 'md5'}
 
 
 def _publish_test_model_local(
@@ -28,7 +28,7 @@ def _publish_test_model_local(
     """
     _remove_test_directories_local()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version='v1')
 
 
 def _publish_test_model_s3(
@@ -43,7 +43,7 @@ def _publish_test_model_s3(
     """
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
-    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, 'v1')
+    builder.publish(TEST_MODEL_PUBLICATION_PATH_S3, version='v1')
 
 
 def test_init_loads_model_local(
