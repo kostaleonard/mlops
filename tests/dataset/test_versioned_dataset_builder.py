@@ -31,7 +31,7 @@ TEST_DATASET_FILENAMES = ['file0.txt',
                           'file2.txt',
                           'sub1/file3.txt',
                           'sub1/sub2/file4.txt']
-TEST_DATASET_HASH = '48d019842836ed2fd8721f5ee7d427c1'
+TEST_DATASET_HASH = 'cf178bc689619bce0844222e3d8a387b'
 
 
 def _remove_test_directories_local() -> None:
