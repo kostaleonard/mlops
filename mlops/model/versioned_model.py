@@ -6,6 +6,7 @@ import json
 from tempfile import NamedTemporaryFile
 from s3fs import S3FileSystem
 from tensorflow.keras.models import load_model
+from mlops.republication import republication
 
 
 class VersionedModel:
@@ -61,7 +62,7 @@ class VersionedModel:
             same version.
         :return: The versioned model's publication path.
         """
-        raise NotImplementedError
+        return republication.republish(self.path, path, self.version)
 
     def __eq__(self, other: 'VersionedModel') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,
