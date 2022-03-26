@@ -47,6 +47,23 @@ class VersionedModel:
             self.version = metadata['version']
             self.md5 = metadata['hash']
 
+    def republish(self, path: str) -> str:
+        """Saves the versioned model files to the given path. If the path and
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
+
+        :param path: The path, either on the local filesystem or in a cloud
+            store such as S3, to which the model should be saved. The version
+            will be appended to this path as a subdirectory. An S3 path
+            should be a URL of the form "s3://bucket-name/path/to/dir". It is
+            recommended to use this same path to publish all models, since it
+            will prevent the user from creating two different models with the
+            same version.
+        :return: The versioned model's publication path.
+        """
+        # TODO test copies files
+        # TODO test for error
+
     def __eq__(self, other: 'VersionedModel') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,
         False otherwise.

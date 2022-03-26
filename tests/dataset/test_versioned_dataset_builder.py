@@ -419,6 +419,32 @@ def test_same_datasets_have_same_hashes() -> None:
     assert contents1['hash'] == contents2['hash']
 
 
+def test_rebuilt_datasets_have_same_hashes() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
+    shutil.rmtree(TEST_DATASET_PATH_LOCAL)
+    _create_test_dataset_local()
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+
+
 def test_different_datasets_have_different_hashes() -> None:
     """Tests that the hash values from two datasets that have different files
     are different."""

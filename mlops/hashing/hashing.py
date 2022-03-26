@@ -19,6 +19,8 @@ def get_hash_local(files_to_hash: Collection) -> str:
         given files.
     """
     hash_md5 = hashlib.md5()
+    # TODO remove printing
+    print(files_to_hash)
     for filename in sorted(files_to_hash):
         with open(filename, 'rb') as infile:
             for chunk in iter(partial(infile.read, CHUNK_SIZE), b''):

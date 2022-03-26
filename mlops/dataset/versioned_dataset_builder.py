@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 from tempfile import TemporaryFile, TemporaryDirectory
 import tarfile
+from tarfile import TarInfo
 from typing import Optional, List, Set
 from datetime import datetime
 import json
@@ -169,6 +170,7 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
         # Save tensors.
+        # TODO does not hash tensors
         self._write_tensors_local(publication_path)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:
@@ -217,6 +219,7 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
         # Save tensors.
+        # TODO does not hash tensors
         self._write_tensors_s3(publication_path, fs)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:
@@ -317,6 +320,34 @@ class VersionedDatasetBuilder:
             with fs.open(path, 'wb') as outfile:
                 outfile.write(tmp_file.read())
 
+    @staticmethod
+    def _get_raw_dataset_archive_paths(local_dataset_path: str) -> list[str]:
+        """Returns the sorted paths to all files in the raw dataset.
+
+        :param local_dataset_path: The path to the local raw dataset. If the
+            builder's raw dataset is in S3, this path may be a
+            TemporaryDirectory.
+        :return: The sorted paths to all files in the raw dataset.
+        """
+        all_files = []
+        for (curdir, _, files) in os.walk(local_dataset_path):
+            all_files += [os.path.join(curdir, filename) for filename in files]
+        all_files.sort(key=lambda file_path: (
+            os.path.dirname(file_path), os.path.basename(file_path)))
+        return all_files
+
+    @staticmethod
+    def _set_reproducible_tarinfo(tarinfo: TarInfo) -> None:
+        """Sets standardized time and uid in the TarInfo object.
+
+        :param tarinfo: The TarInfo object for a raw dataset file.
+        """
+        tarinfo.uid = 500
+        tarinfo.gid = 500
+        tarinfo.uname = 'mlops'
+        tarinfo.gname = 'mlops'
+        tarinfo.mtime = 0
+
     def _copy_zip_raw_dataset_local(self, copy_path: str) -> str:
         """Copies the raw dataset to the given path, zips it, and returns the
         path to the zip file for hashing.
@@ -330,12 +361,24 @@ class VersionedDatasetBuilder:
             with TemporaryDirectory() as tempdir:
                 unzipped_copy_path = os.path.join(tempdir, 'raw')
                 fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(unzipped_copy_path)
                 with tarfile.open(copy_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+                    for filename in all_files:
+                        tarinfo = outfile.gettarinfo(filename)
+                    VersionedDatasetBuilder._set_reproducible_tarinfo(tarinfo)
+                    with open(filename, 'rb') as infile:
+                        outfile.addfile(tarinfo, infile)
         else:
             # Copy raw dataset from local filesystem to local filesystem.
+            all_files = VersionedDatasetBuilder._get_raw_dataset_archive_paths(
+                self.dataset_path)
             with tarfile.open(copy_path, 'w:bz2') as outfile:
-                outfile.add(self.dataset_path, arcname='raw')
+                for filename in all_files:
+                    tarinfo = outfile.gettarinfo(filename)
+                    VersionedDatasetBuilder._set_reproducible_tarinfo(tarinfo)
+                    with open(filename, 'rb') as infile:
+                        outfile.addfile(tarinfo, infile)
         return copy_path
 
     def _copy_zip_raw_dataset_s3(self,
@@ -348,6 +391,7 @@ class VersionedDatasetBuilder:
         :param fs: The S3 filesystem object to interface with S3.
         :return: The paths to all created files.
         """
+        # TODO hash of zipped file is not deterministic
         if self.dataset_path.startswith('s3://'):
             # Copy raw dataset from S3 to S3.
             with TemporaryDirectory() as tempdir:
