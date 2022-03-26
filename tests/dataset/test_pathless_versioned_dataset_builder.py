@@ -38,9 +38,11 @@ def _remove_test_directories_local() -> None:
 
 def test_publish_creates_valid_versioned_dataset() -> None:
     """Tests that a VersionedDataset can be loaded from the published files."""
+    # pylint: disable=no-member
     _remove_test_directories_local()
     builder = PathlessVersionedDatasetBuilder(
-        PRESET_RAW_FEATURES, PRESET_RAW_LABELS)
+        {'X_train': PRESET_RAW_FEATURES},
+        {'y_train': PRESET_RAW_LABELS})
     builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
     dataset_path = os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1')
     dataset = VersionedDataset(dataset_path)
@@ -54,8 +56,9 @@ def test_publish_invalid_strategy_raises_error() -> None:
     """Tests that publish raises an error when dataset_copy_strategy is
     anything other than link."""
     builder = PathlessVersionedDatasetBuilder(
-        PRESET_RAW_FEATURES, PRESET_RAW_LABELS)
-    for strategy in {STRATEGY_COPY_ZIP, STRATEGY_COPY}:
+        {'X_train': PRESET_RAW_FEATURES},
+        {'y_train': PRESET_RAW_LABELS})
+    for strategy in STRATEGY_COPY_ZIP, STRATEGY_COPY:
         with pytest.raises(InvalidDatasetCopyStrategyError):
             builder.publish(TEST_PUBLICATION_PATH_LOCAL,
                             version='v1',

@@ -1,6 +1,6 @@
 """Contains the PathlessVersionedDatasetBuilder class."""
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 import numpy as np
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_LINK
@@ -12,14 +12,17 @@ DATASET_PATH_DNE = 'pathless'
 
 class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
     """Builds a versioned dataset directly from feature and label tensors."""
+    # pylint: disable=too-few-public-methods
 
-    def __init__(self, X_train: np.ndarray, y_train: np.ndarray) -> None:
+    def __init__(self,
+                 features: Dict[str, np.ndarray],
+                 labels: Dict[str, np.ndarray]) -> None:
         """Instantiates the object.
 
-        :param X_train: The training features.
-        :param y_train: The training labels.
+        :param features: The training features.
+        :param labels: The training labels.
         """
-        processor = PathlessDataProcessor(X_train, y_train)
+        processor = PathlessDataProcessor(features, labels)
         super().__init__(DATASET_PATH_DNE, processor)
 
     def publish(self,
@@ -75,6 +78,7 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
             metadata.
         :return: The versioned dataset's publication path.
         """
+        # pylint: disable=too-many-arguments
         if dataset_copy_strategy != STRATEGY_LINK:
             raise InvalidDatasetCopyStrategyError(
                 'PathlessVersionedDatasetBuilder must use the link strategy.')
