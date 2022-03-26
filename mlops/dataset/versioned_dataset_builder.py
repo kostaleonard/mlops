@@ -365,17 +365,20 @@ class VersionedDatasetBuilder:
                     ._get_raw_dataset_archive_paths(unzipped_copy_path)
                 with tarfile.open(copy_path, 'w:bz2') as outfile:
                     for filename in all_files:
-                        tarinfo = outfile.gettarinfo(filename)
-                    VersionedDatasetBuilder._set_reproducible_tarinfo(tarinfo)
-                    with open(filename, 'rb') as infile:
-                        outfile.addfile(tarinfo, infile)
+                        arcname = filename.replace(unzipped_copy_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
         else:
             # Copy raw dataset from local filesystem to local filesystem.
             all_files = VersionedDatasetBuilder._get_raw_dataset_archive_paths(
                 self.dataset_path)
             with tarfile.open(copy_path, 'w:bz2') as outfile:
                 for filename in all_files:
-                    tarinfo = outfile.gettarinfo(filename)
+                    arcname = filename.replace(self.dataset_path, 'raw')
+                    tarinfo = outfile.gettarinfo(filename, arcname=arcname)
                     VersionedDatasetBuilder._set_reproducible_tarinfo(tarinfo)
                     with open(filename, 'rb') as infile:
                         outfile.addfile(tarinfo, infile)
