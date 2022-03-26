@@ -20,6 +20,22 @@ mlops.dataset.invertible\_data\_processor module
    :undoc-members:
    :show-inheritance:
 
+mlops.dataset.pathless\_data\_processor module
+----------------------------------------------
+
+.. automodule:: mlops.dataset.pathless_data_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.dataset.pathless\_versioned\_dataset\_builder module
+----------------------------------------------------------
+
+.. automodule:: mlops.dataset.pathless_versioned_dataset_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mlops.dataset.versioned\_dataset module
 ---------------------------------------
 

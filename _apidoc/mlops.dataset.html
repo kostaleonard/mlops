@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mlops.dataset package &mdash; mlops v0.1.3 documentation</title>
+  <title>mlops.dataset package &mdash; mlops v0.1.4 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -41,6 +41,8 @@
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-mlops.dataset.data_processor">mlops.dataset.data_processor module</a></li>
 <li><a class="reference internal" href="#module-mlops.dataset.invertible_data_processor">mlops.dataset.invertible_data_processor module</a></li>
+<li><a class="reference internal" href="#module-mlops.dataset.pathless_data_processor">mlops.dataset.pathless_data_processor module</a></li>
+<li><a class="reference internal" href="#module-mlops.dataset.pathless_versioned_dataset_builder">mlops.dataset.pathless_versioned_dataset_builder module</a></li>
 <li><a class="reference internal" href="#module-mlops.dataset.versioned_dataset">mlops.dataset.versioned_dataset module</a></li>
 <li><a class="reference internal" href="#module-mlops.dataset.versioned_dataset_builder">mlops.dataset.versioned_dataset_builder module</a></li>
 <li><a class="reference internal" href="#module-mlops.dataset">Module contents</a></li>
@@ -111,7 +113,7 @@ referenced. For example, the training features (value) may be called
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.dataset.data_processor.DataProcessor.get_preprocessed_features_and_labels">
-<span class="sig-name descname"><span class="pre">get_preprocessed_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.data_processor.DataProcessor.get_preprocessed_features_and_labels" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_preprocessed_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.dataset.data_processor.DataProcessor.get_preprocessed_features_and_labels" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the preprocessed feature and label tensors from the dataset
 path. This method is specifically used for the train/val/test sets and
 not input data for prediction, because in some cases the features and
@@ -156,7 +158,7 @@ referenced. For example, the training features (value) may be called
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.dataset.data_processor.DataProcessor.get_raw_features_and_labels">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_raw_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.data_processor.DataProcessor.get_raw_features_and_labels" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_raw_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.dataset.data_processor.DataProcessor.get_raw_features_and_labels" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the raw feature and label tensors from the dataset path. This
 method is specifically used for the train/val/test sets and not input
 data for prediction, because in some cases the features and labels need
@@ -270,31 +272,90 @@ transform model outputs into real-world values.</p>
 </dd></dl>
 
 </section>
-<section id="module-mlops.dataset.versioned_dataset">
-<span id="mlops-dataset-versioned-dataset-module"></span><h2>mlops.dataset.versioned_dataset module<a class="headerlink" href="#module-mlops.dataset.versioned_dataset" title="Permalink to this headline"></a></h2>
-<p>Contains the VersionedDataset class.</p>
+<section id="module-mlops.dataset.pathless_data_processor">
+<span id="mlops-dataset-pathless-data-processor-module"></span><h2>mlops.dataset.pathless_data_processor module<a class="headerlink" href="#module-mlops.dataset.pathless_data_processor" title="Permalink to this headline"></a></h2>
+<p>Contains the PathlessDataProcessor class.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset.VersionedDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.versioned_dataset.</span></span><span class="sig-name descname"><span class="pre">VersionedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.versioned_dataset.VersionedDataset" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Represents a versioned dataset.</p>
+<dt class="sig sig-object py" id="mlops.dataset.pathless_data_processor.PathlessDataProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.pathless_data_processor.</span></span><span class="sig-name descname"><span class="pre">PathlessDataProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.pathless_data_processor.PathlessDataProcessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mlops.dataset.data_processor.DataProcessor" title="mlops.dataset.data_processor.DataProcessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlops.dataset.data_processor.DataProcessor</span></code></a></p>
+<p>Loads preset features and labels.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.pathless_data_processor.PathlessDataProcessor.get_raw_features">
+<span class="sig-name descname"><span class="pre">get_raw_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.dataset.pathless_data_processor.PathlessDataProcessor.get_raw_features" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the training features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset_path</strong> – Unused.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary whose values are feature tensors and whose
+corresponding keys are the names by which those tensors should be
+referenced. For example, the training features (value) may be called
+‘X_train’ (key).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.pathless_data_processor.PathlessDataProcessor.get_raw_features_and_labels">
+<span class="sig-name descname"><span class="pre">get_raw_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.dataset.pathless_data_processor.PathlessDataProcessor.get_raw_features_and_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the training features and labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset_path</strong> – Unused</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 2-tuple of the features dictionary and labels dictionary,
+with matching keys and ordered tensors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.pathless_data_processor.PathlessDataProcessor.preprocess_features">
+<span class="sig-name descname"><span class="pre">preprocess_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_feature_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.dataset.pathless_data_processor.PathlessDataProcessor.preprocess_features" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the identity function on the input features.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_feature_tensor</strong> – The raw features to be preprocessed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The preprocessed feature tensor. This tensor is ready for
+downstream model consumption.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.pathless_data_processor.PathlessDataProcessor.preprocess_labels">
+<span class="sig-name descname"><span class="pre">preprocess_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_label_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.dataset.pathless_data_processor.PathlessDataProcessor.preprocess_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the the identity function on the input labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>raw_label_tensor</strong> – The raw labels to be preprocessed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The preprocessed label tensor. This tensor is ready for
+downstream model consumption.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
-<section id="module-mlops.dataset.versioned_dataset_builder">
-<span id="mlops-dataset-versioned-dataset-builder-module"></span><h2>mlops.dataset.versioned_dataset_builder module<a class="headerlink" href="#module-mlops.dataset.versioned_dataset_builder" title="Permalink to this headline"></a></h2>
-<p>Contains the VersionedDatasetBuilder class.</p>
+<section id="module-mlops.dataset.pathless_versioned_dataset_builder">
+<span id="mlops-dataset-pathless-versioned-dataset-builder-module"></span><h2>mlops.dataset.pathless_versioned_dataset_builder module<a class="headerlink" href="#module-mlops.dataset.pathless_versioned_dataset_builder" title="Permalink to this headline"></a></h2>
+<p>Contains the PathlessVersionedDatasetBuilder class.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.versioned_dataset_builder.</span></span><span class="sig-name descname"><span class="pre">VersionedDatasetBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_processor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mlops.dataset.data_processor.DataProcessor" title="mlops.dataset.data_processor.DataProcessor"><span class="pre">mlops.dataset.data_processor.DataProcessor</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>An object containing all of the components that form a versioned dataset.
-This object is only used to ensure a standard format for datasets stored in
-a dataset archive (such as the local filesystem or S3), and is not meant for
-consumption by downstream models.</p>
+<dt class="sig sig-object py" id="mlops.dataset.pathless_versioned_dataset_builder.PathlessVersionedDatasetBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.pathless_versioned_dataset_builder.</span></span><span class="sig-name descname"><span class="pre">PathlessVersionedDatasetBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.pathless_versioned_dataset_builder.PathlessVersionedDatasetBuilder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder" title="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder</span></code></a></p>
+<p>Builds a versioned dataset directly from feature and label tensors.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish">
-<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_copy_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'copy_zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="mlops.dataset.pathless_versioned_dataset_builder.PathlessVersionedDatasetBuilder.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dataset'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_copy_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'link'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.pathless_versioned_dataset_builder.PathlessVersionedDatasetBuilder.publish" title="Permalink to this definition"></a></dt>
 <dd><p>Saves the versioned dataset files to the given path. If the path and
 appended version already exists, this operation will raise a
 PublicationPathAlreadyExistsError.</p>
@@ -309,7 +370,8 @@ raw.tar.bz2 (bz2-zipped directory with the raw dataset files)</p>
 </dl>
 </dd>
 <dt>The contents of meta.json will be:</dt><dd><dl>
-<dt>{</dt><dd><p>version: (dataset version)
+<dt>{</dt><dd><p>name: (dataset name)
+version: (dataset version)
 hash: (MD5 hash of all objects apart from data_processor.pkl and</p>
 <blockquote>
 <div><p>meta.json)</p>
@@ -331,6 +393,118 @@ should be a URL of the form “s3://bucket-name/path/to/dir”. It is
 recommended to use this same path to publish all datasets, since it
 will prevent the user from creating two different datasets with the
 same version.</p></li>
+<li><p><strong>name</strong> – The name of the dataset, e.g., “mnist”.</p></li>
+<li><p><strong>version</strong> – A string indicating the dataset version. The version
+should be unique to this dataset. If None, the publication timestamp
+will be used as the version.</p></li>
+<li><p><strong>dataset_copy_strategy</strong> – The strategy by which to copy the
+original, raw dataset to the published path. STRATEGY_COPY
+recursively copies all files and directories from the dataset path
+supplied at instantiation to the published path so that the dataset
+can be properly versioned. STRATEGY_COPY_ZIP is identical in
+behavior, but zips the directory upon completion. STRATEGY_LINK
+will instead create a file ‘link.txt’ containing the supplied
+dataset path; this is desirable if the raw dataset is already stored
+in a versioned repository, and copying would create an unnecessary
+duplicate.</p></li>
+<li><p><strong>tags</strong> – An optional list of string tags to add to the dataset
+metadata.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned dataset’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.dataset.versioned_dataset">
+<span id="mlops-dataset-versioned-dataset-module"></span><h2>mlops.dataset.versioned_dataset module<a class="headerlink" href="#module-mlops.dataset.versioned_dataset" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedDataset class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset.VersionedDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.versioned_dataset.</span></span><span class="sig-name descname"><span class="pre">VersionedDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.versioned_dataset.VersionedDataset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a versioned dataset.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset.VersionedDataset.republish">
+<span class="sig-name descname"><span class="pre">republish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.versioned_dataset.VersionedDataset.republish" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the versioned dataset files to the given path. If the path and
+appended version already exists, this operation will raise a
+PublicationPathAlreadyExistsError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – The path, either on the local filesystem or in a cloud
+store such as S3, to which the dataset should be saved. The version
+will be appended to this path as a subdirectory. An S3 path
+should be a URL of the form “s3://bucket-name/path/to/dir”. It is
+recommended to use this same path to publish all datasets, since it
+will prevent the user from creating two different datasets with the
+same version.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned dataset’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.dataset.versioned_dataset_builder">
+<span id="mlops-dataset-versioned-dataset-builder-module"></span><h2>mlops.dataset.versioned_dataset_builder module<a class="headerlink" href="#module-mlops.dataset.versioned_dataset_builder" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedDatasetBuilder class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.dataset.versioned_dataset_builder.</span></span><span class="sig-name descname"><span class="pre">VersionedDatasetBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_processor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#mlops.dataset.data_processor.DataProcessor" title="mlops.dataset.data_processor.DataProcessor"><span class="pre">mlops.dataset.data_processor.DataProcessor</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An object containing all of the components that form a versioned dataset.
+This object is only used to ensure a standard format for datasets stored in
+a dataset archive (such as the local filesystem or S3), and is not meant for
+consumption by downstream models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'dataset'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_copy_strategy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'copy_zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.dataset.versioned_dataset_builder.VersionedDatasetBuilder.publish" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the versioned dataset files to the given path. If the path and
+appended version already exists, this operation will raise a
+PublicationPathAlreadyExistsError.</p>
+<dl>
+<dt>The following files will be created:</dt><dd><dl class="simple">
+<dt>path/version/ (the publication path and version)</dt><dd><p>X_train.npy (and other feature tensors by their given names)
+y_train.npy (and other label tensors by their given names)
+data_processor.pkl (DataProcessor object)
+meta.json (metadata)
+raw.tar.bz2 (bz2-zipped directory with the raw dataset files)</p>
+</dd>
+</dl>
+</dd>
+<dt>The contents of meta.json will be:</dt><dd><dl>
+<dt>{</dt><dd><p>name: (dataset name)
+version: (dataset version)
+hash: (MD5 hash of all objects apart from data_processor.pkl and</p>
+<blockquote>
+<div><p>meta.json)</p>
+</div></blockquote>
+<p>created_at: (timestamp)
+tags: (optional list of tags)</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – The path, either on the local filesystem or in a cloud
+store such as S3, to which the dataset should be saved. The version
+will be appended to this path as a subdirectory. An S3 path
+should be a URL of the form “s3://bucket-name/path/to/dir”. It is
+recommended to use this same path to publish all datasets, since it
+will prevent the user from creating two different datasets with the
+same version.</p></li>
+<li><p><strong>name</strong> – The name of the dataset, e.g., “mnist”.</p></li>
 <li><p><strong>version</strong> – A string indicating the dataset version. The version
 should be unique to this dataset. If None, the publication timestamp
 will be used as the version.</p></li>

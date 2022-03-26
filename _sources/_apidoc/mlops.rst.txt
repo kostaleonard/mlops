@@ -12,6 +12,7 @@ Subpackages
    mlops.examples
    mlops.hashing
    mlops.model
+   mlops.republication
 
 Module contents
 ---------------
