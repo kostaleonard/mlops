@@ -450,6 +450,7 @@ def test_rebuilt_datasets_have_same_hashes_local_to_local() -> None:
     assert contents1['hash'] == TEST_DATASET_HASH
 
 
+@pytest.mark.awstest
 def test_rebuilt_datasets_have_same_hashes_s3_to_local() -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same, even when the datasets have different metadata (e.g.,
@@ -473,6 +474,66 @@ def test_rebuilt_datasets_have_same_hashes_s3_to_local() -> None:
     with open(meta_path1, 'r', encoding='utf-8') as infile:
         contents1 = json.loads(infile.read())
     with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
+@pytest.mark.awstest
+def test_rebuilt_datasets_have_same_hashes_local_to_s3() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v1')
+    shutil.rmtree(TEST_DATASET_PATH_LOCAL)
+    _create_test_dataset_local()
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v2',
+                              'meta.json')
+    fs = S3FileSystem()
+    with fs.open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with fs.open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['created_at'] != contents2['created_at']
+    assert contents1['hash'] == contents2['hash']
+    assert contents1['hash'] == TEST_DATASET_HASH
+
+
+@pytest.mark.awstest
+def test_rebuilt_datasets_have_same_hashes_s3_to_s3() -> None:
+    """Tests that the hash values from two datasets that have identical files
+    are the same, even when the datasets have different metadata (e.g.,
+    timestamp)."""
+    _remove_test_directories_local()
+    _remove_test_directories_s3()
+    _create_test_dataset_s3()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_S3, processor)
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v1')
+    fs = S3FileSystem()
+    fs.rm(TEST_DATASET_PATH_S3, recursive=True)
+    _create_test_dataset_s3()
+    builder.publish(TEST_PUBLICATION_PATH_S3, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_S3,
+                              'v2',
+                              'meta.json')
+    with fs.open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with fs.open(meta_path2, 'r', encoding='utf-8') as infile:
         contents2 = json.loads(infile.read())
     assert contents1['created_at'] != contents2['created_at']
     assert contents1['hash'] == contents2['hash']

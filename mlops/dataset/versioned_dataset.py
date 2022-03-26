@@ -115,8 +115,7 @@ class VersionedDataset:
         """
         if path.startswith('s3://'):
             return self._republish_to_s3(path)
-        else:
-            return self._republish_to_local(path)
+        return self._republish_to_local(path)
 
     def __eq__(self, other: 'VersionedDataset') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,

@@ -394,22 +394,37 @@ class VersionedDatasetBuilder:
         :param fs: The S3 filesystem object to interface with S3.
         :return: The paths to all created files.
         """
-        # TODO hash of zipped file is not deterministic
         if self.dataset_path.startswith('s3://'):
             # Copy raw dataset from S3 to S3.
             with TemporaryDirectory() as tempdir:
                 unzipped_copy_path = os.path.join(tempdir, 'raw')
-                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
                 fs.get(self.dataset_path, unzipped_copy_path, recursive=True)
+                tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(unzipped_copy_path)
                 with tarfile.open(tempzip_path, 'w:bz2') as outfile:
-                    outfile.add(unzipped_copy_path, arcname='raw')
+                    for filename in all_files:
+                        arcname = filename.replace(unzipped_copy_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
                 fs.put(tempzip_path, copy_path)
         else:
             # Copy raw dataset from local filesystem to S3.
             with TemporaryDirectory() as tempdir:
                 tempzip_path = os.path.join(tempdir, 'raw.tar.bz2')
+                all_files = VersionedDatasetBuilder \
+                    ._get_raw_dataset_archive_paths(self.dataset_path)
                 with tarfile.open(tempzip_path, 'w:bz2') as outfile:
-                    outfile.add(self.dataset_path, arcname='raw')
+                    for filename in all_files:
+                        arcname = filename.replace(self.dataset_path, 'raw')
+                        tarinfo = outfile.gettarinfo(filename, arcname=arcname)
+                        VersionedDatasetBuilder._set_reproducible_tarinfo(
+                            tarinfo)
+                        with open(filename, 'rb') as infile:
+                            outfile.addfile(tarinfo, infile)
                 fs.put(tempzip_path, copy_path)
         return copy_path
 
