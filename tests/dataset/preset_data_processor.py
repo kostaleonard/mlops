@@ -1,7 +1,7 @@
 """Contains the PresetDataProcessor class."""
 # pylint:disable=no-name-in-module
 
-from typing import Dict
+from typing import Dict, Tuple
 import numpy as np
 from tensorflow.keras.utils import to_categorical
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
@@ -28,7 +28,7 @@ class PresetDataProcessor(InvertibleDataProcessor):
     """Processes a preset dataset, with no file I/O."""
 
     def get_raw_features_and_labels(self, dataset_path: str) -> \
-            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
+            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns preset raw feature and label tensors.
 
         :param dataset_path: Unused

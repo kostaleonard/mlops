@@ -1,7 +1,7 @@
 """Contains the DataProcessor class."""
 
 from abc import abstractmethod
-from typing import Dict
+from typing import Dict, Tuple
 import numpy as np
 
 
@@ -10,7 +10,7 @@ class DataProcessor:
     training, prediction, etc."""
 
     def get_preprocessed_features_and_labels(self, dataset_path: str) -> \
-            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
+            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the preprocessed feature and label tensors from the dataset
         path. This method is specifically used for the train/val/test sets and
         not input data for prediction, because in some cases the features and
@@ -53,7 +53,7 @@ class DataProcessor:
 
     @abstractmethod
     def get_raw_features_and_labels(self, dataset_path: str) -> \
-            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
+            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the raw feature and label tensors from the dataset path. This
         method is specifically used for the train/val/test sets and not input
         data for prediction, because in some cases the features and labels need
