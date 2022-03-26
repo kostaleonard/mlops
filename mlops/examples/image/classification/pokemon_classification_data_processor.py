@@ -1,7 +1,7 @@
 """Contains the PokemonClassificationDataProcessor class."""
 
 import os
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 import numpy as np
 import pandas as pd
 from matplotlib.image import imread
@@ -29,7 +29,7 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
     labels for classification."""
 
     def get_raw_features_and_labels(self, dataset_path: str) -> \
-            (Dict[str, np.ndarray], Dict[str, np.ndarray]):
+            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the raw feature and label tensors from the dataset path. This
         method is specifically used for the train/val/test sets and not input
         data for prediction, because in some cases the features and labels need

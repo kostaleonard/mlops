@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name,no-name-in-module,unused-import
 
 import os
+import shutil
 import pytest
 from tensorflow.keras.models import Model
 from mlops.dataset.versioned_dataset import VersionedDataset
@@ -14,6 +15,15 @@ from tests.model.test_versioned_model_builder import \
     dataset, model, training_config
 
 EXPECTED_ATTRIBUTES = {'path', 'name', 'version', 'model', 'md5'}
+TEST_REPUBLICATION_PATH_LOCAL = '/tmp/test_versioned_model/models'
+
+
+def _remove_republication_directories_local() -> None:
+    """Removes the republication paths from the local filesystem."""
+    try:
+        shutil.rmtree(TEST_REPUBLICATION_PATH_LOCAL)
+    except FileNotFoundError:
+        pass
 
 
 def _publish_test_model_local(
@@ -114,3 +124,22 @@ def test_hashcode_is_hash_of_md5_digest(
     model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
     versioned_model = VersionedModel(model_path)
     assert hash(versioned_model) == hash(versioned_model.md5)
+
+
+def test_republish_creates_files(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that republish creates the expected files.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_republication_directories_local()
+    _publish_test_model_local(dataset, model, training_config)
+    model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    versioned_model = VersionedModel(model_path)
+    versioned_model.republish(TEST_REPUBLICATION_PATH_LOCAL)
+    republication_path = os.path.join(TEST_REPUBLICATION_PATH_LOCAL, 'v1')
+    assert os.path.exists(republication_path)

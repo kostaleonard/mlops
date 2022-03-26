@@ -17,6 +17,8 @@ from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
 from mlops.errors import PublicationPathAlreadyExistsError, \
     InvalidDatasetCopyStrategyError
 from tests.dataset.preset_data_processor import PresetDataProcessor
+from tests.dataset.doubled_preset_data_processor import \
+    DoubledPresetDataProcessor
 
 TEST_DATASET_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/raw_dataset'
 TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_versioned_dataset_builder/datasets'
@@ -29,7 +31,7 @@ TEST_DATASET_FILENAMES = ['file0.txt',
                           'file2.txt',
                           'sub1/file3.txt',
                           'sub1/sub2/file4.txt']
-TEST_DATASET_HASH = '48d019842836ed2fd8721f5ee7d427c1'
+TEST_DATASET_HASH = 'cf178bc689619bce0844222e3d8a387b'
 
 
 def _remove_test_directories_local() -> None:
@@ -657,3 +659,26 @@ def test_published_data_processor_reproduces_dataset() -> None:
         original_tensor = original_features[name]
         loaded_tensor = loaded_features[name]
         assert np.array_equal(original_tensor, loaded_tensor)
+
+
+def test_publish_hashes_tensors() -> None:
+    """Tests that publish() hashes tensors."""
+    _remove_test_directories_local()
+    _create_test_dataset_local()
+    processor = PresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v1')
+    processor = DoubledPresetDataProcessor()
+    builder = VersionedDatasetBuilder(TEST_DATASET_PATH_LOCAL, processor)
+    builder.publish(TEST_PUBLICATION_PATH_LOCAL, version='v2')
+    meta_path1 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v1',
+                              'meta.json')
+    meta_path2 = os.path.join(TEST_PUBLICATION_PATH_LOCAL,
+                              'v2',
+                              'meta.json')
+    with open(meta_path1, 'r', encoding='utf-8') as infile:
+        contents1 = json.loads(infile.read())
+    with open(meta_path2, 'r', encoding='utf-8') as infile:
+        contents2 = json.loads(infile.read())
+    assert contents1['hash'] != contents2['hash']

@@ -171,7 +171,8 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
         # Save tensors.
-        self._write_tensors_local(publication_path)
+        file_paths = self._write_tensors_local(publication_path)
+        files_to_hash = files_to_hash.union(file_paths)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_local(link_path)
@@ -219,7 +220,8 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
         # Save tensors.
-        self._write_tensors_s3(publication_path, fs)
+        file_paths = self._write_tensors_s3(publication_path, fs)
+        files_to_hash = files_to_hash.union(file_paths)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:
             self._make_raw_dataset_link_s3(link_path, fs)
