@@ -104,6 +104,7 @@ class VersionedDatasetBuilder:
             metadata.
         :return: The versioned dataset's publication path.
         """
+        # pylint: disable=too-many-arguments
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
@@ -170,7 +171,6 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
         # Save tensors.
-        # TODO does not hash tensors
         self._write_tensors_local(publication_path)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:
@@ -219,7 +219,6 @@ class VersionedDatasetBuilder:
         # Create publication path.
         VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
         # Save tensors.
-        # TODO does not hash tensors
         self._write_tensors_s3(publication_path, fs)
         # Save the raw dataset.
         if dataset_copy_strategy == STRATEGY_LINK:

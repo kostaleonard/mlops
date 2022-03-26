@@ -61,8 +61,7 @@ class VersionedModel:
             same version.
         :return: The versioned model's publication path.
         """
-        # TODO test copies files
-        # TODO test for error
+        raise NotImplementedError
 
     def __eq__(self, other: 'VersionedModel') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,

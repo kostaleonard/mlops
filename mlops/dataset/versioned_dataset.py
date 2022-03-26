@@ -68,6 +68,13 @@ class VersionedDataset:
             self.data_processor = processor
 
     def _republish_to_local(self, path: str) -> str:
+        """Saves the versioned dataset files to the given path. If the path and
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
+
+        :param path: The local path to which to publish the dataset.
+        :return: The versioned dataset's publication path.
+        """
         # pylint: disable=protected-access
         publication_path = os.path.join(path, self.version)
         VersionedDatasetBuilder._make_publication_path_local(publication_path)
@@ -79,6 +86,13 @@ class VersionedDataset:
         return publication_path
 
     def _republish_to_s3(self, path: str) -> str:
+        """Saves the versioned dataset files to the given path. If the path and
+        appended version already exists, this operation will raise a
+        PublicationPathAlreadyExistsError.
+
+        :param path: The S3 path to which to publish the dataset.
+        :return: The versioned dataset's publication path.
+        """
         # pylint: disable=protected-access
         publication_path = os.path.join(path, self.version)
         fs = S3FileSystem()
