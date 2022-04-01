@@ -1,5 +1,5 @@
 """Tests versioned_model.py."""
-# pylint: disable=redefined-outer-name,no-name-in-module,unused-import
+# pylint: disable=no-name-in-module
 
 import os
 import shutil
@@ -11,8 +11,7 @@ from mlops.model.training_config import TrainingConfig
 from mlops.model.versioned_model import VersionedModel
 from tests.model.test_versioned_model_builder import \
     _remove_test_directories_local, _remove_test_directories_s3, \
-    TEST_MODEL_PUBLICATION_PATH_LOCAL, TEST_MODEL_PUBLICATION_PATH_S3, \
-    dataset, model, training_config
+    TEST_MODEL_PUBLICATION_PATH_LOCAL, TEST_MODEL_PUBLICATION_PATH_S3
 
 EXPECTED_ATTRIBUTES = {'path', 'name', 'version', 'model', 'md5'}
 TEST_REPUBLICATION_PATH_LOCAL = '/tmp/test_versioned_model/models'
