@@ -142,3 +142,22 @@ def test_republish_creates_files(
     versioned_model.republish(TEST_REPUBLICATION_PATH_LOCAL)
     republication_path = os.path.join(TEST_REPUBLICATION_PATH_LOCAL, 'v1')
     assert os.path.exists(republication_path)
+
+
+def test_versioned_model_has_dataset_path(
+        dataset: VersionedDataset,
+        model: Model,
+        training_config: TrainingConfig) -> None:
+    """Tests that VersionedModel has a dataset path attribute.
+
+    :param dataset: The versioned dataset.
+    :param model: The model.
+    :param training_config: The training configuration.
+    """
+    _remove_republication_directories_local()
+    _publish_test_model_local(dataset, model, training_config)
+    model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, 'v1')
+    versioned_model = VersionedModel(model_path)
+    assert hasattr(versioned_model, 'dataset_path')
+    loaded_dataset = VersionedDataset(versioned_model.dataset_path)
+    assert loaded_dataset.md5 == dataset.md5
