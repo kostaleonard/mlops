@@ -6,23 +6,23 @@ help:
 install:
 	pip install -r requirements.txt
 
-pylint:
+lint:
 	pylint mlops
 	pylint tests
 
-pytest:
+test:
 	pytest -m "not slowtest and not awstest" --cov=mlops tests
 	coverage xml
 
-pytest_slow:
+test_slow:
 	pytest -m "slowtest" --cov=mlops tests
 	coverage xml
 
-pytest_aws:
+test_aws:
 	pytest -m "awstest" --cov=mlops tests
 	coverage xml
 
-pytest_full:
+test_full:
 	pytest --cov=mlops tests
 	coverage xml
 

@@ -33,9 +33,6 @@ class VersionedModel:
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            self.name = metadata['name']
-            self.version = metadata['version']
-            self.md5 = metadata['hash']
         else:
             # Get model.
             self.model = load_model(os.path.join(path, 'model.h5'))
@@ -44,9 +41,10 @@ class VersionedModel:
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            self.name = metadata['name']
-            self.version = metadata['version']
-            self.md5 = metadata['hash']
+        self.name = metadata['name']
+        self.version = metadata['version']
+        self.md5 = metadata['hash']
+        self.dataset_path = metadata['dataset']
 
     def republish(self, path: str) -> str:
         """Saves the versioned model files to the given path. If the path and
