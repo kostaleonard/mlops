@@ -7,9 +7,10 @@ from tempfile import NamedTemporaryFile
 from s3fs import S3FileSystem
 from tensorflow.keras.models import load_model
 from mlops.republication import republication
+from mlops.artifact.versioned_artifact import VersionedArtifact
 
 
-class VersionedModel:
+class VersionedModel(VersionedArtifact):
     """Represents a versioned model."""
 
     def __init__(self, path: str) -> None:

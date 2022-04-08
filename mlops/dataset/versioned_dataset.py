@@ -6,9 +6,10 @@ import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
 from mlops.republication import republication
+from mlops.artifact.versioned_artifact import VersionedArtifact
 
 
-class VersionedDataset:
+class VersionedDataset(VersionedArtifact):
     """Represents a versioned dataset."""
 
     def __init__(self, path: str) -> None:
