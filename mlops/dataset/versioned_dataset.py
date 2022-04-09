@@ -5,7 +5,6 @@ import json
 import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
-from mlops.republication import republication
 from mlops.artifact.versioned_artifact import VersionedArtifact
 
 
@@ -19,7 +18,7 @@ class VersionedDataset(VersionedArtifact):
             store such as S3, from which the dataset should be loaded. An S3
             path should be a URL of the form "s3://bucket-name/path/to/dir".
         """
-        self.path = path
+        self._path = path
         self._metadata_path = os.path.join(path, 'meta.json')
         if path.startswith('s3://'):
             fs = S3FileSystem()
@@ -37,9 +36,6 @@ class VersionedDataset(VersionedArtifact):
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            self.name = metadata['name']
-            self.version = metadata['version']
-            self.md5 = metadata['hash']
             # Get data processor.
             with fs.open(os.path.join(path, 'data_processor.pkl'),
                          'rb') as infile:
@@ -60,13 +56,21 @@ class VersionedDataset(VersionedArtifact):
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-            self.name = metadata['name']
-            self.version = metadata['version']
-            self.md5 = metadata['hash']
             # Get data processor.
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
                 processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
+        self.name = metadata['name']
+        self._version = metadata['version']
+        self.md5 = metadata['hash']
+
+    @property
+    def path(self) -> str:
+        """Returns the local or remote path to the artifact.
+
+        :return: The local or remote path to the artifact.
+        """
+        return self._path
 
     @property
     def metadata_path(self) -> str:
@@ -76,21 +80,13 @@ class VersionedDataset(VersionedArtifact):
         """
         return self._metadata_path
 
-    def republish(self, path: str) -> str:
-        """Saves the versioned dataset files to the given path. If the path and
-        appended version already exists, this operation will raise a
-        PublicationPathAlreadyExistsError.
+    @property
+    def version(self) -> str:
+        """Returns the artifact's version.
 
-        :param path: The path, either on the local filesystem or in a cloud
-            store such as S3, to which the dataset should be saved. The version
-            will be appended to this path as a subdirectory. An S3 path
-            should be a URL of the form "s3://bucket-name/path/to/dir". It is
-            recommended to use this same path to publish all datasets, since it
-            will prevent the user from creating two different datasets with the
-            same version.
-        :return: The versioned dataset's publication path.
+        :return: The artifact's version.
         """
-        return republication.republish(self.path, path, self.version)
+        return self._version
 
     def __eq__(self, other: 'VersionedDataset') -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,
