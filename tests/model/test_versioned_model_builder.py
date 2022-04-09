@@ -101,7 +101,7 @@ def test_publish_local_path_creates_expected_files(
     assert set(os.listdir(publication_dir)) == {'model.h5', 'meta.json'}
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_path_creates_expected_files(
         dataset: VersionedDataset,
         model: Model,
@@ -147,7 +147,7 @@ def test_publish_local_path_raises_path_already_exists_error(
         builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_path_raises_path_already_exists_error(
         dataset: VersionedDataset,
         model: Model,
@@ -251,7 +251,7 @@ def test_publish_local_with_trailing_slash(
     assert os.path.isdir(expected_filename)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_with_trailing_slash(
         dataset: VersionedDataset,
         model: Model,
@@ -383,7 +383,7 @@ def test_different_models_have_different_hashes(
     assert contents1['hash'] != contents2['hash']
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_local_and_s3_create_same_model(
         dataset: VersionedDataset,
         model: Model,

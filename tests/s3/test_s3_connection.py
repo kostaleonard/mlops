@@ -10,7 +10,7 @@ TEST_FILENAME = 's3_conn_test.txt'
 TEST_FILE_PATH = os.path.join('/tmp', TEST_FILENAME)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_connection_to_project_s3_bucket(mocked_s3: None) -> None:
     """Tests that the project S3 bucket (s3://kosta-mlops) can be reached.
 
@@ -23,7 +23,7 @@ def test_connection_to_project_s3_bucket(mocked_s3: None) -> None:
     assert len(bucket_matches) == 1
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_project_s3_bucket_read_write(mocked_s3: None) -> None:
     """Tests that the project S3 bucket (s3://kosta-mlops) can be read from and
     written to.

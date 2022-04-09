@@ -72,7 +72,7 @@ def test_init_loads_model_local(
         assert hasattr(versioned_model, attribute)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_init_loads_model_s3(
         dataset: VersionedDataset,
         model: Model,

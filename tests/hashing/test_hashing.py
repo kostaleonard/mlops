@@ -25,7 +25,7 @@ def test_hash_local_is_reproducible() -> None:
     assert hash_forward == hash_reverse
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_hash_s3_is_reproducible(mocked_s3: None) -> None:
     """Tests that hashing of remote files is reproducible.
 

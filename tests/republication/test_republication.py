@@ -41,7 +41,7 @@ def test_republish_copies_files_local_to_local() -> None:
     assert os.path.exists(republication_path)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_republish_copies_files_s3_to_local(mocked_s3: None) -> None:
     """Tests that republish copies files from S3 to local.
 
@@ -55,7 +55,7 @@ def test_republish_copies_files_s3_to_local(mocked_s3: None) -> None:
     assert os.path.exists(republication_path)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_republish_copies_files_local_to_s3(mocked_s3: None) -> None:
     """Tests that republish copies files from local to S3.
 
@@ -70,7 +70,7 @@ def test_republish_copies_files_local_to_s3(mocked_s3: None) -> None:
     assert fs.exists(republication_path)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_republish_copies_files_s3_to_s3(mocked_s3: None) -> None:
     """Tests that republish copies files from S3 to S3.
 

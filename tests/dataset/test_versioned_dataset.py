@@ -59,7 +59,7 @@ def test_init_creates_expected_attributes_local() -> None:
         assert hasattr(dataset, attribute)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_init_creates_expected_attributes_s3(mocked_s3: None) -> None:
     """Tests that init creates all feature/label tensors, the hash, and the
     data processor as attributes when the dataset is on S3.

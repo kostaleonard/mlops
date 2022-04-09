@@ -128,7 +128,7 @@ def test_publish_local_path_creates_expected_files() -> None:
         {'data_processor.pkl', 'meta.json', 'raw.tar.bz2'})
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_path_creates_expected_files(mocked_s3: None) -> None:
     """Tests that publish on an S3 path creates the expected files/directories
     on S3.
@@ -164,7 +164,7 @@ def test_publish_s3_path_creates_expected_files(mocked_s3: None) -> None:
     assert any(key.startswith(raw_directory_key) for key in item_keys)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_from_raw_dataset_in_s3_to_local(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3 and writes to the local filesystem.
@@ -189,7 +189,7 @@ def test_publish_from_raw_dataset_in_s3_to_local(mocked_s3: None) -> None:
     assert raw_dataset_paths == set(TEST_DATASET_FILENAMES)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_from_raw_dataset_in_s3_to_s3(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3 and writes to S3.
@@ -226,7 +226,7 @@ def test_publish_local_path_raises_path_already_exists_error() -> None:
         builder.publish(TEST_PUBLICATION_PATH_LOCAL, version=version)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_path_raises_path_already_exists_error(
         mocked_s3: None) -> None:
     """Tests that publish on an S3 path that already exists raises a
@@ -261,7 +261,7 @@ def test_publish_zips_raw_dataset() -> None:
     assert os.path.exists(raw_dataset_zip)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_zips_s3_to_s3(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
     in S3 and writes to S3.
@@ -323,7 +323,7 @@ def test_publish_includes_raw_dataset_link() -> None:
         assert infile.read() == TEST_DATASET_PATH_LOCAL
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_includes_raw_dataset_link_s3(mocked_s3: None) -> None:
     """Tests that publish to S3 includes a link to the raw dataset when the copy
     strategy is STRATEGY_LINK.
@@ -471,7 +471,7 @@ def test_rebuilt_datasets_have_same_hashes_local_to_local() -> None:
     assert contents1['hash'] == TEST_DATASET_HASH
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_rebuilt_datasets_have_same_hashes_s3_to_local(
         mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
@@ -505,7 +505,7 @@ def test_rebuilt_datasets_have_same_hashes_s3_to_local(
     assert contents1['hash'] == TEST_DATASET_HASH
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_rebuilt_datasets_have_same_hashes_local_to_s3(
         mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
@@ -539,7 +539,7 @@ def test_rebuilt_datasets_have_same_hashes_local_to_s3(
     assert contents1['hash'] == TEST_DATASET_HASH
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_rebuilt_datasets_have_same_hashes_s3_to_s3(mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same, even when the datasets have different metadata (e.g.,
@@ -597,7 +597,7 @@ def test_different_datasets_have_different_hashes() -> None:
     assert contents1['hash'] != contents2['hash']
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_local_and_s3_create_same_dataset(mocked_s3: None) -> None:
     """Tests that publishing locally or remotely on S3 produces the same
     dataset. Verifies identity by comparing dataset hashes.
@@ -643,7 +643,7 @@ def test_publish_local_with_trailing_slash() -> None:
     assert os.path.isdir(expected_filename)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_publish_s3_with_trailing_slash(mocked_s3: None) -> None:
     """Tests that publishing to an S3 path with a trailing slash works
     properly.
