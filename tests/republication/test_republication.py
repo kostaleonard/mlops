@@ -42,8 +42,11 @@ def test_republish_copies_files_local_to_local() -> None:
 
 
 @pytest.mark.awstest
-def test_republish_copies_files_s3_to_local() -> None:
-    """Tests that republish copies files from S3 to local."""
+def test_republish_copies_files_s3_to_local(mocked_s3: None) -> None:
+    """Tests that republish copies files from S3 to local.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_republication_directories_local()
     _publish_test_dataset_s3()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_S3, 'v1'))
@@ -53,8 +56,11 @@ def test_republish_copies_files_s3_to_local() -> None:
 
 
 @pytest.mark.awstest
-def test_republish_copies_files_local_to_s3() -> None:
-    """Tests that republish copies files from local to S3."""
+def test_republish_copies_files_local_to_s3(mocked_s3: None) -> None:
+    """Tests that republish copies files from local to S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_republication_directories_s3()
     _publish_test_dataset_local()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1'))
@@ -65,8 +71,11 @@ def test_republish_copies_files_local_to_s3() -> None:
 
 
 @pytest.mark.awstest
-def test_republish_copies_files_s3_to_s3() -> None:
-    """Tests that republish copies files from S3 to S3."""
+def test_republish_copies_files_s3_to_s3(mocked_s3: None) -> None:
+    """Tests that republish copies files from S3 to S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_republication_directories_s3()
     _publish_test_dataset_s3()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_S3, 'v1'))

@@ -21,6 +21,7 @@ class VersionedModel(VersionedArtifact):
             should be a URL of the form "s3://bucket-name/path/to/dir".
         """
         self.path = path
+        self._metadata_path = os.path.join(path, 'meta.json')
         if path.startswith('s3://'):
             fs = S3FileSystem()
             # Get model.
@@ -30,7 +31,7 @@ class VersionedModel(VersionedArtifact):
                 tmp_file.seek(0)
                 self.model = load_model(tmp_file.name)
             # Get metadata.
-            with fs.open(os.path.join(path, 'meta.json'),
+            with fs.open(self.metadata_path,
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
@@ -38,7 +39,7 @@ class VersionedModel(VersionedArtifact):
             # Get model.
             self.model = load_model(os.path.join(path, 'model.h5'))
             # Get metadata.
-            with open(os.path.join(path, 'meta.json'),
+            with open(self.metadata_path,
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
@@ -46,6 +47,14 @@ class VersionedModel(VersionedArtifact):
         self.version = metadata['version']
         self.md5 = metadata['hash']
         self.dataset_path = metadata['dataset']
+
+    @property
+    def metadata_path(self) -> str:
+        """Returns the local or remote path to the artifact's metadata.
+
+        :return: The local or remote path to the artifact's metadata.
+        """
+        return self._metadata_path
 
     def republish(self, path: str) -> str:
         """Saves the versioned model files to the given path. If the path and

@@ -58,7 +58,7 @@ def fixture_training_config(dataset: VersionedDataset,
     return TrainingConfig(history, train_kwargs)
 
 
-@pytest.fixture(name='aws_credentials', scope='module')
+@pytest.fixture(name='aws_credentials', scope='session')
 def fixture_aws_credentials() -> None:
     """Mocked AWS credentials for moto."""
     os.environ['AWS_ACCESS_KEY_ID'] = 'testing'
@@ -68,7 +68,7 @@ def fixture_aws_credentials() -> None:
     os.environ['AWS_DEFAULT_REGION'] = TEST_REGION
 
 
-@pytest.fixture(name='mocked_s3', scope='module')
+@pytest.fixture(name='mocked_s3', scope='session')
 def fixture_mocked_s3(aws_credentials: None) -> None:
     """Creates a mocked S3 bucket for tests.
 

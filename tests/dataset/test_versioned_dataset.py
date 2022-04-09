@@ -60,9 +60,12 @@ def test_init_creates_expected_attributes_local() -> None:
 
 
 @pytest.mark.awstest
-def test_init_creates_expected_attributes_s3() -> None:
+def test_init_creates_expected_attributes_s3(mocked_s3: None) -> None:
     """Tests that init creates all feature/label tensors, the hash, and the
-    data processor as attributes when the dataset is on S3."""
+    data processor as attributes when the dataset is on S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _publish_test_dataset_s3()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_S3, 'v1'))
     for attribute in EXPECTED_ATTRIBUTES:

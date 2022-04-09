@@ -11,8 +11,11 @@ TEST_FILE_PATH = os.path.join('/tmp', TEST_FILENAME)
 
 
 @pytest.mark.awstest
-def test_connection_to_project_s3_bucket() -> None:
-    """Tests that the project S3 bucket (s3://kosta-mlops) can be reached."""
+def test_connection_to_project_s3_bucket(mocked_s3: None) -> None:
+    """Tests that the project S3 bucket (s3://kosta-mlops) can be reached.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     s3 = boto3.client('s3')
     response = s3.list_buckets()
     bucket_matches = [bucket_dict for bucket_dict in response['Buckets']
@@ -21,9 +24,12 @@ def test_connection_to_project_s3_bucket() -> None:
 
 
 @pytest.mark.awstest
-def test_project_s3_bucket_read_write() -> None:
+def test_project_s3_bucket_read_write(mocked_s3: None) -> None:
     """Tests that the project S3 bucket (s3://kosta-mlops) can be read from and
-    written to."""
+    written to.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     s3 = boto3.client('s3')
     # Remove test file from local filesystem.
     try:

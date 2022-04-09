@@ -105,13 +105,15 @@ def test_publish_local_path_creates_expected_files(
 def test_publish_s3_path_creates_expected_files(
         dataset: VersionedDataset,
         model: Model,
-        training_config: TrainingConfig) -> None:
+        training_config: TrainingConfig,
+        mocked_s3: None) -> None:
     """Tests that publish on an S3 path creates the expected files/directories
     on S3.
 
     :param dataset: The versioned dataset.
     :param model: The model.
     :param training_config: The training configuration.
+    :param mocked_s3: A mocked S3 bucket for testing.
     """
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
@@ -149,13 +151,15 @@ def test_publish_local_path_raises_path_already_exists_error(
 def test_publish_s3_path_raises_path_already_exists_error(
         dataset: VersionedDataset,
         model: Model,
-        training_config: TrainingConfig) -> None:
+        training_config: TrainingConfig,
+        mocked_s3: None) -> None:
     """Tests that publish on an S3 path that already exists raises a
     PublicationPathAlreadyExistsError.
 
     :param dataset: The versioned dataset.
     :param model: The model.
     :param training_config: The training configuration.
+    :param mocked_s3: A mocked S3 bucket for testing.
     """
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
@@ -251,7 +255,8 @@ def test_publish_local_with_trailing_slash(
 def test_publish_s3_with_trailing_slash(
         dataset: VersionedDataset,
         model: Model,
-        training_config: TrainingConfig) -> None:
+        training_config: TrainingConfig,
+        mocked_s3: None) -> None:
     """Tests that publishing to an S3 path with a trailing slash works
     properly.
 
@@ -382,13 +387,15 @@ def test_different_models_have_different_hashes(
 def test_publish_local_and_s3_create_same_model(
         dataset: VersionedDataset,
         model: Model,
-        training_config: TrainingConfig) -> None:
+        training_config: TrainingConfig,
+        mocked_s3: None) -> None:
     """Tests that publishing locally or remotely on S3 produces the same model.
     Verifies identity by comparing model hashes.
 
     :param dataset: The versioned dataset.
     :param model: The model.
     :param training_config: The training configuration.
+    :param mocked_s3: A mocked S3 bucket for testing.
     """
     _remove_test_directories_local()
     _remove_test_directories_s3()
