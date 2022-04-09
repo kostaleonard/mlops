@@ -16,6 +16,7 @@ def test_connection_to_project_s3_bucket(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     s3 = boto3.client('s3')
     response = s3.list_buckets()
     bucket_matches = [bucket_dict for bucket_dict in response['Buckets']
@@ -30,6 +31,7 @@ def test_project_s3_bucket_read_write(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     s3 = boto3.client('s3')
     # Remove test file from local filesystem.
     try:

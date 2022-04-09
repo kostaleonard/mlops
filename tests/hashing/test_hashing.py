@@ -31,6 +31,7 @@ def test_hash_s3_is_reproducible(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_s3()
     _create_test_dataset_s3()
     files_to_hash_forward = [os.path.join(TEST_DATASET_PATH_S3, filename)

@@ -135,6 +135,7 @@ def test_publish_s3_path_creates_expected_files(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument,too-many-locals
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -171,6 +172,7 @@ def test_publish_from_raw_dataset_in_s3_to_local(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -196,6 +198,7 @@ def test_publish_from_raw_dataset_in_s3_to_s3(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -234,6 +237,7 @@ def test_publish_s3_path_raises_path_already_exists_error(
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -268,6 +272,7 @@ def test_publish_zips_s3_to_s3(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -330,6 +335,7 @@ def test_publish_includes_raw_dataset_link_s3(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -480,6 +486,7 @@ def test_rebuilt_datasets_have_same_hashes_s3_to_local(
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -514,6 +521,7 @@ def test_rebuilt_datasets_have_same_hashes_local_to_s3(
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_local()
@@ -547,6 +555,7 @@ def test_rebuilt_datasets_have_same_hashes_s3_to_s3(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -604,6 +613,7 @@ def test_publish_local_and_s3_create_same_dataset(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -650,6 +660,7 @@ def test_publish_s3_with_trailing_slash(mocked_s3: None) -> None:
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()

@@ -115,6 +115,7 @@ def test_publish_s3_path_creates_expected_files(
     :param training_config: The training configuration.
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
     version = 'v2'
@@ -161,6 +162,7 @@ def test_publish_s3_path_raises_path_already_exists_error(
     :param training_config: The training configuration.
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
     version = 'v2'
@@ -264,6 +266,7 @@ def test_publish_s3_with_trailing_slash(
     :param model: The model.
     :param training_config: The training configuration.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
     version = 'v2'
@@ -397,6 +400,7 @@ def test_publish_local_and_s3_create_same_model(
     :param training_config: The training configuration.
     :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _remove_test_directories_local()
     _remove_test_directories_s3()
     builder = VersionedModelBuilder(dataset, model, training_config)
