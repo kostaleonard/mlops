@@ -72,17 +72,20 @@ def test_init_loads_model_local(
         assert hasattr(versioned_model, attribute)
 
 
-@pytest.mark.awstest
+@pytest.mark.mockedawstest
 def test_init_loads_model_s3(
         dataset: VersionedDataset,
         model: Model,
-        training_config: TrainingConfig) -> None:
+        training_config: TrainingConfig,
+        mocked_s3: None) -> None:
     """Tests that the object loads the saved model from S3.
 
     :param dataset: The versioned dataset.
     :param model: The model.
     :param training_config: The training configuration.
+    :param mocked_s3: A mocked S3 bucket for testing.
     """
+    # pylint: disable=unused-argument
     _publish_test_model_s3(dataset, model, training_config)
     model_path = os.path.join(TEST_MODEL_PUBLICATION_PATH_S3, 'v1')
     versioned_model = VersionedModel(model_path)

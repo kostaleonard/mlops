@@ -6,9 +6,10 @@ import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
 from mlops.republication import republication
+from mlops.artifact.versioned_artifact import VersionedArtifact
 
 
-class VersionedDataset:
+class VersionedDataset(VersionedArtifact):
     """Represents a versioned dataset."""
 
     def __init__(self, path: str) -> None:
@@ -19,6 +20,7 @@ class VersionedDataset:
             path should be a URL of the form "s3://bucket-name/path/to/dir".
         """
         self.path = path
+        self._metadata_path = os.path.join(path, 'meta.json')
         if path.startswith('s3://'):
             fs = S3FileSystem()
             # Get tensors.
@@ -31,7 +33,7 @@ class VersionedDataset:
                     tensor = np.load(infile)
                 setattr(self, attr_name, tensor)
             # Get metadata.
-            with fs.open(os.path.join(path, 'meta.json'),
+            with fs.open(self.metadata_path,
                          'r',
                          encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
@@ -54,7 +56,7 @@ class VersionedDataset:
                 tensor = np.load(tensor_path)
                 setattr(self, attr_name, tensor)
             # Get metadata.
-            with open(os.path.join(path, 'meta.json'),
+            with open(self.metadata_path,
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
@@ -65,6 +67,14 @@ class VersionedDataset:
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
                 processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
+
+    @property
+    def metadata_path(self) -> str:
+        """Returns the local or remote path to the artifact's metadata.
+
+        :return: The local or remote path to the artifact's metadata.
+        """
+        return self._metadata_path
 
     def republish(self, path: str) -> str:
         """Saves the versioned dataset files to the given path. If the path and

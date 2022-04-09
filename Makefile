@@ -11,15 +11,15 @@ lint:
 	pylint tests
 
 test:
-	pytest -m "not slowtest and not awstest" --cov=mlops tests
+	pytest -m "not slowtest" --cov=mlops tests
 	coverage xml
 
 test_slow:
 	pytest -m "slowtest" --cov=mlops tests
 	coverage xml
 
-test_aws:
-	pytest -m "awstest" --cov=mlops tests
+test_mocked_aws:
+	pytest -m "mockedawstest" --cov=mlops tests
 	coverage xml
 
 test_full:
