@@ -129,9 +129,12 @@ def test_publish_local_path_creates_expected_files() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_s3_path_creates_expected_files() -> None:
+def test_publish_s3_path_creates_expected_files(mocked_s3: None) -> None:
     """Tests that publish on an S3 path creates the expected files/directories
-    on S3."""
+    on S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -162,9 +165,12 @@ def test_publish_s3_path_creates_expected_files() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_from_raw_dataset_in_s3_to_local() -> None:
+def test_publish_from_raw_dataset_in_s3_to_local(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
-    in S3 and writes to the local filesystem."""
+    in S3 and writes to the local filesystem.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -184,9 +190,12 @@ def test_publish_from_raw_dataset_in_s3_to_local() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_from_raw_dataset_in_s3_to_s3() -> None:
+def test_publish_from_raw_dataset_in_s3_to_s3(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
-    in S3 and writes to S3."""
+    in S3 and writes to S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -218,9 +227,13 @@ def test_publish_local_path_raises_path_already_exists_error() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_s3_path_raises_path_already_exists_error() -> None:
+def test_publish_s3_path_raises_path_already_exists_error(
+        mocked_s3: None) -> None:
     """Tests that publish on an S3 path that already exists raises a
-    PublicationPathAlreadyExistsError."""
+    PublicationPathAlreadyExistsError.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -249,9 +262,12 @@ def test_publish_zips_raw_dataset() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_zips_s3_to_s3() -> None:
+def test_publish_zips_s3_to_s3(mocked_s3: None) -> None:
     """Tests that publish correctly reads the dataset path when the dataset is
-    in S3 and writes to S3."""
+    in S3 and writes to S3.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -308,9 +324,12 @@ def test_publish_includes_raw_dataset_link() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_includes_raw_dataset_link_s3() -> None:
+def test_publish_includes_raw_dataset_link_s3(mocked_s3: None) -> None:
     """Tests that publish to S3 includes a link to the raw dataset when the copy
-    strategy is STRATEGY_LINK."""
+    strategy is STRATEGY_LINK.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -453,10 +472,14 @@ def test_rebuilt_datasets_have_same_hashes_local_to_local() -> None:
 
 
 @pytest.mark.awstest
-def test_rebuilt_datasets_have_same_hashes_s3_to_local() -> None:
+def test_rebuilt_datasets_have_same_hashes_s3_to_local(
+        mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same, even when the datasets have different metadata (e.g.,
-    timestamp)."""
+    timestamp).
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -483,10 +506,14 @@ def test_rebuilt_datasets_have_same_hashes_s3_to_local() -> None:
 
 
 @pytest.mark.awstest
-def test_rebuilt_datasets_have_same_hashes_local_to_s3() -> None:
+def test_rebuilt_datasets_have_same_hashes_local_to_s3(
+        mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same, even when the datasets have different metadata (e.g.,
-    timestamp)."""
+    timestamp).
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_local()
@@ -513,10 +540,13 @@ def test_rebuilt_datasets_have_same_hashes_local_to_s3() -> None:
 
 
 @pytest.mark.awstest
-def test_rebuilt_datasets_have_same_hashes_s3_to_s3() -> None:
+def test_rebuilt_datasets_have_same_hashes_s3_to_s3(mocked_s3: None) -> None:
     """Tests that the hash values from two datasets that have identical files
     are the same, even when the datasets have different metadata (e.g.,
-    timestamp)."""
+    timestamp).
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()
@@ -568,9 +598,12 @@ def test_different_datasets_have_different_hashes() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_local_and_s3_create_same_dataset() -> None:
+def test_publish_local_and_s3_create_same_dataset(mocked_s3: None) -> None:
     """Tests that publishing locally or remotely on S3 produces the same
-    dataset. Verifies identity by comparing dataset hashes."""
+    dataset. Verifies identity by comparing dataset hashes.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _create_test_dataset_local()
     _remove_test_directories_s3()
@@ -611,9 +644,12 @@ def test_publish_local_with_trailing_slash() -> None:
 
 
 @pytest.mark.awstest
-def test_publish_s3_with_trailing_slash() -> None:
+def test_publish_s3_with_trailing_slash(mocked_s3: None) -> None:
     """Tests that publishing to an S3 path with a trailing slash works
-    properly."""
+    properly.
+
+    :param mocked_s3: A mocked S3 bucket for testing.
+    """
     _remove_test_directories_local()
     _remove_test_directories_s3()
     _create_test_dataset_s3()

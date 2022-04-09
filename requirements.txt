@@ -16,3 +16,4 @@ sphinx_rtd_theme
 build
 twine
 python-dateutil
+moto

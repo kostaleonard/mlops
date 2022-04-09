@@ -3,12 +3,18 @@
 
 import os
 import pytest
+import boto3
+from moto import mock_s3
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Dense
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.training_config import TrainingConfig
 from tests.dataset.test_versioned_dataset import _publish_test_dataset_local, \
     TEST_PUBLICATION_PATH_LOCAL as TEST_DATASET_PUBLICATION_PATH_LOCAL
+
+TEST_BUCKET = 'kosta-mlops'
+TEST_REGION = 'us-east-2'
+
 
 
 @pytest.fixture(name='dataset')
@@ -50,3 +56,30 @@ def fixture_training_config(dataset: VersionedDataset,
                         y=dataset.y_train,
                         **train_kwargs)
     return TrainingConfig(history, train_kwargs)
+
+
+@pytest.fixture(name='aws_credentials', scope='module')
+def fixture_aws_credentials() -> None:
+    """Mocked AWS credentials for moto."""
+    os.environ['AWS_ACCESS_KEY_ID'] = 'testing'
+    os.environ['AWS_SECRET_ACCESS_KEY'] = 'testing'
+    os.environ['AWS_SECURITY_TOKEN'] = 'testing'
+    os.environ['AWS_SESSION_TOKEN'] = 'testing'
+    os.environ['AWS_DEFAULT_REGION'] = TEST_REGION
+
+
+@pytest.fixture(name='mocked_s3', scope='module')
+def fixture_mocked_s3(aws_credentials: None) -> None:
+    """Creates a mocked S3 bucket for tests.
+
+    :param aws_credentials: Mocked AWS credentials.
+    """
+    with mock_s3():
+        conn = boto3.resource('s3', region_name=TEST_REGION)
+        conn.create_bucket(
+            Bucket=TEST_BUCKET,
+            CreateBucketConfiguration={
+                'LocationConstraint': TEST_REGION
+            }
+        )
+        yield
