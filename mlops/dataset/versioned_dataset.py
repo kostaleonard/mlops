@@ -60,9 +60,17 @@ class VersionedDataset(VersionedArtifact):
             with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
                 processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
-        self.name = metadata['name']
+        self._name = metadata['name']
         self._version = metadata['version']
-        self.md5 = metadata['hash']
+        self._md5 = metadata['hash']
+
+    @property
+    def name(self) -> str:
+        """Returns the artifact's name.
+
+        :return: The artifact's name.
+        """
+        return self._name
 
     @property
     def path(self) -> str:
@@ -88,18 +96,10 @@ class VersionedDataset(VersionedArtifact):
         """
         return self._version
 
-    def __eq__(self, other: 'VersionedDataset') -> bool:
-        """Returns True if the two objects have the same loaded MD5 hash code,
-        False otherwise.
+    @property
+    def md5(self) -> str:
+        """Returns the artifact's MD5 hash.
 
-        :param other: The dataset with which to compare this object.
-        :return: True if the object MD5 hashes match.
+        :return: The artifact's MD5 hash.
         """
-        return self.md5 == other.md5
-
-    def __hash__(self) -> int:
-        """Returns this object's hashcode based on the loaded MD5 hashcode.
-
-        :return: The object's hashcode based on the loaded MD5 hashcode.
-        """
-        return hash(self.md5)
+        return self._md5

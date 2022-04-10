@@ -14,6 +14,14 @@ class VersionedArtifact(ABC):
 
     @property
     @abstractmethod
+    def name(self) -> str:
+        """Returns the artifact's name.
+
+        :return: The artifact's name.
+        """
+
+    @property
+    @abstractmethod
     def path(self) -> str:
         """Returns the local or remote path to the artifact.
 
@@ -35,6 +43,30 @@ class VersionedArtifact(ABC):
 
         :return: The artifact's version.
         """
+
+    @property
+    @abstractmethod
+    def md5(self) -> str:
+        """Returns the artifact's MD5 hash.
+
+        :return: The artifact's MD5 hash.
+        """
+
+    def __eq__(self, other: 'VersionedArtifact') -> bool:
+        """Returns True if the two objects have the same loaded MD5 hash code,
+        False otherwise.
+
+        :param other: The dataset with which to compare this object.
+        :return: True if the object MD5 hashes match.
+        """
+        return self.md5 == other.md5
+
+    def __hash__(self) -> int:
+        """Returns this object's hashcode based on the loaded MD5 hashcode.
+
+        :return: The object's hashcode based on the loaded MD5 hashcode.
+        """
+        return hash(self.md5)
 
     def update_metadata(self, updates: dict[str, Any]) -> None:
         """Updates the artifact's metadata with the new values.
