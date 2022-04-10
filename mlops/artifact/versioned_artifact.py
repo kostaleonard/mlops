@@ -6,7 +6,7 @@ import os
 import shutil
 import json
 from s3fs import S3FileSystem
-from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
+from mlops.artifact.versioned_artifact_builder import VersionedArtifactBuilder
 
 
 class VersionedArtifact(ABC):
@@ -56,7 +56,7 @@ class VersionedArtifact(ABC):
         """Returns True if the two objects have the same loaded MD5 hash code,
         False otherwise.
 
-        :param other: The dataset with which to compare this object.
+        :param other: The artifact with which to compare this object.
         :return: True if the object MD5 hashes match.
         """
         return self.md5 == other.md5
@@ -129,7 +129,7 @@ class VersionedArtifact(ABC):
         """
         # pylint: disable=protected-access
         publication_path = os.path.join(republication_path, self.version)
-        VersionedDatasetBuilder._make_publication_path_local(publication_path)
+        VersionedArtifactBuilder._make_publication_path_local(publication_path)
         if self.path.startswith('s3://'):
             fs = S3FileSystem()
             fs.get(self.path, publication_path, recursive=True)
@@ -149,7 +149,8 @@ class VersionedArtifact(ABC):
         # pylint: disable=protected-access
         publication_path = os.path.join(republication_path, self.version)
         fs = S3FileSystem()
-        VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
+        VersionedArtifactBuilder._make_publication_path_s3(
+            publication_path, fs)
         if self.path.startswith('s3://'):
             artifact_path_no_prefix = self.path.replace('s3://', '', 1)
             copy_path_no_prefix = publication_path.replace('s3://', '', 1)

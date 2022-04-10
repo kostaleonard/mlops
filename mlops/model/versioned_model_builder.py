@@ -4,18 +4,18 @@
 import os
 import json
 from tempfile import TemporaryDirectory
-from typing import Optional, List
+from typing import Optional, List, Any
 from datetime import datetime
 from s3fs import S3FileSystem
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import History
-from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder
+from mlops.artifact.versioned_artifact_builder import VersionedArtifactBuilder
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.training_config import TrainingConfig
 from mlops.hashing.hashing import get_hash_local, get_hash_s3
 
 
-class VersionedModelBuilder:
+class VersionedModelBuilder(VersionedArtifactBuilder):
     """An object containing all of the components that form a versioned
     model."""
     # pylint: disable=too-few-public-methods
@@ -49,9 +49,11 @@ class VersionedModelBuilder:
 
     def publish(self,
                 path: str,
+                *args: Any,
                 name: str = 'model',
                 version: Optional[str] = None,
-                tags: Optional[List[str]] = None) -> str:
+                tags: Optional[List[str]] = None,
+                **kwargs: Any) -> str:
         """Saves the versioned model files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -131,8 +133,7 @@ class VersionedModelBuilder:
         """
         files_to_hash = set()
         # Create publication path.
-        # pylint: disable=protected-access
-        VersionedDatasetBuilder._make_publication_path_local(publication_path)
+        VersionedArtifactBuilder._make_publication_path_local(publication_path)
         # Save model.
         self.model.save(model_path)
         files_to_hash.add(model_path)
@@ -160,8 +161,8 @@ class VersionedModelBuilder:
         fs = S3FileSystem()
         files_to_hash = set()
         # Create publication path.
-        # pylint: disable=protected-access
-        VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
+        VersionedArtifactBuilder._make_publication_path_s3(
+            publication_path, fs)
         # Save model.
         with TemporaryDirectory() as tmp_dir:
             self.model.save(f'{tmp_dir}/model.h5')

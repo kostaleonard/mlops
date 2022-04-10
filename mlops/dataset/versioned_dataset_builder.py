@@ -1,28 +1,27 @@
 """Contains the VersionedDatasetBuilder class."""
 
 import os
-from pathlib import Path
 import shutil
 from tempfile import TemporaryFile, TemporaryDirectory
 import tarfile
 from tarfile import TarInfo
-from typing import Optional, List, Set
+from typing import Optional, List, Set, Any
 from datetime import datetime
 import json
 import dill as pickle
 import numpy as np
 from s3fs import S3FileSystem
+from mlops.artifact.versioned_artifact_builder import VersionedArtifactBuilder
 from mlops.dataset.data_processor import DataProcessor
 from mlops.hashing.hashing import get_hash_local, get_hash_s3
-from mlops.errors import PublicationPathAlreadyExistsError, \
-    InvalidDatasetCopyStrategyError
+from mlops.errors import InvalidDatasetCopyStrategyError
 
 STRATEGY_COPY_ZIP = 'copy_zip'
 STRATEGY_COPY = 'copy'
 STRATEGY_LINK = 'link'
 
 
-class VersionedDatasetBuilder:
+class VersionedDatasetBuilder(VersionedArtifactBuilder):
     """An object containing all of the components that form a versioned dataset.
     This object is only used to ensure a standard format for datasets stored in
     a dataset archive (such as the local filesystem or S3), and is not meant for
@@ -53,10 +52,12 @@ class VersionedDatasetBuilder:
 
     def publish(self,
                 path: str,
+                *args: Any,
                 name: str = 'dataset',
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_COPY_ZIP,
-                tags: Optional[List[str]] = None) -> str:
+                tags: Optional[List[str]] = None,
+                **kwargs: Any) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -104,7 +105,7 @@ class VersionedDatasetBuilder:
             metadata.
         :return: The versioned dataset's publication path.
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments,too-many-locals
         timestamp = datetime.now().isoformat()
         if not version:
             version = timestamp
@@ -169,7 +170,7 @@ class VersionedDatasetBuilder:
         # pylint: disable=too-many-arguments
         files_to_hash = set()
         # Create publication path.
-        VersionedDatasetBuilder._make_publication_path_local(publication_path)
+        VersionedArtifactBuilder._make_publication_path_local(publication_path)
         # Save tensors.
         file_paths = self._write_tensors_local(publication_path)
         files_to_hash = files_to_hash.union(file_paths)
@@ -218,7 +219,8 @@ class VersionedDatasetBuilder:
         fs = S3FileSystem()
         files_to_hash = set()
         # Create publication path.
-        VersionedDatasetBuilder._make_publication_path_s3(publication_path, fs)
+        VersionedArtifactBuilder._make_publication_path_s3(
+            publication_path, fs)
         # Save tensors.
         file_paths = self._write_tensors_s3(publication_path, fs)
         files_to_hash = files_to_hash.union(file_paths)
@@ -239,31 +241,6 @@ class VersionedDatasetBuilder:
         # Save data processor object.
         self._write_data_processor_s3(processor_path, fs)
         return publication_path
-
-    @staticmethod
-    def _make_publication_path_local(publication_path: str) -> None:
-        """Creates the directories that compose the publication path.
-
-        :param publication_path: The path to which to publish the dataset.
-        """
-        path_obj = Path(publication_path)
-        try:
-            path_obj.mkdir(parents=True, exist_ok=False)
-        except FileExistsError as err:
-            raise PublicationPathAlreadyExistsError from err
-
-    @staticmethod
-    def _make_publication_path_s3(publication_path: str,
-                                  fs: S3FileSystem) -> None:
-        """Creates the directories that compose the publication path.
-
-        :param publication_path: The path to which to publish the dataset.
-        :param fs: The S3 filesystem object to interface with S3.
-        """
-        # fs.mkdirs with exist_ok=False does not raise an error, so use ls.
-        if fs.ls(publication_path):
-            raise PublicationPathAlreadyExistsError
-        fs.mkdirs(publication_path)
 
     def _write_tensors_local(self, publication_path: str) -> Set[str]:
         """Writes the feature and label tensors to the publication path
