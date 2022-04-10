@@ -1,0 +1,29 @@
+mlops.artifact package
+======================
+
+Submodules
+----------
+
+mlops.artifact.versioned\_artifact module
+-----------------------------------------
+
+.. automodule:: mlops.artifact.versioned_artifact
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+mlops.artifact.versioned\_artifact\_builder module
+--------------------------------------------------
+
+.. automodule:: mlops.artifact.versioned_artifact_builder
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: mlops.artifact
+   :members:
+   :undoc-members:
+   :show-inheritance:

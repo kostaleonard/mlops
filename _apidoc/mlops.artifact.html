@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mlops.artifact package &mdash; mlops v0.1.6 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> mlops
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">mlops.artifact package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-mlops.artifact.versioned_artifact">mlops.artifact.versioned_artifact module</a></li>
+<li><a class="reference internal" href="#module-mlops.artifact.versioned_artifact_builder">mlops.artifact.versioned_artifact_builder module</a></li>
+<li><a class="reference internal" href="#module-mlops.artifact">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mlops</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>mlops.artifact package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_apidoc/mlops.artifact.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mlops-artifact-package">
+<h1>mlops.artifact package<a class="headerlink" href="#mlops-artifact-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-mlops.artifact.versioned_artifact">
+<span id="mlops-artifact-versioned-artifact-module"></span><h2>mlops.artifact.versioned_artifact module<a class="headerlink" href="#module-mlops.artifact.versioned_artifact" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedArtifact class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.artifact.versioned_artifact.</span></span><span class="sig-name descname"><span class="pre">VersionedArtifact</span></span><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Represents a versioned artifact (e.g., a dataset or model).</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.md5">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">md5</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.md5" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s MD5 hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s MD5 hash.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.metadata_path">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metadata_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.metadata_path" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the local or remote path to the artifact’s metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The local or remote path to the artifact’s metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.name">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.name" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.path">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.path" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the local or remote path to the artifact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The local or remote path to the artifact.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.republish">
+<span class="sig-name descname"><span class="pre">republish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">republication_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.republish" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the versioned artifact files to the given path. If the path
+and appended version already exists, this operation will raise a
+PublicationPathAlreadyExistsError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>republication_path</strong> – The path, either on the local filesystem or
+in a cloud store such as S3, to which the artifact should be saved.
+The version will be appended to this path as a subdirectory. An S3
+path should be a URL of the form “s3://bucket-name/path/to/dir”. It
+is recommended to use this same path to publish all artifacts,
+since it will prevent the user from creating two different
+artifacts with the same version.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned artifact’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.update_metadata">
+<span class="sig-name descname"><span class="pre">update_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">updates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.update_metadata" title="Permalink to this definition"></a></dt>
+<dd><p>Updates the artifact’s metadata with the new values.</p>
+<p>The current object will not reflect changes made to the metadata and
+will need to be reloaded from the path. For example, updating the
+object’s name in the metadata will not change the object’s name field,
+but will change the name of any future copies of the object loaded from
+the same versioned files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>updates</strong> – The dictionary of keys and values to add or update. If
+a key does not exist in the metadata, it is added; if it does
+exist, its value is overwritten.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact.VersionedArtifact.version">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.artifact.versioned_artifact.VersionedArtifact.version" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s version.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.artifact.versioned_artifact_builder">
+<span id="mlops-artifact-versioned-artifact-builder-module"></span><h2>mlops.artifact.versioned_artifact_builder module<a class="headerlink" href="#module-mlops.artifact.versioned_artifact_builder" title="Permalink to this headline"></a></h2>
+<p>Contains the VersionedArtifactBuilder class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.artifact.versioned_artifact_builder.</span></span><span class="sig-name descname"><span class="pre">VersionedArtifactBuilder</span></span><a class="headerlink" href="#mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>Represents a versioned artifact builder.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder.publish">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder.publish" title="Permalink to this definition"></a></dt>
+<dd><p>Saves the versioned artifact files to the given path. If the path
+and appended version already exists, this operation will raise a
+PublicationPathAlreadyExistsError.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – The path, either on the local filesystem or in a cloud
+store such as S3, to which the artifact should be saved. The
+version will be appended to this path as a subdirectory. An S3 path
+should be a URL of the form “s3://bucket-name/path/to/dir”. It is
+recommended to use this same path to publish all artifacts of a
+given type (e.g., datasets, models), since it will prevent the user
+from creating two different artifacts with the same version.</p></li>
+<li><p><strong>args</strong> – Additional positional args.</p></li>
+<li><p><strong>kwargs</strong> – Keyword args.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The versioned artifact’s publication path.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-mlops.artifact">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-mlops.artifact" title="Permalink to this headline"></a></h2>
+<p>Contains versioned artifact modules.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Leo Kosta.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

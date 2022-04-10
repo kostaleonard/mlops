@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mlops.model package &mdash; mlops v0.1.5 documentation</title>
+  <title>mlops.model package &mdash; mlops v0.1.6 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -105,26 +105,59 @@ train_args: The training arguments.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.model.versioned_model.</span></span><span class="sig-name descname"><span class="pre">VersionedModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="mlops.artifact.html#mlops.artifact.versioned_artifact.VersionedArtifact" title="mlops.artifact.versioned_artifact.VersionedArtifact"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlops.artifact.versioned_artifact.VersionedArtifact</span></code></a></p>
 <p>Represents a versioned model.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.republish">
-<span class="sig-name descname"><span class="pre">republish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.republish" title="Permalink to this definition"></a></dt>
-<dd><p>Saves the versioned model files to the given path. If the path and
-appended version already exists, this operation will raise a
-PublicationPathAlreadyExistsError.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.md5">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">md5</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.md5" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s MD5 hash.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> – The path, either on the local filesystem or in a cloud
-store such as S3, to which the model should be saved. The version
-will be appended to this path as a subdirectory. An S3 path
-should be a URL of the form “s3://bucket-name/path/to/dir”. It is
-recommended to use this same path to publish all models, since it
-will prevent the user from creating two different models with the
-same version.</p>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s MD5 hash.</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The versioned model’s publication path.</p>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.metadata_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metadata_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.metadata_path" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the local or remote path to the artifact’s metadata.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The local or remote path to the artifact’s metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.name" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.path" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the local or remote path to the artifact.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The local or remote path to the artifact.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="mlops.model.versioned_model.VersionedModel.version">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#mlops.model.versioned_model.VersionedModel.version" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the artifact’s version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The artifact’s version.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -138,12 +171,12 @@ same version.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="mlops.model.versioned_model_builder.VersionedModelBuilder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mlops.model.versioned_model_builder.</span></span><span class="sig-name descname"><span class="pre">VersionedModelBuilder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">versioned_dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">keras.engine.training.Model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">training_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#mlops.model.training_config.TrainingConfig" title="mlops.model.training_config.TrainingConfig"><span class="pre">mlops.model.training_config.TrainingConfig</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mlops.model.versioned_model_builder.VersionedModelBuilder" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="mlops.artifact.html#mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder" title="mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder"><code class="xref py py-class docutils literal notranslate"><span class="pre">mlops.artifact.versioned_artifact_builder.VersionedArtifactBuilder</span></code></a></p>
 <p>An object containing all of the components that form a versioned
 model.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.model.versioned_model_builder.VersionedModelBuilder.publish">
-<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'model'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.model.versioned_model_builder.VersionedModelBuilder.publish" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'model'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#mlops.model.versioned_model_builder.VersionedModelBuilder.publish" title="Permalink to this definition"></a></dt>
 <dd><p>Saves the versioned model files to the given path. If the path and
 appended version already exists, this operation will raise a
 PublicationPathAlreadyExistsError.</p>
