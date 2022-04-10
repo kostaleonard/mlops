@@ -6,7 +6,6 @@ import json
 from tempfile import NamedTemporaryFile
 from s3fs import S3FileSystem
 from tensorflow.keras.models import load_model
-from mlops.republication import republication
 from mlops.artifact.versioned_artifact import VersionedArtifact
 
 
@@ -20,7 +19,7 @@ class VersionedModel(VersionedArtifact):
             store such as S3, from which the model should be loaded. An S3 path
             should be a URL of the form "s3://bucket-name/path/to/dir".
         """
-        self.path = path
+        self._path = path
         self._metadata_path = os.path.join(path, 'meta.json')
         if path.startswith('s3://'):
             fs = S3FileSystem()
@@ -43,10 +42,26 @@ class VersionedModel(VersionedArtifact):
                       'r',
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
-        self.name = metadata['name']
-        self.version = metadata['version']
-        self.md5 = metadata['hash']
+        self._name = metadata['name']
+        self._version = metadata['version']
+        self._md5 = metadata['hash']
         self.dataset_path = metadata['dataset']
+
+    @property
+    def name(self) -> str:
+        """Returns the artifact's name.
+
+        :return: The artifact's name.
+        """
+        return self._name
+
+    @property
+    def path(self) -> str:
+        """Returns the local or remote path to the artifact.
+
+        :return: The local or remote path to the artifact.
+        """
+        return self._path
 
     @property
     def metadata_path(self) -> str:
@@ -56,34 +71,18 @@ class VersionedModel(VersionedArtifact):
         """
         return self._metadata_path
 
-    def republish(self, path: str) -> str:
-        """Saves the versioned model files to the given path. If the path and
-        appended version already exists, this operation will raise a
-        PublicationPathAlreadyExistsError.
+    @property
+    def version(self) -> str:
+        """Returns the artifact's version.
 
-        :param path: The path, either on the local filesystem or in a cloud
-            store such as S3, to which the model should be saved. The version
-            will be appended to this path as a subdirectory. An S3 path
-            should be a URL of the form "s3://bucket-name/path/to/dir". It is
-            recommended to use this same path to publish all models, since it
-            will prevent the user from creating two different models with the
-            same version.
-        :return: The versioned model's publication path.
+        :return: The artifact's version.
         """
-        return republication.republish(self.path, path, self.version)
+        return self._version
 
-    def __eq__(self, other: 'VersionedModel') -> bool:
-        """Returns True if the two objects have the same loaded MD5 hash code,
-        False otherwise.
+    @property
+    def md5(self) -> str:
+        """Returns the artifact's MD5 hash.
 
-        :param other: The model with which to compare this object.
-        :return: True if the object MD5 hashes match.
+        :return: The artifact's MD5 hash.
         """
-        return self.md5 == other.md5
-
-    def __hash__(self) -> int:
-        """Returns this object's hashcode based on the loaded MD5 hashcode.
-
-        :return: The object's hashcode based on the loaded MD5 hashcode.
-        """
-        return hash(self.md5)
+        return self._md5

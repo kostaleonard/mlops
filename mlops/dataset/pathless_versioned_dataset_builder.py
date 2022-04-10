@@ -1,6 +1,6 @@
 """Contains the PathlessVersionedDatasetBuilder class."""
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 import numpy as np
 from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
     STRATEGY_LINK
@@ -27,10 +27,12 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
 
     def publish(self,
                 path: str,
+                *args: Any,
                 name: str = 'dataset',
                 version: Optional[str] = None,
                 dataset_copy_strategy: str = STRATEGY_LINK,
-                tags: Optional[List[str]] = None) -> str:
+                tags: Optional[List[str]] = None,
+                **kwargs: Any) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
