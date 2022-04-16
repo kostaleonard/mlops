@@ -2,11 +2,15 @@
 
 import pytest
 import numpy as np
-from mlops.examples.image.classification.\
-    pokemon_classification_data_processor \
-    import PokemonClassificationDataProcessor, \
-    DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
-    HEIGHT, WIDTH, CHANNELS, CLASSES
+from mlops.examples.image.classification.pokemon_classification_data_processor import (
+    PokemonClassificationDataProcessor,
+    DEFAULT_DATASET_TRAINVALTEST_PATH,
+    DEFAULT_DATASET_PRED_PATH,
+    HEIGHT,
+    WIDTH,
+    CHANNELS,
+    CLASSES,
+)
 from mlops.examples.image.classification.errors import LabelsNotFoundError
 
 EXPECTED_NUM_TRAINVALTEST = 10
@@ -16,9 +20,9 @@ EXPECTED_NUM_PRED = 3
 PIXEL_MIN = 0
 PIXEL_MAX = 255
 BULBASAUR_IMG_MEAN = 0.06437409
-BULBASAUR_LABEL = {'Grass', 'Poison'}
+BULBASAUR_LABEL = {"Grass", "Poison"}
 CHARIZARD_IMG_MEAN = 0.17114125
-CHARIZARD_LABEL = {'Fire', 'Flying'}
+CHARIZARD_LABEL = {"Fire", "Flying"}
 
 
 def test_get_raw_features_and_labels_returns_expected_keys() -> None:
@@ -26,9 +30,10 @@ def test_get_raw_features_and_labels_returns_expected_keys() -> None:
     train/val/test dataset."""
     processor = PokemonClassificationDataProcessor()
     features, labels = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    assert set(features.keys()) == {'X_train', 'X_val', 'X_test'}
-    assert set(labels.keys()) == {'y_train', 'y_val', 'y_test'}
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
+    assert set(features.keys()) == {"X_train", "X_val", "X_test"}
+    assert set(labels.keys()) == {"y_train", "y_val", "y_test"}
 
 
 def test_get_raw_features_and_labels_pred_raises_error() -> None:
@@ -44,16 +49,19 @@ def test_get_raw_features_and_labels_trainvaltest_correct_split() -> None:
     sizes."""
     processor = PokemonClassificationDataProcessor()
     features, labels = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     num_examples = sum(map(len, features.values()))
     assert num_examples == EXPECTED_NUM_TRAINVALTEST
-    assert len(features['X_train']) == EXPECTED_NUM_TRAIN
-    assert len(features['X_val']) == EXPECTED_NUM_VAL
-    assert len(features['X_test']) == EXPECTED_NUM_TRAINVALTEST - \
-           EXPECTED_NUM_TRAIN - EXPECTED_NUM_VAL
-    assert len(features['X_train']) == len(labels['y_train'])
-    assert len(features['X_val']) == len(labels['y_val'])
-    assert len(features['X_test']) == len(labels['y_test'])
+    assert len(features["X_train"]) == EXPECTED_NUM_TRAIN
+    assert len(features["X_val"]) == EXPECTED_NUM_VAL
+    assert (
+        len(features["X_test"])
+        == EXPECTED_NUM_TRAINVALTEST - EXPECTED_NUM_TRAIN - EXPECTED_NUM_VAL
+    )
+    assert len(features["X_train"]) == len(labels["y_train"])
+    assert len(features["X_val"]) == len(labels["y_val"])
+    assert len(features["X_test"]) == len(labels["y_test"])
 
 
 def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
@@ -62,7 +70,7 @@ def test_get_raw_features_trainvaltest_returns_expected_keys() -> None:
     """
     processor = PokemonClassificationDataProcessor()
     raw = processor.get_raw_features(DEFAULT_DATASET_TRAINVALTEST_PATH)
-    assert set(raw.keys()) == {'X_train', 'X_val', 'X_test'}
+    assert set(raw.keys()) == {"X_train", "X_val", "X_test"}
 
 
 def test_get_raw_features_match() -> None:
@@ -71,15 +79,21 @@ def test_get_raw_features_match() -> None:
     # pylint: disable=invalid-name
     processor = PokemonClassificationDataProcessor()
     features, _ = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    X_all = np.concatenate((features['X_train'],
-                            features['X_val'],
-                            features['X_test']))
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
+    X_all = np.concatenate(
+        (features["X_train"], features["X_val"], features["X_test"])
+    )
     features_only = processor.get_raw_features(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    X_all_only = np.concatenate((features_only['X_train'],
-                                 features_only['X_val'],
-                                 features_only['X_test']))
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
+    X_all_only = np.concatenate(
+        (
+            features_only["X_train"],
+            features_only["X_val"],
+            features_only["X_test"],
+        )
+    )
     X_all.sort(axis=0)
     X_all_only.sort(axis=0)
     assert np.array_equal(X_all, X_all_only)
@@ -91,7 +105,7 @@ def test_get_raw_features_pred_returns_expected_keys() -> None:
     """
     processor = PokemonClassificationDataProcessor()
     raw = processor.get_raw_features(DEFAULT_DATASET_PRED_PATH)
-    assert set(raw.keys()) == {'X_pred'}
+    assert set(raw.keys()) == {"X_pred"}
 
 
 def test_get_raw_features_correct_shape() -> None:
@@ -141,17 +155,19 @@ def test_get_raw_labels_trainvaltest_lengths_match_features() -> None:
     of examples as their counterpart features."""
     processor = PokemonClassificationDataProcessor()
     raw_features, raw_labels = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    assert len(raw_features['X_train']) == len(raw_labels['y_train'])
-    assert len(raw_features['X_val']) == len(raw_labels['y_val'])
-    assert len(raw_features['X_test']) == len(raw_labels['y_test'])
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
+    assert len(raw_features["X_train"]) == len(raw_labels["y_train"])
+    assert len(raw_features["X_val"]) == len(raw_labels["y_val"])
+    assert len(raw_features["X_test"]) == len(raw_labels["y_test"])
 
 
 def test_get_raw_labels_correct_tensor_shapes() -> None:
     """Tests that labels are of the correct shape."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         assert tensor.shape[1:] == (2,)
 
@@ -160,7 +176,8 @@ def test_get_raw_labels_correct_dtype() -> None:
     """Tests that labels are of type object (string)."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         assert tensor.dtype == object
 
@@ -169,7 +186,8 @@ def test_get_raw_labels_valid_classes() -> None:
     """Tests that all raw label classes are valid Pokemon types."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         for row in tensor:
             assert row[0] in CLASSES
@@ -218,7 +236,8 @@ def test_preprocess_labels_correct_shape() -> None:
     """Tests that the preprocessed labels have the correct shape."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         assert preprocessed.shape == (len(tensor), len(CLASSES))
@@ -228,7 +247,8 @@ def test_preprocess_labels_correct_dtype() -> None:
     """Tests that the preprocessed labels are of dtype float32."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         assert preprocessed.dtype == np.float32
@@ -238,7 +258,8 @@ def test_preprocess_labels_no_na() -> None:
     """Tests that the preprocessed labels have no missing values."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         assert not np.isnan(preprocessed).any()
@@ -248,7 +269,8 @@ def test_preprocess_labels_binary() -> None:
     """Tests that the preprocessed labels have values in the set {0, 1}."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         assert set(np.unique(preprocessed)) == {0, 1}
@@ -259,7 +281,8 @@ def test_preprocess_labels_min_one_max_two_classes() -> None:
     ones indicating the class(es)."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         row_sums = preprocessed.sum(axis=1)
@@ -282,7 +305,8 @@ def test_unpreprocess_labels_inverts_transformation() -> None:
     labels."""
     processor = PokemonClassificationDataProcessor()
     _, raw = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
     for tensor in raw.values():
         preprocessed = processor.preprocess_labels(tensor)
         unpreprocessed = processor.unpreprocess_labels(preprocessed)
@@ -296,13 +320,14 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
     # pylint: disable=invalid-name
     processor = PokemonClassificationDataProcessor()
     features, labels = processor.get_raw_features_and_labels(
-        DEFAULT_DATASET_TRAINVALTEST_PATH)
-    X_all = np.concatenate((features['X_train'],
-                            features['X_val'],
-                            features['X_test']))
-    y_all = np.concatenate((labels['y_train'],
-                            labels['y_val'],
-                            labels['y_test']))
+        DEFAULT_DATASET_TRAINVALTEST_PATH
+    )
+    X_all = np.concatenate(
+        (features["X_train"], features["X_val"], features["X_test"])
+    )
+    y_all = np.concatenate(
+        (labels["y_train"], labels["y_val"], labels["y_test"])
+    )
     bulbasaur_idx = None
     for idx, arr in enumerate(X_all):
         if np.isclose(arr.mean(), BULBASAUR_IMG_MEAN):
@@ -320,8 +345,7 @@ def test_get_raw_features_and_labels_examples_in_same_order() -> None:
 def test_get_valid_prediction_correct_shape() -> None:
     """Tests that the output of get_valid_prediction is of the same shape as
     the input."""
-    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
-                         [0.3, 0.4, 0.1, 0.1]])
+    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6], [0.3, 0.4, 0.1, 0.1]])
     valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
     assert pred_arr.shape == valid.shape
 
@@ -329,32 +353,34 @@ def test_get_valid_prediction_correct_shape() -> None:
 def test_get_valid_prediction_output_is_binary() -> None:
     """Tests that the output of get_valid_prediction on arbitrary input is
     binary."""
-    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
-                         [0.3, 0.4, 0.1, 0.1],
-                         [-1, 5, 2, 0.5]])
+    pred_arr = np.array(
+        [[0.8, 0.4, 0.2, 0.6], [0.3, 0.4, 0.1, 0.1], [-1, 5, 2, 0.5]]
+    )
     valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
     assert set(np.unique(valid)) == {0, 1}
 
 
 def test_get_valid_prediction_chooses_highest() -> None:
     """Tests that get_valid_prediction chooses the highest scores as output."""
-    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
-                         [0.3, 0.4, 0.1, 0.1],
-                         [0.9, 0.9, 0.8, 0.8]])
+    pred_arr = np.array(
+        [[0.8, 0.4, 0.2, 0.6], [0.3, 0.4, 0.1, 0.1], [0.9, 0.9, 0.8, 0.8]]
+    )
     valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
-    assert valid.tolist() == [[1, 0, 0, 1],
-                              [0, 1, 0, 0],
-                              [1, 1, 0, 0]]
+    assert valid.tolist() == [[1, 0, 0, 1], [0, 1, 0, 0], [1, 1, 0, 0]]
 
 
 def test_get_valid_prediction_one_or_two_classes() -> None:
     """Tests that get_valid_prediction returns predictions with one or two
     classes."""
-    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
-                         [0.3, 0.4, 0.1, 0.1],
-                         [0.9, 0.9, 0.9, 0.9],
-                         [0.1, 0.1, 0.1, 0.1],
-                         [2.0, 2.0, 2.0, 2.0]])
+    pred_arr = np.array(
+        [
+            [0.8, 0.4, 0.2, 0.6],
+            [0.3, 0.4, 0.1, 0.1],
+            [0.9, 0.9, 0.9, 0.9],
+            [0.1, 0.1, 0.1, 0.1],
+            [2.0, 2.0, 2.0, 2.0],
+        ]
+    )
     valid = PokemonClassificationDataProcessor.get_valid_prediction(pred_arr)
     row_sums = valid.sum(axis=1)
     assert set(row_sums) == {1, 2}
@@ -363,16 +389,14 @@ def test_get_valid_prediction_one_or_two_classes() -> None:
 def test_get_valid_prediction_threshold_only_affects_second_highest() -> None:
     """Tests that the decision threshold only affects the second highest
     prediction value."""
-    pred_arr = np.array([[0.8, 0.4, 0.2, 0.6],
-                         [0.3, 0.4, 0.1, 0.1],
-                         [0.9, 0.8, 0.7, 0.7]])
+    pred_arr = np.array(
+        [[0.8, 0.4, 0.2, 0.6], [0.3, 0.4, 0.1, 0.1], [0.9, 0.8, 0.7, 0.7]]
+    )
     valid = PokemonClassificationDataProcessor.get_valid_prediction(
-        pred_arr, threshold=0.6)
-    assert valid.tolist() == [[1, 0, 0, 1],
-                              [0, 1, 0, 0],
-                              [1, 1, 0, 0]]
+        pred_arr, threshold=0.6
+    )
+    assert valid.tolist() == [[1, 0, 0, 1], [0, 1, 0, 0], [1, 1, 0, 0]]
     valid = PokemonClassificationDataProcessor.get_valid_prediction(
-        pred_arr, threshold=0.99)
-    assert valid.tolist() == [[1, 0, 0, 0],
-                              [0, 1, 0, 0],
-                              [1, 0, 0, 0]]
+        pred_arr, threshold=0.99
+    )
+    assert valid.tolist() == [[1, 0, 0, 0], [0, 1, 0, 0], [1, 0, 0, 0]]

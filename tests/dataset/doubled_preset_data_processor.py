@@ -8,8 +8,9 @@ from tests.dataset.preset_data_processor import PresetDataProcessor
 class DoubledPresetDataProcessor(PresetDataProcessor):
     """Processes a preset dataset, with no file I/O; doubles tensor values."""
 
-    def get_raw_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    def get_raw_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns doubled preset raw feature and label tensors.
 
         :param dataset_path: Unused
@@ -18,13 +19,13 @@ class DoubledPresetDataProcessor(PresetDataProcessor):
         """
         # See #49 for why we can't use super().
         features, labels = PresetDataProcessor.get_raw_features_and_labels(
-            self, dataset_path)
+            self, dataset_path
+        )
         for name, tensor in features.items():
             features[name] = 2 * tensor
         return features, labels
 
-    def get_raw_features(self,
-                         dataset_path: str) -> Dict[str, np.ndarray]:
+    def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
         """Returns the preset raw features.
 
         :param dataset_path: Unused.

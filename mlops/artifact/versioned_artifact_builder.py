@@ -9,6 +9,7 @@ from mlops.errors import PublicationPathAlreadyExistsError
 
 class VersionedArtifactBuilder(ABC):
     """Represents a versioned artifact builder."""
+
     # pylint: disable=too-few-public-methods
 
     @abstractmethod
@@ -43,8 +44,9 @@ class VersionedArtifactBuilder(ABC):
             raise PublicationPathAlreadyExistsError from err
 
     @staticmethod
-    def _make_publication_path_s3(publication_path: str,
-                                  fs: S3FileSystem) -> None:
+    def _make_publication_path_s3(
+        publication_path: str, fs: S3FileSystem
+    ) -> None:
         """Creates the directories that compose the publication path.
 
         :param publication_path: The path to which to publish the artifact.

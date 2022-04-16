@@ -6,13 +6,15 @@ import shutil
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
 from mlops.dataset.versioned_dataset import VersionedDataset
-from mlops.examples.image.classification.publish_dataset import \
-    publish_dataset, DATASET_VERSION
+from mlops.examples.image.classification.publish_dataset import (
+    publish_dataset,
+    DATASET_VERSION,
+)
 from mlops.examples.image.classification import train_model
 
-TEST_DATASET_PUBLICATION_PATH_LOCAL = '/tmp/test_train_model/datasets'
-TEST_CHECKPOINT_PATH = '/tmp/test_train_model/models/checkpoints'
-TEST_MODEL_PUBLICATION_PATH_LOCAL = '/tmp/test_train_model/models/versioned'
+TEST_DATASET_PUBLICATION_PATH_LOCAL = "/tmp/test_train_model/datasets"
+TEST_CHECKPOINT_PATH = "/tmp/test_train_model/models/checkpoints"
+TEST_MODEL_PUBLICATION_PATH_LOCAL = "/tmp/test_train_model/models/versioned"
 
 
 def _create_dataset() -> None:
@@ -29,7 +31,8 @@ def test_get_baseline_model_correct_shapes() -> None:
     shapes."""
     _create_dataset()
     dataset = VersionedDataset(
-        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION)
+    )
     model = train_model.get_baseline_model(dataset)
     assert model.input_shape[1:] == dataset.X_train.shape[1:]
     assert model.output_shape[1:] == dataset.y_train.shape[1:]
@@ -43,18 +46,23 @@ def test_train_model_creates_checkpoints() -> None:
     except FileNotFoundError:
         pass
     dataset = VersionedDataset(
-        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
-    model = Sequential([
-        Flatten(input_shape=dataset.X_train.shape[1:]),
-        Dense(dataset.y_train.shape[1])])
-    model.compile('adam', loss='mse')
-    train_kwargs = {'epochs': 3, 'batch_size': 8}
-    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION)
+    )
+    model = Sequential(
+        [
+            Flatten(input_shape=dataset.X_train.shape[1:]),
+            Dense(dataset.y_train.shape[1]),
+        ]
+    )
+    model.compile("adam", loss="mse")
+    train_kwargs = {"epochs": 3, "batch_size": 8}
+    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, "model.h5")
     _ = train_model.train_model(
         model,
         dataset,
         model_checkpoint_filename=model_checkpoint_filename,
-        **train_kwargs)
+        **train_kwargs
+    )
     assert os.path.exists(model_checkpoint_filename)
 
 
@@ -63,18 +71,23 @@ def test_train_model_returns_correct_training_config() -> None:
     information."""
     _create_dataset()
     dataset = VersionedDataset(
-        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
-    model = Sequential([
-        Flatten(input_shape=dataset.X_train.shape[1:]),
-        Dense(dataset.y_train.shape[1])])
-    model.compile('adam', loss='mse')
-    train_kwargs = {'epochs': 3, 'batch_size': 8}
-    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION)
+    )
+    model = Sequential(
+        [
+            Flatten(input_shape=dataset.X_train.shape[1:]),
+            Dense(dataset.y_train.shape[1]),
+        ]
+    )
+    model.compile("adam", loss="mse")
+    train_kwargs = {"epochs": 3, "batch_size": 8}
+    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, "model.h5")
     training_config = train_model.train_model(
         model,
         dataset,
         model_checkpoint_filename=model_checkpoint_filename,
-        **train_kwargs)
+        **train_kwargs
+    )
     assert training_config.history == model.history
     assert training_config.train_args == train_kwargs
 
@@ -87,22 +100,25 @@ def test_publish_model_creates_files() -> None:
     except FileNotFoundError:
         pass
     dataset = VersionedDataset(
-        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
-    model = Sequential([
-        Flatten(input_shape=dataset.X_train.shape[1:]),
-        Dense(dataset.y_train.shape[1])])
-    model.compile('adam', loss='mse')
-    train_kwargs = {'epochs': 3, 'batch_size': 8}
-    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, 'model.h5')
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION)
+    )
+    model = Sequential(
+        [
+            Flatten(input_shape=dataset.X_train.shape[1:]),
+            Dense(dataset.y_train.shape[1]),
+        ]
+    )
+    model.compile("adam", loss="mse")
+    train_kwargs = {"epochs": 3, "batch_size": 8}
+    model_checkpoint_filename = os.path.join(TEST_CHECKPOINT_PATH, "model.h5")
     training_config = train_model.train_model(
         model,
         dataset,
         model_checkpoint_filename=model_checkpoint_filename,
-        **train_kwargs)
+        **train_kwargs
+    )
     train_model.publish_model(
-        model,
-        dataset,
-        training_config,
-        TEST_MODEL_PUBLICATION_PATH_LOCAL)
+        model, dataset, training_config, TEST_MODEL_PUBLICATION_PATH_LOCAL
+    )
     assert os.path.exists(TEST_MODEL_PUBLICATION_PATH_LOCAL)
     assert len(os.listdir(TEST_MODEL_PUBLICATION_PATH_LOCAL)) == 1

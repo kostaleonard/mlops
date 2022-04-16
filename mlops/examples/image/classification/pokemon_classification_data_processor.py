@@ -8,16 +8,34 @@ from matplotlib.image import imread
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
 from mlops.examples.image.classification.errors import LabelsNotFoundError
 
-DEFAULT_DATASET_TRAINVALTEST_PATH = os.path.join('sample_data', 'pokemon',
-                                                 'trainvaltest')
-DEFAULT_DATASET_PRED_PATH = os.path.join('sample_data', 'pokemon', 'pred')
-IMAGES_DIRNAME = 'images'
-LABELS_FILENAME = 'pokemon.csv'
+DEFAULT_DATASET_TRAINVALTEST_PATH = os.path.join(
+    "sample_data", "pokemon", "trainvaltest"
+)
+DEFAULT_DATASET_PRED_PATH = os.path.join("sample_data", "pokemon", "pred")
+IMAGES_DIRNAME = "images"
+LABELS_FILENAME = "pokemon.csv"
 TRAIN_SPLIT = 0.7
 VAL_SPLIT = 0.2
-CLASSES = ['Normal', 'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Fighting',
-           'Poison', 'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost',
-           'Dark', 'Dragon', 'Steel', 'Fairy']
+CLASSES = [
+    "Normal",
+    "Fire",
+    "Water",
+    "Grass",
+    "Electric",
+    "Ice",
+    "Fighting",
+    "Poison",
+    "Ground",
+    "Flying",
+    "Psychic",
+    "Bug",
+    "Rock",
+    "Ghost",
+    "Dark",
+    "Dragon",
+    "Steel",
+    "Fairy",
+]
 HEIGHT = 120
 WIDTH = 120
 CHANNELS = 3
@@ -28,8 +46,9 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
     """Transforms the pokemon dataset at sample_data/pokemon into features and
     labels for classification."""
 
-    def get_raw_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    def get_raw_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the raw feature and label tensors from the dataset path.
         This method is specifically used for the train/val/test sets and not
         input data for prediction, because in some cases the features and
@@ -58,9 +77,9 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         y = []
         for _, row in df.iterrows():
             name, type1, type2 = row
-            full_path = os.path.join(dataset_path,
-                                     IMAGES_DIRNAME,
-                                     f'{name}.png')
+            full_path = os.path.join(
+                dataset_path, IMAGES_DIRNAME, f"{name}.png"
+            )
             try:
                 # Discard alpha channel.
                 tensor = imread(full_path)[:, :, :3]
@@ -80,12 +99,14 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         num_val = int(len(X) * VAL_SPLIT)
         X_train = X[:num_train]
         y_train = y[:num_train]
-        X_val = X[num_train:num_train + num_val]
-        y_val = y[num_train:num_train + num_val]
-        X_test = X[num_train + num_val:]
-        y_test = y[num_train + num_val:]
-        return ({'X_train': X_train, 'X_val': X_val, 'X_test': X_test},
-                {'y_train': y_train, 'y_val': y_val, 'y_test': y_test})
+        X_val = X[num_train : num_train + num_val]
+        y_val = y[num_train : num_train + num_val]
+        X_test = X[num_train + num_val :]
+        y_test = y[num_train + num_val :]
+        return (
+            {"X_train": X_train, "X_val": X_val, "X_test": X_test},
+            {"y_train": y_train, "y_val": y_val, "y_test": y_test},
+        )
 
     def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
         """Returns the raw feature tensors from the prediction dataset path.
@@ -111,18 +132,19 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
             X.append(tensor)
         X = np.array(X)
         features = {}
-        if dataset_path.rstrip('/').endswith('trainvaltest'):
+        if dataset_path.rstrip("/").endswith("trainvaltest"):
             num_train = int(len(X) * TRAIN_SPLIT)
             num_val = int(len(X) * VAL_SPLIT)
-            features['X_train'] = X[:num_train]
-            features['X_val'] = X[num_train:num_train + num_val]
-            features['X_test'] = X[num_train + num_val:]
+            features["X_train"] = X[:num_train]
+            features["X_val"] = X[num_train : num_train + num_val]
+            features["X_test"] = X[num_train + num_val :]
         else:
-            features['X_pred'] = X
+            features["X_pred"] = X
         return features
 
     def preprocess_features(
-            self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+        self, raw_feature_tensor: np.ndarray
+    ) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor. The
         preprocessed features are how training/validation/test as well as
         prediction data are fed into downstream models. The preprocessed
@@ -153,7 +175,8 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         preprocessed = []
         for label_strs in raw_label_tensor:
             label_arr = PokemonClassificationDataProcessor._get_label_arr(
-                *label_strs)
+                *label_strs
+            )
             preprocessed.append(label_arr)
         return np.array(preprocessed)
 
@@ -179,7 +202,8 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         unpreprocessed = []
         for label_arr in label_tensor:
             type_strs = PokemonClassificationDataProcessor._get_label_strs(
-                label_arr)
+                label_arr
+            )
             unpreprocessed.append(type_strs)
         return np.array(unpreprocessed)
 
@@ -218,8 +242,9 @@ class PokemonClassificationDataProcessor(InvertibleDataProcessor):
         return np.array(type_strs)
 
     @staticmethod
-    def get_valid_prediction(pred_arr: np.ndarray,
-                             threshold: float = THRESHOLD) -> np.ndarray:
+    def get_valid_prediction(
+        pred_arr: np.ndarray, threshold: float = THRESHOLD
+    ) -> np.ndarray:
         """Returns a valid binary prediction from the raw prediction tensor. A
         valid prediction has one or two 1s, and all other entries are 0. The
         highest value in the prediction array is automatically converted to a

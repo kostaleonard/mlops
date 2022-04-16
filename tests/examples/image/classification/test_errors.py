@@ -1,7 +1,9 @@
 """Tests errors.py."""
 
-from mlops.examples.image.classification.errors import LabelsNotFoundError, \
-    NoModelPathsSuppliedError
+from mlops.examples.image.classification.errors import (
+    LabelsNotFoundError,
+    NoModelPathsSuppliedError,
+)
 
 
 def test_labels_not_found_error_extends_file_not_found_error() -> None:

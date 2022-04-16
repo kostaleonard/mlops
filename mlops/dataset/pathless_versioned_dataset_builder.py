@@ -2,21 +2,24 @@
 
 from typing import List, Optional, Dict, Any
 import numpy as np
-from mlops.dataset.versioned_dataset_builder import VersionedDatasetBuilder, \
-    STRATEGY_LINK
+from mlops.dataset.versioned_dataset_builder import (
+    VersionedDatasetBuilder,
+    STRATEGY_LINK,
+)
 from mlops.dataset.pathless_data_processor import PathlessDataProcessor
 from mlops.errors import InvalidDatasetCopyStrategyError
 
-DATASET_PATH_DNE = 'pathless'
+DATASET_PATH_DNE = "pathless"
 
 
 class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
     """Builds a versioned dataset directly from feature and label tensors."""
+
     # pylint: disable=too-few-public-methods
 
-    def __init__(self,
-                 features: Dict[str, np.ndarray],
-                 labels: Dict[str, np.ndarray]) -> None:
+    def __init__(
+        self, features: Dict[str, np.ndarray], labels: Dict[str, np.ndarray]
+    ) -> None:
         """Instantiates the object.
 
         :param features: The training features.
@@ -25,14 +28,16 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
         processor = PathlessDataProcessor(features, labels)
         super().__init__(DATASET_PATH_DNE, processor)
 
-    def publish(self,
-                path: str,
-                *args: Any,
-                name: str = 'dataset',
-                version: Optional[str] = None,
-                dataset_copy_strategy: str = STRATEGY_LINK,
-                tags: Optional[List[str]] = None,
-                **kwargs: Any) -> str:
+    def publish(
+        self,
+        path: str,
+        *args: Any,
+        name: str = "dataset",
+        version: Optional[str] = None,
+        dataset_copy_strategy: str = STRATEGY_LINK,
+        tags: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> str:
         """Saves the versioned dataset files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -83,10 +88,12 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
         # pylint: disable=too-many-arguments
         if dataset_copy_strategy != STRATEGY_LINK:
             raise InvalidDatasetCopyStrategyError(
-                'PathlessVersionedDatasetBuilder must use the link strategy.')
+                "PathlessVersionedDatasetBuilder must use the link strategy."
+            )
         return super().publish(
             path,
             name=name,
             version=version,
             dataset_copy_strategy=STRATEGY_LINK,
-            tags=tags)
+            tags=tags,
+        )

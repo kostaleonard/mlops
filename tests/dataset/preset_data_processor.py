@@ -6,18 +6,20 @@ import numpy as np
 from tensorflow.keras.utils import to_categorical
 from mlops.dataset.invertible_data_processor import InvertibleDataProcessor
 
-PRESET_RAW_FEATURES = np.array([
-    [10, 20, 30, 40],
-    [0, 20, 40, 50],
-    [10, 20, 20, 60],
-    [20, 20, 50, 70],
-    [10, 20, 10, 80],
-    [10, 20, 60, 90],
-    [10, 20, 0, 100],
-    [30, 20, 70, 110],
-    [10, 20, -10, 120],
-    [-10, 20, 30, 130]
-])
+PRESET_RAW_FEATURES = np.array(
+    [
+        [10, 20, 30, 40],
+        [0, 20, 40, 50],
+        [10, 20, 20, 60],
+        [20, 20, 50, 70],
+        [10, 20, 10, 80],
+        [10, 20, 60, 90],
+        [10, 20, 0, 100],
+        [30, 20, 70, 110],
+        [10, 20, -10, 120],
+        [-10, 20, 30, 130],
+    ]
+)
 PRESET_RAW_LABELS = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2, 0])
 TRAIN_END = int(len(PRESET_RAW_FEATURES) * 0.7)
 VAL_EMD = TRAIN_END + int(len(PRESET_RAW_FEATURES) * 0.2)
@@ -27,21 +29,23 @@ SCALING_FACTOR = 10
 class PresetDataProcessor(InvertibleDataProcessor):
     """Processes a preset dataset, with no file I/O."""
 
-    def get_raw_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    def get_raw_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns preset raw feature and label tensors.
 
         :param dataset_path: Unused
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
-        labels = {'y_train': PRESET_RAW_LABELS[:TRAIN_END],
-                  'y_val': PRESET_RAW_LABELS[TRAIN_END:VAL_EMD],
-                  'y_test': PRESET_RAW_LABELS[VAL_EMD:]}
+        labels = {
+            "y_train": PRESET_RAW_LABELS[:TRAIN_END],
+            "y_val": PRESET_RAW_LABELS[TRAIN_END:VAL_EMD],
+            "y_test": PRESET_RAW_LABELS[VAL_EMD:],
+        }
         return self.get_raw_features(dataset_path), labels
 
-    def get_raw_features(self,
-                         dataset_path: str) -> Dict[str, np.ndarray]:
+    def get_raw_features(self, dataset_path: str) -> Dict[str, np.ndarray]:
         """Returns the preset raw features.
 
         :param dataset_path: Unused.
@@ -50,12 +54,15 @@ class PresetDataProcessor(InvertibleDataProcessor):
             'X_val': The validation features. 20% of the dataset.
             'X_test': The test features. 10% of the dataset.
         """
-        return {'X_train': PRESET_RAW_FEATURES[:TRAIN_END],
-                'X_val': PRESET_RAW_FEATURES[TRAIN_END:VAL_EMD],
-                'X_test': PRESET_RAW_FEATURES[VAL_EMD:]}
+        return {
+            "X_train": PRESET_RAW_FEATURES[:TRAIN_END],
+            "X_val": PRESET_RAW_FEATURES[TRAIN_END:VAL_EMD],
+            "X_test": PRESET_RAW_FEATURES[VAL_EMD:],
+        }
 
     def preprocess_features(
-            self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+        self, raw_feature_tensor: np.ndarray
+    ) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor.
 
         :param raw_feature_tensor: The raw features to be preprocessed.
