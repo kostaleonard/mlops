@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>mlops.examples.image.classification package &mdash; mlops v0.1.6 documentation</title>
+  <title>mlops.examples.image.classification package &mdash; mlops v0.1.7 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -143,8 +143,8 @@ dataset.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="mlops.examples.image.classification.model_prediction.model_predict">
 <span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.model_prediction.</span></span><span class="sig-name descname"><span class="pre">model_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.dataset.html#mlops.dataset.versioned_dataset.VersionedDataset" title="mlops.dataset.versioned_dataset.VersionedDataset"><span class="pre">mlops.dataset.versioned_dataset.VersionedDataset</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="mlops.model.html#mlops.model.versioned_model.VersionedModel" title="mlops.model.versioned_model.VersionedModel"><span class="pre">mlops.model.versioned_model.VersionedModel</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.model_prediction.model_predict" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the model’s unpreprocessed predictions on the data located at the
-given path.</p>
+<dd><p>Returns the model’s unpreprocessed predictions on the data located at
+the given path.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -173,12 +173,12 @@ labels for classification.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features">
 <span class="sig-name descname"><span class="pre">get_raw_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the raw feature tensors from the prediction dataset path. Raw
-features are tensors of shape m x h x w x c, where m is the number of
-images, h is the image height, w is the image width, and c is the number
-of channels (3 for RGB), with all values in the interval [0, 1]. The
-features are already scaled because PNG images load into float32 instead
-of uint8.</p>
+<dd><p>Returns the raw feature tensors from the prediction dataset path.
+Raw features are tensors of shape m x h x w x c, where m is the number
+of images, h is the image height, w is the image width, and c is the
+number of channels (3 for RGB), with all values in the interval [0, 1].
+The features are already scaled because PNG images load into float32
+instead of uint8.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dataset_path</strong> – The path to the file or directory on the local or
@@ -187,9 +187,9 @@ remote filesystem containing the dataset.</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A dictionary whose values are feature tensors and whose
 corresponding keys are the names by which those tensors should be
-referenced. The returned keys will be {‘X_train’, ‘X_val’, ‘X_test’}
-if the directory indicated by dataset_path ends with ‘trainvaltest’,
-and {‘X_pred’} otherwise.</p>
+referenced. The returned keys will be {‘X_train’, ‘X_val’,
+‘X_test’} if the directory indicated by dataset_path ends with
+‘trainvaltest’, and {‘X_pred’} otherwise.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -197,11 +197,11 @@ and {‘X_pred’} otherwise.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features_and_labels">
 <span class="sig-name descname"><span class="pre">get_raw_features_and_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_raw_features_and_labels" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the raw feature and label tensors from the dataset path. This
-method is specifically used for the train/val/test sets and not input
-data for prediction, because in some cases the features and labels need
-to be read simultaneously to ensure proper ordering of features and
-labels.</p>
+<dd><p>Returns the raw feature and label tensors from the dataset path.
+This method is specifically used for the train/val/test sets and not
+input data for prediction, because in some cases the features and
+labels need to be read simultaneously to ensure proper ordering of
+features and labels.</p>
 <p>Raw features are tensors of shape m x h x w x c, where m is the number
 of images, h is the image height, w is the image width, and c is the
 number of channels (3 for RGB), with all values in the interval
@@ -226,9 +226,9 @@ with matching keys and ordered tensors.</p>
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_valid_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pred_arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.get_valid_prediction" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a valid binary prediction from the raw prediction tensor. A
 valid prediction has one or two 1s, and all other entries are 0. The
-highest value in the prediction array is automatically converted to a 1,
-and the second-highest is converted to a 1 if the value is higher than
-the given decision threshold.</p>
+highest value in the prediction array is automatically converted to a
+1, and the second-highest is converted to a 1 if the value is higher
+than the given decision threshold.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -243,8 +243,9 @@ converted to a 1 (Pokemon have at least 1 type).</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The valid binary predictions; a tensor of shape m x k, where m
-is the number of example and k is the number of classes. All entries
-are in the set {0, 1}, and in each example there are 1 or 2 ones.</p>
+is the number of example and k is the number of classes. All
+entries are in the set {0, 1}, and in each example there are 1 or 2
+ones.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -254,10 +255,10 @@ are in the set {0, 1}, and in each example there are 1 or 2 ones.</p>
 <span class="sig-name descname"><span class="pre">preprocess_features</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_feature_tensor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.pokemon_classification_data_processor.PokemonClassificationDataProcessor.preprocess_features" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the preprocessed feature tensor from the raw tensor. The
 preprocessed features are how training/validation/test as well as
-prediction data are fed into downstream models. The preprocessed tensors
-are of shape m x h x w x c, where m is the number of images, h is the
-image height, w is the image width, and c is the number of channels
-(3 for RGB), with all values in the interval [0, 1].</p>
+prediction data are fed into downstream models. The preprocessed
+tensors are of shape m x h x w x c, where m is the number of images, h
+is the image height, w is the image width, and c is the number of
+channels (3 for RGB), with all values in the interval [0, 1].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>raw_feature_tensor</strong> – The raw features to be preprocessed.</p>
@@ -327,8 +328,8 @@ transform model outputs into real-world values.</p>
 </section>
 <section id="module-mlops.examples.image.classification.publish_dataset">
 <span id="mlops-examples-image-classification-publish-dataset-module"></span><h2>mlops.examples.image.classification.publish_dataset module<a class="headerlink" href="#module-mlops.examples.image.classification.publish_dataset" title="Permalink to this headline"></a></h2>
-<p>Publishes a new dataset to the local or remote filesystem. This script should
-be run any time the data processor changes.</p>
+<p>Publishes a new dataset to the local or remote filesystem. This script
+should be run any time the data processor changes.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="mlops.examples.image.classification.publish_dataset.main">
 <span class="sig-prename descclassname"><span class="pre">mlops.examples.image.classification.publish_dataset.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#mlops.examples.image.classification.publish_dataset.main" title="Permalink to this definition"></a></dt>
@@ -341,8 +342,8 @@ be run any time the data processor changes.</p>
 <dd><p>Builds and publishes the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>publication_path</strong> – The path on the local or remote filesystem to which
-to publish the dataset.</p>
+<dd class="field-odd"><p><strong>publication_path</strong> – The path on the local or remote filesystem to
+which to publish the dataset.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The versioned dataset’s publication path.</p>
