@@ -26,7 +26,7 @@ from tests.examples.image.classification.test_train_model import (
 )
 
 TEST_MODEL_PUBLICATION_PATH_LOCAL = (
-    "/tmp/test_model_prediction/models/" "versioned"
+    "/tmp/test_model_prediction/models/versioned"
 )
 EXPECTED_PRED_SHAPE = (3, 2)
 FAKE_TRAIN_HISTORIES = [

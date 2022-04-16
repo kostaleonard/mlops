@@ -30,7 +30,7 @@ PRESET_RAW_FEATURES = np.array(
 )
 PRESET_RAW_LABELS = np.array([0, 1, 2, 0, 1, 2, 0, 1, 2, 0])
 TEST_PUBLICATION_PATH_LOCAL = (
-    "/tmp/test_pathless_versioned_dataset_builder/" "datasets"
+    "/tmp/test_pathless_versioned_dataset_builder/datasets"
 )
 
 

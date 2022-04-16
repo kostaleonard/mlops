@@ -30,10 +30,10 @@ from tests.dataset.doubled_preset_data_processor import (
 TEST_DATASET_PATH_LOCAL = "/tmp/test_versioned_dataset_builder/raw_dataset"
 TEST_PUBLICATION_PATH_LOCAL = "/tmp/test_versioned_dataset_builder/datasets"
 TEST_DATASET_PATH_S3 = (
-    "s3://kosta-mlops/test_versioned_dataset_builder/" "raw_dataset"
+    "s3://kosta-mlops/test_versioned_dataset_builder/raw_dataset"
 )
 TEST_PUBLICATION_PATH_S3 = (
-    "s3://kosta-mlops/test_versioned_dataset_builder/" "datasets"
+    "s3://kosta-mlops/test_versioned_dataset_builder/datasets"
 )
 TEST_DATASET_FILENAMES = [
     "file0.txt",

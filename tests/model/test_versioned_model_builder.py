@@ -19,7 +19,7 @@ from mlops.errors import PublicationPathAlreadyExistsError
 
 TEST_MODEL_PUBLICATION_PATH_LOCAL = "/tmp/test_versioned_model_builder/model"
 TEST_MODEL_PUBLICATION_PATH_S3 = (
-    "s3://kosta-mlops/" "test_versioned_model_builder/model"
+    "s3://kosta-mlops/test_versioned_model_builder/model"
 )
 
 
