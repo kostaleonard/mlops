@@ -97,8 +97,8 @@ def test_versioned_models_from_same_files_are_equal(
         dataset: VersionedDataset,
         model: Model,
         training_config: TrainingConfig) -> None:
-    """Tests that two versioned models loaded from the same files are considered
-    equal in comparisons.
+    """Tests that two versioned models loaded from the same files are
+    considered equal in comparisons.
 
     :param dataset: The versioned dataset.
     :param model: The model.
@@ -115,8 +115,8 @@ def test_hashcode_is_hash_of_md5_digest(
         dataset: VersionedDataset,
         model: Model,
         training_config: TrainingConfig) -> None:
-    """Tests that the hashcode of the model object is the hash of the loaded MD5
-    digest.
+    """Tests that the hashcode of the model object is the hash of the loaded
+    MD5 digest.
 
     :param dataset: The versioned dataset.
     :param model: The model.

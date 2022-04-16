@@ -52,7 +52,8 @@ def _publish_test_dataset_s3() -> None:
 
 def test_init_creates_expected_attributes_local() -> None:
     """Tests that init creates all feature/label tensors, the hash, and the
-    data processor as attributes when the dataset is on the local filesystem."""
+    data processor as attributes when the dataset is on the local
+    filesystem."""
     _publish_test_dataset_local()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH_LOCAL, 'v1'))
     for attribute in EXPECTED_ATTRIBUTES:

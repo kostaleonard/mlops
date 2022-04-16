@@ -330,8 +330,8 @@ def test_publish_includes_raw_dataset_link() -> None:
 
 @pytest.mark.mockedawstest
 def test_publish_includes_raw_dataset_link_s3(mocked_s3: None) -> None:
-    """Tests that publish to S3 includes a link to the raw dataset when the copy
-    strategy is STRATEGY_LINK.
+    """Tests that publish to S3 includes a link to the raw dataset when the
+    copy strategy is STRATEGY_LINK.
 
     :param mocked_s3: A mocked S3 bucket for testing.
     """

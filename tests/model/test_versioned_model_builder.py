@@ -53,7 +53,8 @@ def test_publish_appends_explicit_version(
     builder = VersionedModelBuilder(dataset, model, training_config)
     version = 'v2'
     builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
-    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    expected_filename = os.path.join(
+        TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
 
@@ -243,7 +244,8 @@ def test_publish_local_with_trailing_slash(
     version = 'v2'
     # One trailing slash.
     builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL + '/', version=version)
-    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    expected_filename = os.path.join(
+        TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)
     _remove_test_directories_local()
@@ -543,6 +545,7 @@ def test_publish_without_training_config(
     builder = VersionedModelBuilder(dataset, model)
     version = 'v2'
     builder.publish(TEST_MODEL_PUBLICATION_PATH_LOCAL, version=version)
-    expected_filename = os.path.join(TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
+    expected_filename = os.path.join(
+        TEST_MODEL_PUBLICATION_PATH_LOCAL, version)
     assert os.path.exists(expected_filename)
     assert os.path.isdir(expected_filename)

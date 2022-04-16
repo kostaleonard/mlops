@@ -6,13 +6,15 @@ import json
 import numpy as np
 from mlops.dataset.versioned_dataset import VersionedDataset
 from mlops.model.versioned_model import VersionedModel
-from mlops.examples.image.classification.pokemon_classification_data_processor \
+from mlops.examples.image.classification.\
+    pokemon_classification_data_processor \
     import PokemonClassificationDataProcessor, DEFAULT_DATASET_PRED_PATH
 from mlops.examples.image.classification.publish_dataset import \
     DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION
 from mlops.examples.image.classification.train_model import \
     MODEL_PUBLICATION_PATH_LOCAL
-from mlops.examples.image.classification.errors import NoModelPathsSuppliedError
+from mlops.examples.image.classification.errors import \
+    NoModelPathsSuppliedError
 
 
 def model_evaluate(dataset: VersionedDataset,
@@ -30,8 +32,8 @@ def model_evaluate(dataset: VersionedDataset,
 def model_predict(features: np.ndarray,
                   dataset: VersionedDataset,
                   model: VersionedModel) -> np.ndarray:
-    """Returns the model's unpreprocessed predictions on the data located at the
-    given path.
+    """Returns the model's unpreprocessed predictions on the data located at
+    the given path.
 
     :param features: The preprocessed features on which to run prediction.
     :param dataset: The dataset.
@@ -41,7 +43,8 @@ def model_predict(features: np.ndarray,
     """
     raw_predictions = model.model.predict(features)
     valid_predictions = \
-        PokemonClassificationDataProcessor.get_valid_prediction(raw_predictions)
+        PokemonClassificationDataProcessor.get_valid_prediction(
+            raw_predictions)
     return dataset.data_processor.unpreprocess_labels(valid_predictions)
 
 

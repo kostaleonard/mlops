@@ -30,11 +30,11 @@ class VersionedModelBuilder(VersionedArtifactBuilder):
             model was trained/validated/tested. Used to preprocess new data at
             prediction time.
         :param model: The trained Keras model. This is the exact version of the
-            model that will be saved; if you intend to keep the best weights and
-            not the ones with which the model finished training, ensure that you
-            set the model's weights to those desired (this can be done easily
-            using the ModelCheckpoint callback or a custom callback that stores
-            the best weights in memory).
+            model that will be saved; if you intend to keep the best weights
+            and not the ones with which the model finished training, ensure
+            that you set the model's weights to those desired (this can be done
+            easily using the ModelCheckpoint callback or a custom callback that
+            stores the best weights in memory).
         :param training_config: (Optional) The model's training configuration.
         """
         self.versioned_dataset = versioned_dataset

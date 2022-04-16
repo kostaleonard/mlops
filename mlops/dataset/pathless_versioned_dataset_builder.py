@@ -49,8 +49,8 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
             {
                 name: (dataset name)
                 version: (dataset version)
-                hash: (MD5 hash of all objects apart from data_processor.pkl and
-                    meta.json)
+                hash: (MD5 hash of all objects apart from data_processor.pkl
+                    and meta.json)
                 created_at: (timestamp)
                 tags: (optional list of tags)
             }
@@ -64,8 +64,8 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
             same version.
         :param name: The name of the dataset, e.g., "mnist".
         :param version: A string indicating the dataset version. The version
-            should be unique to this dataset. If None, the publication timestamp
-            will be used as the version.
+            should be unique to this dataset. If None, the publication
+            timestamp will be used as the version.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. STRATEGY_COPY
             recursively copies all files and directories from the dataset path
@@ -73,9 +73,9 @@ class PathlessVersionedDatasetBuilder(VersionedDatasetBuilder):
             can be properly versioned. STRATEGY_COPY_ZIP is identical in
             behavior, but zips the directory upon completion. STRATEGY_LINK
             will instead create a file 'link.txt' containing the supplied
-            dataset path; this is desirable if the raw dataset is already stored
-            in a versioned repository, and copying would create an unnecessary
-            duplicate.
+            dataset path; this is desirable if the raw dataset is already
+            stored in a versioned repository, and copying would create an
+            unnecessary duplicate.
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         :return: The versioned dataset's publication path.

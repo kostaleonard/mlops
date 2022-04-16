@@ -9,8 +9,8 @@ from tests.dataset.preset_data_processor import PresetDataProcessor
 @pytest.mark.xfail
 def test_data_processor_is_abstract() -> None:
     """Tests that the DataProcessor object is abstract."""
-    # This test currently fails because we needed to make DataProcessor concrete
-    # as a serialization workaround. See:
+    # This test currently fails because we needed to make DataProcessor
+    # concrete as a serialization workaround. See:
     # https://github.com/kostaleonard/mlops/issues/12
     with pytest.raises(TypeError):
         _ = DataProcessor()
@@ -78,8 +78,8 @@ def test_get_raw_labels_returns_raw_labels() -> None:
 
 
 def test_preprocessed_features_match() -> None:
-    """Tests that the result of applying preprocess_features on the raw features
-    is the same as the output of get_preprocessed_features."""
+    """Tests that the result of applying preprocess_features on the raw
+    features is the same as the output of get_preprocessed_features."""
     processor = PresetDataProcessor()
     features = processor.get_preprocessed_features('path/to/my/features')
     raw_features = processor.get_raw_features('path/to/my/features')
@@ -101,8 +101,8 @@ def test_preprocessed_labels_match() -> None:
 
 
 def test_get_raw_features_and_labels_features_match() -> None:
-    """Tests that get_raw_features_and_labels and get_raw_features have matching
-    features."""
+    """Tests that get_raw_features_and_labels and get_raw_features have
+    matching features."""
     processor = PresetDataProcessor()
     features, _ = processor.get_raw_features_and_labels('path/to/dataset')
     features_only = processor.get_raw_features('path/to/my/features')

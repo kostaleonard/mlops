@@ -57,7 +57,9 @@ class VersionedDataset(VersionedArtifact):
                       encoding='utf-8') as infile:
                 metadata = json.loads(infile.read())
             # Get data processor.
-            with open(os.path.join(path, 'data_processor.pkl'), 'rb') as infile:
+            with open(
+                    os.path.join(path, 'data_processor.pkl'),
+                    'rb') as infile:
                 processor = pickle.loads(infile.read(), ignore=True)
             self.data_processor = processor
         self._name = metadata['name']

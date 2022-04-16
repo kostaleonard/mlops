@@ -54,7 +54,8 @@ class PresetDataProcessor(InvertibleDataProcessor):
                 'X_val': PRESET_RAW_FEATURES[TRAIN_END:VAL_EMD],
                 'X_test': PRESET_RAW_FEATURES[VAL_EMD:]}
 
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+    def preprocess_features(
+            self, raw_feature_tensor: np.ndarray) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor.
 
         :param raw_feature_tensor: The raw features to be preprocessed.

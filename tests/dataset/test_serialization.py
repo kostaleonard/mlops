@@ -33,12 +33,13 @@ class DataProcessorThatWillChange(DataProcessor):
         :param dataset_path: Unused.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
-            referenced. For example, the training features (value) may be called
-            'X_train' (key).
+            referenced. For example, the training features (value) may be
+            called 'X_train' (key).
         """
         return {'X': np.array([1, 2, 3])}
 
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+    def preprocess_features(
+            self, raw_feature_tensor: np.ndarray) -> np.ndarray:
         """Returns features multiplied by 2.
 
         :param raw_feature_tensor: The raw features to be preprocessed.
@@ -76,8 +77,8 @@ def _redefine_class() -> None:
             """Returns dummy features and labels
 
             :param dataset_path: Unused.
-            :return: A 2-tuple of the features dictionary and labels dictionary,
-                with matching keys and ordered tensors.
+            :return: A 2-tuple of the features dictionary and labels
+                dictionary, with matching keys and ordered tensors.
             """
             raise ValueError('The new implementation is different.')
 
@@ -87,8 +88,8 @@ def _redefine_class() -> None:
             :param dataset_path: Unused.
             :return: A dictionary whose values are feature tensors and whose
                 corresponding keys are the names by which those tensors should
-                be referenced. For example, the training features (value) may be
-                called 'X_train' (key).
+                be referenced. For example, the training features (value) may
+                be called 'X_train' (key).
             """
             raise ValueError('The new implementation is different.')
 
@@ -102,7 +103,8 @@ def _redefine_class() -> None:
             """
             raise ValueError('The new implementation is different.')
 
-        def preprocess_labels(self, raw_label_tensor: np.ndarray) -> np.ndarray:
+        def preprocess_labels(
+                self, raw_label_tensor: np.ndarray) -> np.ndarray:
             """Returns labels multiplied by 2.
 
             :param raw_label_tensor: The raw labels to be preprocessed.
@@ -124,11 +126,13 @@ def test_serialized_data_processor_uses_original_methods() -> None:
     builder = VersionedDatasetBuilder(TEST_DATASET_PATH, data_processor)
     builder.publish(TEST_PUBLICATION_PATH, version='v1')
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH, 'v1'))
-    features, labels = dataset.data_processor.get_raw_features_and_labels('dne')
+    features, labels = dataset.data_processor.get_raw_features_and_labels(
+        'dne')
     assert np.array_equal(features['X'], [1, 2, 3])
     assert np.array_equal(labels['y'], [1, 2, 3])
     _redefine_class()
     dataset = VersionedDataset(os.path.join(TEST_PUBLICATION_PATH, 'v1'))
-    features, labels = dataset.data_processor.get_raw_features_and_labels('dne')
+    features, labels = dataset.data_processor.get_raw_features_and_labels(
+        'dne')
     assert np.array_equal(features['X'], [1, 2, 3])
     assert np.array_equal(labels['y'], [1, 2, 3])

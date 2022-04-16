@@ -35,12 +35,13 @@ class PathlessDataProcessor(DataProcessor):
         :param dataset_path: Unused.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
-            referenced. For example, the training features (value) may be called
-            'X_train' (key).
+            referenced. For example, the training features (value) may be
+            called 'X_train' (key).
         """
         return self.features
 
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+    def preprocess_features(
+            self, raw_feature_tensor: np.ndarray) -> np.ndarray:
         """Returns the identity function on the input features.
 
         :param raw_feature_tensor: The raw features to be preprocessed.

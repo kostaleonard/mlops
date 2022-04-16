@@ -22,10 +22,10 @@ STRATEGY_LINK = 'link'
 
 
 class VersionedDatasetBuilder(VersionedArtifactBuilder):
-    """An object containing all of the components that form a versioned dataset.
-    This object is only used to ensure a standard format for datasets stored in
-    a dataset archive (such as the local filesystem or S3), and is not meant for
-    consumption by downstream models."""
+    """An object containing all of the components that form a versioned
+    dataset. This object is only used to ensure a standard format for datasets
+    stored in a dataset archive (such as the local filesystem or S3), and is
+    not meant for consumption by downstream models."""
     # pylint: disable=too-few-public-methods
 
     def __init__(self,
@@ -74,8 +74,8 @@ class VersionedDatasetBuilder(VersionedArtifactBuilder):
             {
                 name: (dataset name)
                 version: (dataset version)
-                hash: (MD5 hash of all objects apart from data_processor.pkl and
-                    meta.json)
+                hash: (MD5 hash of all objects apart from data_processor.pkl
+                    and meta.json)
                 created_at: (timestamp)
                 tags: (optional list of tags)
             }
@@ -89,8 +89,8 @@ class VersionedDatasetBuilder(VersionedArtifactBuilder):
             same version.
         :param name: The name of the dataset, e.g., "mnist".
         :param version: A string indicating the dataset version. The version
-            should be unique to this dataset. If None, the publication timestamp
-            will be used as the version.
+            should be unique to this dataset. If None, the publication
+            timestamp will be used as the version.
         :param dataset_copy_strategy: The strategy by which to copy the
             original, raw dataset to the published path. STRATEGY_COPY
             recursively copies all files and directories from the dataset path
@@ -98,9 +98,9 @@ class VersionedDatasetBuilder(VersionedArtifactBuilder):
             can be properly versioned. STRATEGY_COPY_ZIP is identical in
             behavior, but zips the directory upon completion. STRATEGY_LINK
             will instead create a file 'link.txt' containing the supplied
-            dataset path; this is desirable if the raw dataset is already stored
-            in a versioned repository, and copying would create an unnecessary
-            duplicate.
+            dataset path; this is desirable if the raw dataset is already
+            stored in a versioned repository, and copying would create an
+            unnecessary duplicate.
         :param tags: An optional list of string tags to add to the dataset
             metadata.
         :return: The versioned dataset's publication path.
@@ -156,7 +156,8 @@ class VersionedDatasetBuilder(VersionedArtifactBuilder):
         """Saves the versioned dataset files to the given local path. See
         publish() for more detailed information.
 
-        :param publication_path: The local path to which to publish the dataset.
+        :param publication_path: The local path to which to publish the
+            dataset.
         :param copy_path: The path to which the raw dataset is copied.
         :param copy_zip_path: The path to the zipped raw dataset.
         :param link_path: The path to the file containing the raw dataset link.
@@ -201,8 +202,8 @@ class VersionedDatasetBuilder(VersionedArtifactBuilder):
                     processor_path: str,
                     dataset_copy_strategy: str,
                     metadata: dict) -> str:
-        """Saves the versioned dataset files to the given S3 path. See publish()
-        for more detailed information.
+        """Saves the versioned dataset files to the given S3 path. See
+        publish() for more detailed information.
 
         :param publication_path: The path to which to publish the dataset.
         :param copy_path: The path to which the raw dataset is copied.

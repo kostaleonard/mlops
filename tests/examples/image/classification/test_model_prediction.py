@@ -12,9 +12,10 @@ from mlops.examples.image.classification.publish_dataset import DATASET_VERSION
 from mlops.examples.image.classification.train_model import train_model, \
     publish_model
 from mlops.examples.image.classification import model_prediction
-from mlops.examples.image.classification.pokemon_classification_data_processor \
-    import DEFAULT_DATASET_PRED_PATH
-from mlops.examples.image.classification.errors import NoModelPathsSuppliedError
+from mlops.examples.image.classification.\
+    pokemon_classification_data_processor import DEFAULT_DATASET_PRED_PATH
+from mlops.examples.image.classification.errors import \
+    NoModelPathsSuppliedError
 from tests.examples.image.classification.test_train_model import \
     _create_dataset, TEST_DATASET_PUBLICATION_PATH_LOCAL
 
@@ -32,8 +33,8 @@ def _create_model() -> str:
 
     :return: The model's publication path.
     """
-    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
-                                            DATASET_VERSION))
+    dataset = VersionedDataset(
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
     model = Sequential([
         Flatten(input_shape=dataset.X_train.shape[1:]),
         Dense(dataset.y_train.shape[1])])
@@ -53,8 +54,8 @@ def test_model_evaluate_returns_valid_loss() -> None:
     """Tests that model evaluation returns a loss value that is valid."""
     _create_dataset()
     publication_path = _create_model()
-    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
-                                            DATASET_VERSION))
+    dataset = VersionedDataset(
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
     model = VersionedModel(publication_path)
     assert model_prediction.model_evaluate(dataset, model) >= 0
 
@@ -63,8 +64,8 @@ def test_model_predict_correct_shape() -> None:
     """Tests that model predictions are of the correct shape."""
     _create_dataset()
     publication_path = _create_model()
-    dataset = VersionedDataset(os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL,
-                                            DATASET_VERSION))
+    dataset = VersionedDataset(
+        os.path.join(TEST_DATASET_PUBLICATION_PATH_LOCAL, DATASET_VERSION))
     model = VersionedModel(publication_path)
     features = dataset.data_processor.get_preprocessed_features(
         DEFAULT_DATASET_PRED_PATH)['X_pred']

@@ -2,7 +2,8 @@
 
 import pytest
 import numpy as np
-from mlops.examples.image.classification.pokemon_classification_data_processor \
+from mlops.examples.image.classification.\
+    pokemon_classification_data_processor \
     import PokemonClassificationDataProcessor, \
     DEFAULT_DATASET_TRAINVALTEST_PATH, DEFAULT_DATASET_PRED_PATH, \
     HEIGHT, WIDTH, CHANNELS, CLASSES
