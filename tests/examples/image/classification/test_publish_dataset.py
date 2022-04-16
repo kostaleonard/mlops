@@ -4,7 +4,7 @@ import os
 import shutil
 from mlops.examples.image.classification.publish_dataset import publish_dataset
 
-TEST_PUBLICATION_PATH_LOCAL = '/tmp/test_publish_dataset/datasets'
+TEST_PUBLICATION_PATH_LOCAL = "/tmp/test_publish_dataset/datasets"
 
 
 def test_publish_dataset_creates_files() -> None:

@@ -52,7 +52,7 @@ class VersionedArtifact(ABC):
         :return: The artifact's MD5 hash.
         """
 
-    def __eq__(self, other: 'VersionedArtifact') -> bool:
+    def __eq__(self, other: "VersionedArtifact") -> bool:
         """Returns True if the two objects have the same loaded MD5 hash code,
         False otherwise.
 
@@ -81,23 +81,19 @@ class VersionedArtifact(ABC):
             a key does not exist in the metadata, it is added; if it does
             exist, its value is overwritten.
         """
-        if self.metadata_path.startswith('s3://'):
+        if self.metadata_path.startswith("s3://"):
             fs = S3FileSystem()
-            with fs.open(self.metadata_path,
-                         'r',
-                         encoding='utf-8') as infile:
+            with fs.open(self.metadata_path, "r", encoding="utf-8") as infile:
                 metadata = json.loads(infile.read())
         else:
-            with open(self.metadata_path, 'r', encoding='utf-8') as infile:
+            with open(self.metadata_path, "r", encoding="utf-8") as infile:
                 metadata = json.loads(infile.read())
         updated_metadata = {**metadata, **updates}
-        if self.metadata_path.startswith('s3://'):
-            with fs.open(self.metadata_path,
-                         'w',
-                         encoding='utf-8') as outfile:
+        if self.metadata_path.startswith("s3://"):
+            with fs.open(self.metadata_path, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(updated_metadata))
         else:
-            with open(self.metadata_path, 'w', encoding='utf-8') as outfile:
+            with open(self.metadata_path, "w", encoding="utf-8") as outfile:
                 outfile.write(json.dumps(updated_metadata))
 
     def republish(self, republication_path: str) -> str:
@@ -114,7 +110,7 @@ class VersionedArtifact(ABC):
             artifacts with the same version.
         :return: The versioned artifact's publication path.
         """
-        if republication_path.startswith('s3://'):
+        if republication_path.startswith("s3://"):
             return self._republish_to_s3(republication_path)
         return self._republish_to_local(republication_path)
 
@@ -130,7 +126,7 @@ class VersionedArtifact(ABC):
         # pylint: disable=protected-access
         publication_path = os.path.join(republication_path, self.version)
         VersionedArtifactBuilder._make_publication_path_local(publication_path)
-        if self.path.startswith('s3://'):
+        if self.path.startswith("s3://"):
             fs = S3FileSystem()
             fs.get(self.path, publication_path, recursive=True)
         else:
@@ -150,18 +146,18 @@ class VersionedArtifact(ABC):
         publication_path = os.path.join(republication_path, self.version)
         fs = S3FileSystem()
         VersionedArtifactBuilder._make_publication_path_s3(
-            publication_path, fs)
-        if self.path.startswith('s3://'):
-            artifact_path_no_prefix = self.path.replace('s3://', '', 1)
-            copy_path_no_prefix = publication_path.replace('s3://', '', 1)
+            publication_path, fs
+        )
+        if self.path.startswith("s3://"):
+            artifact_path_no_prefix = self.path.replace("s3://", "", 1)
+            copy_path_no_prefix = publication_path.replace("s3://", "", 1)
             for current_path, _, filenames in fs.walk(self.path):
-                outfile_prefix = current_path.replace(artifact_path_no_prefix,
-                                                      copy_path_no_prefix, 1)
+                outfile_prefix = current_path.replace(
+                    artifact_path_no_prefix, copy_path_no_prefix, 1
+                )
                 for filename in filenames:
-                    infile_path = os.path.join(current_path,
-                                               filename)
-                    outfile_path = os.path.join(outfile_prefix,
-                                                filename)
+                    infile_path = os.path.join(current_path, filename)
+                    outfile_path = os.path.join(outfile_prefix, filename)
                     fs.copy(infile_path, outfile_path)
         else:
             fs.put(self.path, publication_path, recursive=True)

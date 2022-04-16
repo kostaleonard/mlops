@@ -20,32 +20,28 @@ class VersionedModel(VersionedArtifact):
             should be a URL of the form "s3://bucket-name/path/to/dir".
         """
         self._path = path
-        self._metadata_path = os.path.join(path, 'meta.json')
-        if path.startswith('s3://'):
+        self._metadata_path = os.path.join(path, "meta.json")
+        if path.startswith("s3://"):
             fs = S3FileSystem()
             # Get model.
             with NamedTemporaryFile() as tmp_file:
-                with fs.open(os.path.join(path, 'model.h5'), 'rb') as infile:
+                with fs.open(os.path.join(path, "model.h5"), "rb") as infile:
                     tmp_file.write(infile.read())
                 tmp_file.seek(0)
                 self.model = load_model(tmp_file.name)
             # Get metadata.
-            with fs.open(self.metadata_path,
-                         'r',
-                         encoding='utf-8') as infile:
+            with fs.open(self.metadata_path, "r", encoding="utf-8") as infile:
                 metadata = json.loads(infile.read())
         else:
             # Get model.
-            self.model = load_model(os.path.join(path, 'model.h5'))
+            self.model = load_model(os.path.join(path, "model.h5"))
             # Get metadata.
-            with open(self.metadata_path,
-                      'r',
-                      encoding='utf-8') as infile:
+            with open(self.metadata_path, "r", encoding="utf-8") as infile:
                 metadata = json.loads(infile.read())
-        self._name = metadata['name']
-        self._version = metadata['version']
-        self._md5 = metadata['hash']
-        self.dataset_path = metadata['dataset']
+        self._name = metadata["name"]
+        self._version = metadata["version"]
+        self._md5 = metadata["hash"]
+        self.dataset_path = metadata["dataset"]
 
     @property
     def name(self) -> str:

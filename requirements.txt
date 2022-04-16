@@ -1,6 +1,9 @@
 pylint
 pytest
 pytest-cov
+pytest-randomly
+pre-commit
+black
 numpy
 pandas
 tensorflow==2.7

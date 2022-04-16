@@ -13,5 +13,6 @@ class TrainingConfig:
     history: The model's training history.
     train_args: The training arguments.
     """
+
     history: History
     train_args: Dict[str, Any]

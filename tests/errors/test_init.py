@@ -1,7 +1,9 @@
 """Tests __init__.py."""
 
-from mlops.errors import PublicationPathAlreadyExistsError, \
-    InvalidDatasetCopyStrategyError
+from mlops.errors import (
+    PublicationPathAlreadyExistsError,
+    InvalidDatasetCopyStrategyError,
+)
 
 
 def test_publication_path_error_extends_file_exists_error() -> None:

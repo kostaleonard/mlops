@@ -9,8 +9,9 @@ class DataProcessor:
     """Transforms a raw dataset into features and labels for downstream model
     training, prediction, etc."""
 
-    def get_preprocessed_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    def get_preprocessed_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the preprocessed feature and label tensors from the dataset
         path. This method is specifically used for the train/val/test sets and
         not input data for prediction, because in some cases the features and
@@ -23,16 +24,23 @@ class DataProcessor:
         :return: A 2-tuple of the features dictionary and labels dictionary,
             with matching keys and ordered tensors.
         """
-        raw_feature_tensors, raw_label_tensors = \
-            self.get_raw_features_and_labels(dataset_path)
-        features = {name: self.preprocess_features(raw_feature_tensor)
-                    for name, raw_feature_tensor in raw_feature_tensors.items()}
-        labels = {name: self.preprocess_labels(raw_label_tensor)
-                  for name, raw_label_tensor in raw_label_tensors.items()}
+        (
+            raw_feature_tensors,
+            raw_label_tensors,
+        ) = self.get_raw_features_and_labels(dataset_path)
+        features = {
+            name: self.preprocess_features(raw_feature_tensor)
+            for name, raw_feature_tensor in raw_feature_tensors.items()
+        }
+        labels = {
+            name: self.preprocess_labels(raw_label_tensor)
+            for name, raw_label_tensor in raw_label_tensors.items()
+        }
         return features, labels
 
-    def get_preprocessed_features(self, dataset_path: str) -> \
-            Dict[str, np.ndarray]:
+    def get_preprocessed_features(
+        self, dataset_path: str
+    ) -> Dict[str, np.ndarray]:
         """Transforms the raw data at the given file or directory into features
         that can be used by downstream models. The data in the directory may be
         the training/validation/test data, or it may be a batch of user data
@@ -44,21 +52,24 @@ class DataProcessor:
             remote filesystem containing the dataset.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
-            referenced. For example, the training features (value) may be called
-            'X_train' (key).
+            referenced. For example, the training features (value) may be
+            called 'X_train' (key).
         """
         raw_feature_tensors = self.get_raw_features(dataset_path)
-        return {name: self.preprocess_features(raw_feature_tensor)
-                for name, raw_feature_tensor in raw_feature_tensors.items()}
+        return {
+            name: self.preprocess_features(raw_feature_tensor)
+            for name, raw_feature_tensor in raw_feature_tensors.items()
+        }
 
     @abstractmethod
-    def get_raw_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
-        """Returns the raw feature and label tensors from the dataset path. This
-        method is specifically used for the train/val/test sets and not input
-        data for prediction, because in some cases the features and labels need
-        to be read simultaneously to ensure proper ordering of features and
-        labels.
+    def get_raw_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+        """Returns the raw feature and label tensors from the dataset path.
+        This method is specifically used for the train/val/test sets and not
+        input data for prediction, because in some cases the features and
+        labels need to be read simultaneously to ensure proper ordering of
+        features and labels.
 
         For example, when handling image data, the raw features would likely be
         tensors of shape m x h x w x c, where m is the number of images, h is
@@ -88,12 +99,14 @@ class DataProcessor:
             remote filesystem containing the dataset.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
-            referenced. For example, the training features (value) may be called
-            'X_train' (key).
+            referenced. For example, the training features (value) may be
+            called 'X_train' (key).
         """
 
     @abstractmethod
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+    def preprocess_features(
+        self, raw_feature_tensor: np.ndarray
+    ) -> np.ndarray:
         """Returns the preprocessed feature tensor from the raw tensor. The
         preprocessed features are how training/validation/test as well as
         prediction data are fed into downstream models. For example, when

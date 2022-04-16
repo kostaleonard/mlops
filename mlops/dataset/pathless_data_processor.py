@@ -8,9 +8,9 @@ from mlops.dataset.data_processor import DataProcessor
 class PathlessDataProcessor(DataProcessor):
     """Loads preset features and labels."""
 
-    def __init__(self,
-                 features: Dict[str, np.ndarray],
-                 labels: Dict[str, np.ndarray]) -> None:
+    def __init__(
+        self, features: Dict[str, np.ndarray], labels: Dict[str, np.ndarray]
+    ) -> None:
         """Instantiates the object.
 
         :param features: The training features.
@@ -19,8 +19,9 @@ class PathlessDataProcessor(DataProcessor):
         self.features = features
         self.labels = labels
 
-    def get_raw_features_and_labels(self, dataset_path: str) -> \
-            Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+    def get_raw_features_and_labels(
+        self, dataset_path: str
+    ) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
         """Returns the training features and labels.
 
         :param dataset_path: Unused
@@ -35,12 +36,14 @@ class PathlessDataProcessor(DataProcessor):
         :param dataset_path: Unused.
         :return: A dictionary whose values are feature tensors and whose
             corresponding keys are the names by which those tensors should be
-            referenced. For example, the training features (value) may be called
-            'X_train' (key).
+            referenced. For example, the training features (value) may be
+            called 'X_train' (key).
         """
         return self.features
 
-    def preprocess_features(self, raw_feature_tensor: np.ndarray) -> np.ndarray:
+    def preprocess_features(
+        self, raw_feature_tensor: np.ndarray
+    ) -> np.ndarray:
         """Returns the identity function on the input features.
 
         :param raw_feature_tensor: The raw features to be preprocessed.

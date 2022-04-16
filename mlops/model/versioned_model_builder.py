@@ -18,23 +18,26 @@ from mlops.hashing.hashing import get_hash_local, get_hash_s3
 class VersionedModelBuilder(VersionedArtifactBuilder):
     """An object containing all of the components that form a versioned
     model."""
+
     # pylint: disable=too-few-public-methods
 
-    def __init__(self,
-                 versioned_dataset: VersionedDataset,
-                 model: Model,
-                 training_config: Optional[TrainingConfig] = None) -> None:
+    def __init__(
+        self,
+        versioned_dataset: VersionedDataset,
+        model: Model,
+        training_config: Optional[TrainingConfig] = None,
+    ) -> None:
         """Instantiates the object.
 
         :param versioned_dataset: The versioned dataset object with which the
             model was trained/validated/tested. Used to preprocess new data at
             prediction time.
         :param model: The trained Keras model. This is the exact version of the
-            model that will be saved; if you intend to keep the best weights and
-            not the ones with which the model finished training, ensure that you
-            set the model's weights to those desired (this can be done easily
-            using the ModelCheckpoint callback or a custom callback that stores
-            the best weights in memory).
+            model that will be saved; if you intend to keep the best weights
+            and not the ones with which the model finished training, ensure
+            that you set the model's weights to those desired (this can be done
+            easily using the ModelCheckpoint callback or a custom callback that
+            stores the best weights in memory).
         :param training_config: (Optional) The model's training configuration.
         """
         self.versioned_dataset = versioned_dataset
@@ -44,16 +47,19 @@ class VersionedModelBuilder(VersionedArtifactBuilder):
         else:
             empty_history = History()
             empty_train_args = {}
-            self.training_config = TrainingConfig(empty_history,
-                                                  empty_train_args)
+            self.training_config = TrainingConfig(
+                empty_history, empty_train_args
+            )
 
-    def publish(self,
-                path: str,
-                *args: Any,
-                name: str = 'model',
-                version: Optional[str] = None,
-                tags: Optional[List[str]] = None,
-                **kwargs: Any) -> str:
+    def publish(
+        self,
+        path: str,
+        *args: Any,
+        name: str = "model",
+        version: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> str:
         """Saves the versioned model files to the given path. If the path and
         appended version already exists, this operation will raise a
         PublicationPathAlreadyExistsError.
@@ -95,33 +101,34 @@ class VersionedModelBuilder(VersionedArtifactBuilder):
             version = timestamp
         if not tags:
             tags = []
-        publication_path = os.path.join(path.rstrip('/'), version)
-        model_path = os.path.join(publication_path, 'model.h5')
-        metadata_path = os.path.join(publication_path, 'meta.json')
+        publication_path = os.path.join(path.rstrip("/"), version)
+        model_path = os.path.join(publication_path, "model.h5")
+        metadata_path = os.path.join(publication_path, "meta.json")
         metadata = {
-            'name': name,
-            'version': version,
-            'hash': 'TDB',
-            'dataset': self.versioned_dataset.path,
-            'history': self.training_config.history.history,
-            'train_args': self.training_config.train_args,
-            'created_at': timestamp,
-            'tags': tags}
-        if path.startswith('s3://'):
-            return self._publish_s3(publication_path,
-                                    model_path,
-                                    metadata_path,
-                                    metadata)
-        return self._publish_local(publication_path,
-                                   model_path,
-                                   metadata_path,
-                                   metadata)
+            "name": name,
+            "version": version,
+            "hash": "TDB",
+            "dataset": self.versioned_dataset.path,
+            "history": self.training_config.history.history,
+            "train_args": self.training_config.train_args,
+            "created_at": timestamp,
+            "tags": tags,
+        }
+        if path.startswith("s3://"):
+            return self._publish_s3(
+                publication_path, model_path, metadata_path, metadata
+            )
+        return self._publish_local(
+            publication_path, model_path, metadata_path, metadata
+        )
 
-    def _publish_local(self,
-                       publication_path: str,
-                       model_path: str,
-                       metadata_path: str,
-                       metadata: dict) -> str:
+    def _publish_local(
+        self,
+        publication_path: str,
+        model_path: str,
+        metadata_path: str,
+        metadata: dict,
+    ) -> str:
         """Saves the versioned model files to the given local path. See
         publish() for more detailed information.
 
@@ -139,16 +146,18 @@ class VersionedModelBuilder(VersionedArtifactBuilder):
         files_to_hash.add(model_path)
         # Save metadata.
         hash_digest = get_hash_local(files_to_hash)
-        metadata['hash'] = hash_digest
-        with open(metadata_path, 'w', encoding='utf-8') as outfile:
+        metadata["hash"] = hash_digest
+        with open(metadata_path, "w", encoding="utf-8") as outfile:
             outfile.write(json.dumps(metadata))
         return publication_path
 
-    def _publish_s3(self,
-                    publication_path: str,
-                    model_path: str,
-                    metadata_path: str,
-                    metadata: dict) -> str:
+    def _publish_s3(
+        self,
+        publication_path: str,
+        model_path: str,
+        metadata_path: str,
+        metadata: dict,
+    ) -> str:
         """Saves the versioned model files to the given S3 path. See publish()
         for more detailed information.
 
@@ -162,15 +171,16 @@ class VersionedModelBuilder(VersionedArtifactBuilder):
         files_to_hash = set()
         # Create publication path.
         VersionedArtifactBuilder._make_publication_path_s3(
-            publication_path, fs)
+            publication_path, fs
+        )
         # Save model.
         with TemporaryDirectory() as tmp_dir:
-            self.model.save(f'{tmp_dir}/model.h5')
-            fs.put(f'{tmp_dir}/model.h5', model_path)
+            self.model.save(f"{tmp_dir}/model.h5")
+            fs.put(f"{tmp_dir}/model.h5", model_path)
         files_to_hash.add(model_path)
         # Save metadata.
         hash_digest = get_hash_s3(files_to_hash)
-        metadata['hash'] = hash_digest
-        with fs.open(metadata_path, 'w', encoding='utf-8') as outfile:
+        metadata["hash"] = hash_digest
+        with fs.open(metadata_path, "w", encoding="utf-8") as outfile:
             outfile.write(json.dumps(metadata))
         return publication_path
