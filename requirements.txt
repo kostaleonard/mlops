@@ -1,6 +1,7 @@
 pylint
 pytest
 pytest-cov
+pytest-randomly
 numpy
 pandas
 tensorflow==2.7
